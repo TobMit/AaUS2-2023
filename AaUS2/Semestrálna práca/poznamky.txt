@@ -1,0 +1,11 @@
+do budúcehoh týždňa naimplementovať štruktúru aspoň vkladanie
+dá sa to do vrchola kde sa to zmestí celé bez toho aby sa to rozrezalo
+
+Otázka do bod 2 do budúceho týždňa
+nepoužiť rekurziu
+veľkoosť stacku sa dá nastaviť, ale je fixná
+zložitosť nevieme povedať, nedá sa stanoviť
+koreň musí mať zadefinovanú svoju oblasť
+skúsiť vymyslieť alebo navrhnúť spôsob
+
+
