@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AaUS2", "AaUS2\AaUS2.csproj", "{C95D7422-4EB2-4DD7-8351-F1602B3EC56C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quadtree", "Quadtree\Quadtree.csproj", "{EDB67729-A5BB-4AFC-ACC4-D564DDAD5B22}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{C95D7422-4EB2-4DD7-8351-F1602B3EC56C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C95D7422-4EB2-4DD7-8351-F1602B3EC56C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C95D7422-4EB2-4DD7-8351-F1602B3EC56C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EDB67729-A5BB-4AFC-ACC4-D564DDAD5B22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDB67729-A5BB-4AFC-ACC4-D564DDAD5B22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDB67729-A5BB-4AFC-ACC4-D564DDAD5B22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDB67729-A5BB-4AFC-ACC4-D564DDAD5B22}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
