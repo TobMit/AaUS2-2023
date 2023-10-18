@@ -1,12 +1,12 @@
+using System.Drawing;
+
 namespace Quadtree.StructureClasses;
 
 public class QuadTreeNode<T>
 {
-    /**
-     * Suradnice stredu uzla
-     */
-    public double X { get; }
-    public double Y { get; }
+    public Point pointDownLeft { get; }
+    public Point pointUpRight { get; }
+
     public T? Data { get; set; }
 
     /**
@@ -32,19 +32,29 @@ public class QuadTreeNode<T>
     private bool isLeaf;
     public bool IsLeaf { get => isLeaf; }
 
-    public QuadTreeNode(double pX, double pY)
+    public QuadTreeNode(Point pPointDownLeft, Point pPointUpRight)
     {
-        X = pX;
-        Y = pY;
+        pointDownLeft = pPointDownLeft;
+        pointUpRight = pPointUpRight;
         Data = default;
         isLeaf = false;
     }
     
-    public QuadTreeNode(double pX, double pY, T pData)
+    public QuadTreeNode(Point pPointDownLeft, Point pPointUpRight, T pData)
     {
-        X = pX;
-        Y = pY;
+        pointDownLeft = pPointDownLeft;
+        pointUpRight = pPointUpRight;
         isLeaf = true;
         Data = pData;
+    }
+    
+    public bool containsPoints(Point pPointDownLeft, Point pPointUpRight) {
+        return pointDownLeft.X <= pPointDownLeft.X && pointDownLeft.Y <= pPointDownLeft.Y &&
+               pointUpRight.X >= pPointUpRight.X && pointUpRight.Y >= pPointUpRight.Y;
+    }
+
+    public bool containNode(QuadTreeNode<T> node)
+    {
+        return containsPoints(node.pointDownLeft, node.pointUpRight);
     }
 }

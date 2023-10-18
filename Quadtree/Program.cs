@@ -262,27 +262,33 @@ public class Program
 {
     public static void Main()
     {
-        QuadTree<string> quadtree = new QuadTree<string>(0, 0, 100, 100, 4);
+        // QuadTree<string> quadtree = new QuadTree<string>(0, 0, 100, 100, 4);
 
         // Insert a polygon (a square in this example)
-        var polygon = new List<(double, double)>
-        {
-            (20, 20),
-            (30, 20),
-            (30, 30),
-            (20, 30)
-        };
-        quadtree.InsertPolygon(polygon, "Square");
+        // var polygon = new List<(double, double)>
+        // {
+            // (20, 20),
+            // (30, 20),
+            // (30, 30),
+            // (20, 30)
+        // };
+        // quadtree.InsertPolygon(polygon, "Square");
 
-        Console.WriteLine("Search for (25, 25): " + quadtree.Search(25, 25));
+        // Console.WriteLine("Search for (25, 25): " + quadtree.Search(25, 25));
 
         // You can also query for polygons within a range
-        List<(double, double, string)> polygonsInRange = quadtree.QueryRange(25, 25, 5);
+        // List<(double, double, string)> polygonsInRange = quadtree.QueryRange(25, 25, 5);
 
-        Console.WriteLine("Polygons within range:");
-        foreach (var polygonInfo in polygonsInRange)
-        {
-            Console.WriteLine($"Center: ({polygonInfo.Item1}, {polygonInfo.Item2}), Data: {polygonInfo.Item3}");
-        }
+        // Console.WriteLine("Polygons within range:");
+        // foreach (var polygonInfo in polygonsInRange)
+        // {
+            // Console.WriteLine($"Center: ({polygonInfo.Item1}, {polygonInfo.Item2}), Data: {polygonInfo.Item3}");
+        // }
+
+        double px = 0.0;
+        double py = 1.12345;
+        int x = (int)double.Round(px * 100000, 5);
+        Console.WriteLine(3/2);
+        Console.WriteLine(3%2);
     }
 }
