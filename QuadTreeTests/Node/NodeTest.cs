@@ -1,3 +1,4 @@
+using System.Collections;
 using System.ComponentModel;
 using Quadtree.StructureClasses;
 
@@ -29,23 +30,37 @@ public class NodeTest
     [Test] 
     public void NodeContainsNode()
     {
-        Assert.True(testNode.containNode(testNodeData));
-        Assert.False(testNodeData.containNode(testNode));
+        Assert.True(testNode.ContainNode(testNodeData));
+        Assert.False(testNodeData.ContainNode(testNode));
     }
     
     [Test] 
     public void NodeContainsPoints()
     {
-        Assert.True(testNode.containsPoints(new(12, 10), new(18, 18)));
-        Assert.True(testNode.containsPoints(new(18, 18), new(12, 10)));
-        Assert.False(testNode.containsPoints(new(120, 100), new(180, 180)));
-        Assert.False(testNode.containsPoints(new(12, 10), new(21, 21)));
+        Assert.True(testNode.ContainsPoints(new(12, 10), new(18, 18)));
+        Assert.True(testNode.ContainsPoints(new(18, 18), new(12, 10)));
+        Assert.False(testNode.ContainsPoints(new(120, 100), new(180, 180)));
+        Assert.False(testNode.ContainsPoints(new(12, 10), new(21, 21)));
     }
     
     [Test]
     public void GetData()
     {
-        Assert.AreEqual("data", testNodeData.Data);
+        Assert.AreEqual("data", testNodeData.GetData(0));
+        Assert.Throws<ArgumentOutOfRangeException>(()=>testNodeData.GetData(1));
+        Assert.NotNull(testNodeData.GetArrayListData());
+        Assert.AreEqual(1, testNodeData.GetArrayListData().Count);
+        testNodeData.AddData("data2");
+        Assert.AreEqual("data2", testNodeData.GetData(1));
+        Assert.AreEqual(2, testNodeData.GetArrayListData().Count);
+        testNodeData.RemoveData("data2");
+        Assert.AreEqual(1, testNodeData.GetArrayListData().Count);
+        ArrayList tmp = new();
+        tmp.Add("data2");
+        tmp.Add("data3");
+        testNodeData.AddData(tmp);
+        Assert.AreEqual(3, testNodeData.GetArrayListData().Count);
+        Assert.AreEqual("data3", testNodeData.GetData(2));
     }
     
 }

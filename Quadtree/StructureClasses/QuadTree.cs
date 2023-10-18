@@ -40,13 +40,14 @@ public class QuadTree<T>
     /// <exception cref="Exception">Ak su zle suradnice</exception>
     public void Insert(double xDownLeft, double yDownLeft, double xUpRight, double yUpLeft, T pData)
     {
-        if (!root.containsPoints(new(QuadTreeRound(xDownLeft), QuadTreeRound(yDownLeft)), 
+        if (!root.ContainsPoints(new(QuadTreeRound(xDownLeft), QuadTreeRound(yDownLeft)), 
                 new(QuadTreeRound(xUpRight), QuadTreeRound(yUpLeft))))
         {
             throw new Exception("Coordinates exceed parameter size");
         }
         QuadTreeNode<T> current = root;
         QuadTreeNode<T> parent = null;
+        
         
     }
 

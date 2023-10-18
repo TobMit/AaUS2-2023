@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Drawing;
 
 namespace Quadtree.StructureClasses;
@@ -7,7 +8,7 @@ public class QuadTreeNode<T>
     public Point pointDownLeft { get; }
     public Point pointUpRight { get; }
 
-    public T? Data { get; set; }
+    private ArrayList data;
 
     /**
      * Severo zapadny
@@ -36,8 +37,8 @@ public class QuadTreeNode<T>
     {
         pointDownLeft = pPointDownLeft;
         pointUpRight = pPointUpRight;
-        Data = default;
         isLeaf = true;
+        data = new();
     }
     
     public QuadTreeNode(Point pPointDownLeft, Point pPointUpRight, T pData)
@@ -45,16 +46,47 @@ public class QuadTreeNode<T>
         pointDownLeft = pPointDownLeft;
         pointUpRight = pPointUpRight;
         isLeaf = false;
-        Data = pData;
+        data = new();
+        data.Add(pData);
     }
     
-    public bool containsPoints(Point pPointDownLeft, Point pPointUpRight) {
+    public bool ContainsPoints(Point pPointDownLeft, Point pPointUpRight) {
         return pointDownLeft.X <= pPointDownLeft.X && pointDownLeft.Y <= pPointDownLeft.Y &&
                pointUpRight.X >= pPointUpRight.X && pointUpRight.Y >= pPointUpRight.Y;
     }
 
-    public bool containNode(QuadTreeNode<T> node)
+    public bool ContainNode(QuadTreeNode<T> node)
     {
-        return containsPoints(node.pointDownLeft, node.pointUpRight);
+        return ContainsPoints(node.pointDownLeft, node.pointUpRight);
+    }
+
+    public void AddData(T pdata)
+    {
+        data.Add(pdata);
+    }
+    
+    public void AddData(ArrayList pdata)
+    {
+        data.AddRange(pdata);
+    }
+    
+    public void RemoveData(T pdata)
+    {
+        data.Remove(pdata);
+    }
+    
+    public int DataCount()
+    {
+        return data.Count;
+    }
+
+    public ArrayList GetArrayListData()
+    {
+        return data;
+    }
+    
+    public T? GetData(int index)
+    {
+        return (T) data[index]!;
     }
 }
