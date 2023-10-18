@@ -19,15 +19,14 @@ public class QuadTree<T>
     /// <param name="pMaxDepth">max deepth of the tree</param>
     public QuadTree(double pX, double pY, double width, double height, int pMaxDepth)
     {
-        // root = new(pX + width / 2, pY + height / 2);
-
-        if (checkCoordinates(quadTreeRound(pX), quadTreeRound(pY)) && checkCoordinates(quadTreeRound(pX + width), quadTreeRound(pY + height)))
+        if (!CheckCoordinates(QuadTreeRound(pX), QuadTreeRound(pY)) 
+            || !CheckCoordinates(QuadTreeRound(pX + width), QuadTreeRound(pY + height)))
         {
             throw new Exception("Wrong world coordination");
         }
-
-        root = new(new(quadTreeRound(pX), quadTreeRound(pY)),
-            new(quadTreeRound(pX + width), quadTreeRound(pY + height)));
+        
+        root = new(new(QuadTreeRound(pX), QuadTreeRound(pY)),
+            new(QuadTreeRound(pX + width), QuadTreeRound(pY + height)));
         
         this.max_depth = pMaxDepth;
     }
@@ -41,26 +40,31 @@ public class QuadTree<T>
     /// <exception cref="Exception">Ak su zle suradnice</exception>
     public void Insert(double xDownLeft, double yDownLeft, double xUpRight, double yUpLeft, T pData)
     {
-        if (!root.containsPoints(new(quadTreeRound(xDownLeft), quadTreeRound(yDownLeft)), 
-                new(quadTreeRound(xUpRight), quadTreeRound(yUpLeft))))
+        if (!root.containsPoints(new(QuadTreeRound(xDownLeft), QuadTreeRound(yDownLeft)), 
+                new(QuadTreeRound(xUpRight), QuadTreeRound(yUpLeft))))
         {
-            throw new Exception("Coordinates exeed parameter size");
+            throw new Exception("Coordinates exceed parameter size");
         }
         QuadTreeNode<T> current = root;
         QuadTreeNode<T> parent = null;
         
     }
 
-    private static int quadTreeRound(double value)
+    /// <summary>
+    /// Round data and decimal numbers for this structure
+    /// </summary>
+    /// <param name="value">double that will be rounded</param>
+    /// <returns>rounded integer</returns>
+    private static int QuadTreeRound(double value)
     {
         return (int)double.Round(value * HODNOTA, 5);
     }
 
-    /**
-     * Check if coordinates is valid for this structure
-     * @return true if good, if bad then false
-     */
-    private static bool checkCoordinates(int x, int y)
+    /// <summary>
+    /// Check if the world coordinations are valid for this structure
+    /// </summary>
+    /// <returns>true if are valid, false if not</returns>
+    private static bool CheckCoordinates(int x, int y)
     {
         if (x < -180 * HODNOTA || x > 180 * HODNOTA || y < -90 * HODNOTA || y > 90 * HODNOTA)
         {
@@ -68,5 +72,22 @@ public class QuadTree<T>
         }
 
         return true;
+    }
+
+
+    /// <summary>
+    /// This is only for testing, after that will be removed
+    /// </summary>
+    public static int TestQuadTreeRound(double value)
+    {
+        return QuadTreeRound(value);
+    }
+    
+    /// <summary>
+    /// This is only for testing, after that will be removed
+    /// </summary>
+    public static bool TestCheckCoordinates(int x, int y)
+    {
+        return CheckCoordinates(x, y);
     }
 }

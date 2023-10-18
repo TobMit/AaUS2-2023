@@ -37,14 +37,14 @@ public class QuadTreeNode<T>
         pointDownLeft = pPointDownLeft;
         pointUpRight = pPointUpRight;
         Data = default;
-        isLeaf = false;
+        isLeaf = true;
     }
     
     public QuadTreeNode(Point pPointDownLeft, Point pPointUpRight, T pData)
     {
         pointDownLeft = pPointDownLeft;
         pointUpRight = pPointUpRight;
-        isLeaf = true;
+        isLeaf = false;
         Data = pData;
     }
     

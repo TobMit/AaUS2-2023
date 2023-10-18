@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+/*
 public class QuadTreeNode<T>
 {
     public double X { get; }
@@ -257,7 +257,7 @@ public class QuadTree<T>
 
 
 }
-
+*/
 public class Program
 {
     public static void Main()
