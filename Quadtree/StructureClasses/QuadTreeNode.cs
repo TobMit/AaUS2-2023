@@ -89,4 +89,9 @@ public class QuadTreeNode<T>
     {
         return (T) data[index]!;
     }
+    
+    public bool dataIsEmpty()
+    {
+        return data.Count == 0;
+    }
 }

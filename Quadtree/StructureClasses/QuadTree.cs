@@ -46,8 +46,38 @@ public class QuadTree<T>
             throw new Exception("Coordinates exceed parameter size");
         }
         QuadTreeNode<T> current = root;
-        QuadTreeNode<T> parent = null;
-        
+        int depth = 0;
+        while (current != null)
+        {
+            // 1 pozrieme sa či sa nejaký polygón nachádza v danom uzle
+            if (current.dataIsEmpty())
+            {
+                current.AddData(pData);
+                current = null;
+            }
+            // ak nie je prázdny
+            //Skontrolujeme či nie je naplnená hlbka
+            else if (depth == max_depth)
+            {
+                current.AddData(pData);
+                current = null;
+            }
+            // môžu nastať 2 prípady
+            // 1 skontrolujeme či sa objekt nezmestí do nejakého poduzla
+                // môžu nastať 3 situácie
+                // poduzol existuje a porovnáme do ktorého sa zmestí
+                    // Ak sa zmestí tak current = poduzol
+                // poduzol neexistuje
+                    // vytvoríme predbežné poduzly a s ními skontrolujeme či sa zmestí
+                    // ak sa zmestí tak poduzly vytvoríme a current = poduzol do ktorého sa zmesti a pokračujeme v cykle
+            // Ak sa nezmestí do žiadného poduzla tak skontrolujeme počet objektov v danom uzle
+                // ak ich tam je viack ako 1 to znamená že objekty ktoré sú tam sa už nikde nedajú presunúť
+            // Ak je tam jeden objekt tak 
+                // skontrolujeme či tento objekt sa nezmesti do nejakého poduzla
+                // ak sa zmestí do niektorého poduzla tak aktuálny objekt vložíme
+                // potom z daného objektu vymažeme nový objekt, potom zmeníme premennu currentData na tento nový objekt
+                // a current = poduzol do ktorého sa zmesti a pokračujeme v cykle
+        }
         
     }
 

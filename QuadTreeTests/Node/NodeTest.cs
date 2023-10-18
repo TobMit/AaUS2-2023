@@ -61,6 +61,7 @@ public class NodeTest
         testNodeData.AddData(tmp);
         Assert.AreEqual(3, testNodeData.GetArrayListData().Count);
         Assert.AreEqual("data3", testNodeData.GetData(2));
+        Assert.False(testNodeData.dataIsEmpty());
     }
     
 }
