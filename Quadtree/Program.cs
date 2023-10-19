@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Quadtree.StructureClasses;
+
 /*
 public class QuadTreeNode<T>
 {
@@ -285,10 +287,9 @@ public class Program
             // Console.WriteLine($"Center: ({polygonInfo.Item1}, {polygonInfo.Item2}), Data: {polygonInfo.Item3}");
         // }
 
-        double px = 0.0;
-        double py = 1.12345;
-        int x = (int)double.Round(px * 100000, 5);
-        Console.WriteLine(3/2);
-        Console.WriteLine(3%2);
+        QuadTree<int> quadtree = new QuadTree<int>(0, 0, 100, 90, 4);
+        quadtree.Insert(20, 20, 30, 30, 1);
+        quadtree.Insert(0, 0, 10, 10, 2);
+        Console.WriteLine(quadtree.Count);
     }
 }

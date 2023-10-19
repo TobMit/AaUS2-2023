@@ -9,6 +9,7 @@ public class QuadTree<T>
     private QuadTreeNodeLeaf<T> root;
     private const int HODNOTA = 100000;
     private int max_depth;
+    public int Count { get; set; }
 
     /// <summary>
     /// Quad tree structure
@@ -30,6 +31,7 @@ public class QuadTree<T>
             new(QuadTreeRound(pX + width), QuadTreeRound(pY + height)));
         
         this.max_depth = pMaxDepth;
+        Count = 0;
     }
 
     /// <summary>
@@ -46,17 +48,18 @@ public class QuadTree<T>
         {
             throw new Exception("Coordinates exceed parameter size");
         }
-        QuadTreeNodeLeaf<T> current = root;
+        QuadTreeNodeLeaf<T>? current = root;
         QuadTreeNodeData<T> currentDataNode = new(new(QuadTreeRound(xDownLeft), QuadTreeRound(yDownLeft)), 
           new (QuadTreeRound(xUpRight), QuadTreeRound(yDownLeft)), pData);
         
         int depth = 0;
-        while (current != null)
+        while (current is not null)
         {
-            // 1 pozrieme sa či sa nejaký polygón nachádza v danom uzle
-            if (current.DataIsEmpty())
+            // pozrieme sa či sa nejaký polygón nachádza v danom uzle a nie sú listy tak to môžeme vložiť
+            if (current.DataIsEmpty() && !current.LeafsInicialised)
             {
                 current.AddData(currentDataNode);
+                Count++;
                 current = null;
             }
             // ak nie je prázdny
@@ -64,23 +67,49 @@ public class QuadTree<T>
             else if (depth == max_depth)
             {
                 current.AddData(currentDataNode);
+                Count++;
                 current = null;
             }
             // môžu nastať 2 prípady
             // 1 skontrolujeme či sa objekt nezmestí do nejakého poduzla
-                // môžu nastať 3 situácie
-                // poduzol existuje a porovnáme do ktorého sa zmestí
-                    // Ak sa zmestí tak current = poduzol
-                // poduzol neexistuje
-                    // vytvoríme predbežné poduzly a s ními skontrolujeme či sa zmestí
-                    // ak sa zmestí tak poduzly vytvoríme a current = poduzol do ktorého sa zmesti a pokračujeme v cykle
+            else if (current.AnySubNodeContainDataNode(currentDataNode))
+            {
+                // Ak sa zmestí tak current = poduzol
+                var tmp = current.GetLeafeThatCanContainDataNode(currentDataNode);
+                if (tmp is null) throw new Exception("Error in QuadTree, this shouldnt happend");
+                current = tmp;
+                depth++;
+            }
             // Ak sa nezmestí do žiadného poduzla tak skontrolujeme počet objektov v danom uzle
-                // ak ich tam je viack ako 1 to znamená že objekty ktoré sú tam sa už nikde nedajú presunúť
+            else if (current.DataIsEmpty() || current.DataCount() > 1)
+            {
+                // ak ich tam je viack ako 1 alebo žiaden to znamená že objekty ktoré sú tam sa už nikde nedajú presunúť
+                current.AddData(currentDataNode);
+                Count++;
+                current = null;
+            }
             // Ak je tam jeden objekt tak 
+            else
+            {
                 // skontrolujeme či tento objekt sa nezmesti do nejakého poduzla
-                // ak sa zmestí do niektorého poduzla tak aktuálny objekt vložíme
-                // potom z daného objektu vymažeme nový objekt, potom zmeníme premennu currentData na tento nový objekt
-                // a current = poduzol do ktorého sa zmesti a pokračujeme v cykle
+                var tmpDataNode = current.GetData(0);
+                if (current.AnySubNodeContainDataNode(tmpDataNode))
+                {
+                    // potom z daného objektu vymažeme nový objekt
+                    current.RemoveData(tmpDataNode);
+                    Count--;
+                    // ak sa zmestí do niektorého poduzla tak aktuálny objekt vložíme
+                    current.AddData(currentDataNode);
+                    Count++;
+                    //potom zmeníme premennu currentData na tento nový objekt
+                    currentDataNode = tmpDataNode;
+                    var tmp = current.GetLeafeThatCanContainDataNode(currentDataNode);
+                    if (tmp is null) throw new Exception("Error in QuadTree, this shouldnt happend");
+                    // a current = poduzol do ktorého sa zmesti a pokračujeme v cykle
+                    current = tmp;
+                    depth++;
+                }
+            }
         }
         
     }

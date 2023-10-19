@@ -21,6 +21,12 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
     /// </summary>
     public QuadTreeNodeLeaf<T>[] Leafs;
 
+    private bool _leafsInicialised;
+    public bool LeafsInicialised
+    {
+        get => _leafsInicialised;
+    }
+
 
     public QuadTreeNodeLeaf(Point pPointDownLeft, Point pPointUpRight)
     {
@@ -28,6 +34,7 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
         _pointUpRight = pPointUpRight;
         Leafs = new QuadTreeNodeLeaf<T>[4];
         data = new();
+        _leafsInicialised = false;
     }
     
     public QuadTreeNodeLeaf(Point pPointDownLeft, Point pPointUpRight, QuadTreeNodeData<T> pData)
@@ -37,11 +44,76 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
         Leafs = new QuadTreeNodeLeaf<T>[4];
         data = new();
         data.Add(pData);
+        _leafsInicialised = false;
+    }
+
+    public bool AnySubNodeContainDataNode(QuadTreeNodeData<T> pData )
+    {
+        // môžu nastať 2 situácie
+            // poduzol existuje a porovnáme do ktorého sa zmestí
+        if (_leafsInicialised)
+        {
+            // skontroluj či sa zmetie s niektorým z listov
+            foreach (QuadTreeNodeLeaf<T> leaf in Leafs)
+            {
+                if (leaf.ContainNode(pData))
+                {
+                    return true;
+                }
+            }
+        }
+            // poduzol neexistuje
+        else
+        {
+            // inicializuj tmp listy
+            InitLeafs();
+            // skontroluj či sa zmetie s niektorým z listov
+            foreach (QuadTreeNodeLeaf<T> leaf in Leafs)
+            {
+                if (leaf.ContainNode(pData))
+                {
+                    return true;
+                }
+            }
+            
+        }
+        return false;
+    }
+
+    public QuadTreeNodeLeaf<T>? GetLeafeThatCanContainDataNode(QuadTreeNodeData<T> pData)
+    {
+        foreach (QuadTreeNodeLeaf<T> leaf in Leafs)
+        {
+            if (leaf.ContainNode(pData))
+            {
+                return leaf;
+            }
+        }
+
+        return null;
     }
     
+    private void InitLeafs()
+    {
+        int x1 = _pointDownLeft.X;
+        int y1 = _pointDownLeft.Y;
+        int x2 = _pointUpRight.X;
+        int y2 = _pointUpRight.Y;
+        int xS = (x1 + x2) / 2;
+        int yS = (y1 + y2) / 2;
+        Leafs[0] = new(new(x1, y1), new(xS, yS));
+        Leafs[1] = new(new(x1, yS), new(xS, y2));
+        Leafs[2] = new(new(xS, yS), new(x2, y2));
+        Leafs[3] = new(new(xS, y1), new(x2, yS));
+        _leafsInicialised = true;
+    }
     
     public void AddData(QuadTreeNodeData<T> pdata)
     {
+        if (!ContainNode(pdata))
+        {
+            throw new Exception("Data is not in this node. This shouldnt happend");
+        }
         data.Add(pdata);
     }
     
