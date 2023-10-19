@@ -1,67 +1,57 @@
 using System.Collections;
 using System.ComponentModel;
 using Quadtree.StructureClasses;
+using Quadtree.StructureClasses.Node;
 
 namespace QuadTreeTests.Node;
 
 public class NodeTest
 {
-    private QuadTreeNode<string> testNode;
-    private QuadTreeNode<string> testNodeData;
+    private QuadTreeNodeLeaf<string> _testNodeLeaf;
+    private QuadTreeNodeData<string> _testNodeLeafData;
     [SetUp]
     public void Setup()
     {
-        testNode = new(new(10, 10), new(20, 20));
-        testNodeData = new(new(12, 10), new(18, 18), "data");
-    }
-
-    [Test] 
-    public void NodeReturnIsLease()
-    {
-        Assert.True(testNode.IsLeaf);
-    }
-    
-    [Test] 
-    public void DataNodeReturnIsLease()
-    {
-        Assert.False(testNodeData.IsLeaf);
+        _testNodeLeafData = new(new(12, 10), new(18, 18), "data");
+        _testNodeLeaf = new(new(10, 10), new(20, 20), _testNodeLeafData);
     }
     
     [Test] 
     public void NodeContainsNode()
     {
-        Assert.True(testNode.ContainNode(testNodeData));
-        Assert.False(testNodeData.ContainNode(testNode));
+        Assert.True(_testNodeLeaf.ContainNode(_testNodeLeafData));
+        Assert.False(_testNodeLeafData.ContainNode(_testNodeLeaf));
     }
     
     [Test] 
     public void NodeContainsPoints()
     {
-        Assert.True(testNode.ContainsPoints(new(12, 10), new(18, 18)));
-        Assert.True(testNode.ContainsPoints(new(18, 18), new(12, 10)));
-        Assert.False(testNode.ContainsPoints(new(120, 100), new(180, 180)));
-        Assert.False(testNode.ContainsPoints(new(12, 10), new(21, 21)));
+        Assert.True(_testNodeLeaf.ContainsPoints(new(12, 10), new(18, 18)));
+        Assert.True(_testNodeLeaf.ContainsPoints(new(18, 18), new(12, 10)));
+        Assert.False(_testNodeLeaf.ContainsPoints(new(120, 100), new(180, 180)));
+        Assert.False(_testNodeLeaf.ContainsPoints(new(12, 10), new(21, 21)));
     }
     
     [Test]
     public void GetData()
     {
-        Assert.AreEqual("data", testNodeData.GetData(0));
-        Assert.Throws<ArgumentOutOfRangeException>(()=>testNodeData.GetData(1));
-        Assert.NotNull(testNodeData.GetArrayListData());
-        Assert.AreEqual(1, testNodeData.GetArrayListData().Count);
-        testNodeData.AddData("data2");
-        Assert.AreEqual("data2", testNodeData.GetData(1));
-        Assert.AreEqual(2, testNodeData.GetArrayListData().Count);
-        testNodeData.RemoveData("data2");
-        Assert.AreEqual(1, testNodeData.GetArrayListData().Count);
-        ArrayList tmp = new();
-        tmp.Add("data2");
-        tmp.Add("data3");
-        testNodeData.AddData(tmp);
-        Assert.AreEqual(3, testNodeData.GetArrayListData().Count);
-        Assert.AreEqual("data3", testNodeData.GetData(2));
-        Assert.False(testNodeData.dataIsEmpty());
+        Assert.That(_testNodeLeaf.GetData(0).Data, Is.EqualTo("data"));
+        Assert.Throws<ArgumentOutOfRangeException>(()=>_testNodeLeaf.GetData(1));
+        Assert.NotNull(_testNodeLeaf.GetArrayListData());
+        Assert.That(_testNodeLeaf.DataCount(), Is.EqualTo(1));
+        QuadTreeNodeData<string> data = new(new(12, 10), new(21, 21),"data2");
+        _testNodeLeaf.AddData(data);
+        Assert.That(_testNodeLeaf.GetData(1).Data, Is.EqualTo("data2"));
+        Assert.That(_testNodeLeaf.DataCount(), Is.EqualTo(2));
+        _testNodeLeaf.RemoveData(data);
+        Assert.That(_testNodeLeaf.DataCount(), Is.EqualTo(1));
+        List<QuadTreeNodeData<string>> tmp = new();
+        tmp.Add(data);
+        tmp.Add(new(new(12, 10), new(21, 21), "data3"));
+        _testNodeLeaf.AddData(tmp);
+        Assert.That(_testNodeLeaf.DataCount(), Is.EqualTo(3));
+        Assert.That(_testNodeLeaf.GetData(2).Data, Is.EqualTo("data3"));
+        Assert.False(_testNodeLeaf.DataIsEmpty()); 
     }
     
 }

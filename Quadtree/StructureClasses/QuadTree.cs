@@ -1,11 +1,12 @@
 using System.Drawing;
 using System.Runtime.InteropServices.JavaScript;
+using Quadtree.StructureClasses.Node;
 
 namespace Quadtree.StructureClasses;
 
 public class QuadTree<T>
 {
-    private QuadTreeNode<T> root;
+    private QuadTreeNodeLeaf<T> root;
     private const int HODNOTA = 100000;
     private int max_depth;
 
@@ -45,21 +46,24 @@ public class QuadTree<T>
         {
             throw new Exception("Coordinates exceed parameter size");
         }
-        QuadTreeNode<T> current = root;
+        QuadTreeNodeLeaf<T> current = root;
+        QuadTreeNodeData<T> currentDataNode = new(new(QuadTreeRound(xDownLeft), QuadTreeRound(yDownLeft)), 
+          new (QuadTreeRound(xUpRight), QuadTreeRound(yDownLeft)), pData);
+        
         int depth = 0;
         while (current != null)
         {
             // 1 pozrieme sa či sa nejaký polygón nachádza v danom uzle
-            if (current.dataIsEmpty())
+            if (current.DataIsEmpty())
             {
-                current.AddData(pData);
+                current.AddData(currentDataNode);
                 current = null;
             }
             // ak nie je prázdny
             //Skontrolujeme či nie je naplnená hlbka
             else if (depth == max_depth)
             {
-                current.AddData(pData);
+                current.AddData(currentDataNode);
                 current = null;
             }
             // môžu nastať 2 prípady
