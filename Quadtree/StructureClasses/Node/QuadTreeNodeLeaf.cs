@@ -47,6 +47,7 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
         _leafsInicialised = false;
     }
 
+    //todo add tests
     public bool AnySubNodeContainDataNode(QuadTreeNodeData<T> pData )
     {
         // môžu nastať 2 situácie
@@ -93,6 +94,7 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
         return null;
     }
     
+    //todo add tests
     private void InitLeafs()
     {
         int x1 = _pointDownLeft.X;

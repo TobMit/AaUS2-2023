@@ -287,9 +287,27 @@ public class Program
             // Console.WriteLine($"Center: ({polygonInfo.Item1}, {polygonInfo.Item2}), Data: {polygonInfo.Item3}");
         // }
 
-        QuadTree<int> quadtree = new QuadTree<int>(0, 0, 100, 90, 4);
-        quadtree.Insert(20, 20, 30, 30, 1);
-        quadtree.Insert(0, 0, 10, 10, 2);
+        QuadTree<int> quadtree = new QuadTree<int>(-50, -50, 100, 100, 4);
+        quadtree.Insert(-5.0, -5.0, -1, -1, 5);
+        quadtree.Insert(-5.0, -5.0, -1, -1, 6);
+        quadtree.Insert(-45.0, -45.0, 30, 30, 1);
+        quadtree.Insert(-45.0, -45.0, -10, -10, 2);
+        quadtree.Insert(-20.0, -20.0, -10, -10, 3);
+        quadtree.Insert(-10.0, -10.0, -1, -1, 4);
         Console.WriteLine(quadtree.Count);
+        
+        long hodnota =  90 * 10000000;
+        Console.WriteLine(hodnota);
+        Console.WriteLine(int.MaxValue);
+        Console.WriteLine(double.MaxValue);
+        Console.WriteLine(double.MinValue);
+        int pocetDeleni = 0;
+
+        while (hodnota > 1)
+        {
+            hodnota /= 2;
+            pocetDeleni++;
+        }
+        Console.WriteLine(pocetDeleni);
     }
 }

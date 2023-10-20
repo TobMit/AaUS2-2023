@@ -7,7 +7,8 @@ namespace Quadtree.StructureClasses;
 public class QuadTree<T>
 {
     private QuadTreeNodeLeaf<T> root;
-    private const int HODNOTA = 100000;
+    private const int HODNOTA = 10000000;
+    private const int MAX_DEPTH = 29; // je to kôli tomu že keď zoberiem max rozmer tak ho viem deliť iba 29 krát kým by som nedostal samé 1
     private int max_depth;
     public int Count { get; set; }
 
@@ -26,6 +27,11 @@ public class QuadTree<T>
         {
             throw new Exception("Wrong world coordination");
         }
+
+        if (pMaxDepth > MAX_DEPTH)
+        {
+            throw new Exception("Max depth is 29");
+        }
         
         root = new(new(QuadTreeRound(pX), QuadTreeRound(pY)),
             new(QuadTreeRound(pX + width), QuadTreeRound(pY + height)));
@@ -41,16 +47,16 @@ public class QuadTree<T>
     /// <param name="pY"></param>
     /// <param name="pData"></param>
     /// <exception cref="Exception">Ak su zle suradnice</exception>
-    public void Insert(double xDownLeft, double yDownLeft, double xUpRight, double yUpLeft, T pData)
+    public void Insert(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight, T pData)
     {
         if (!root.ContainsPoints(new(QuadTreeRound(xDownLeft), QuadTreeRound(yDownLeft)), 
-                new(QuadTreeRound(xUpRight), QuadTreeRound(yUpLeft))))
+                new(QuadTreeRound(xUpRight), QuadTreeRound(yUpRight))))
         {
             throw new Exception("Coordinates exceed parameter size");
         }
         QuadTreeNodeLeaf<T>? current = root;
         QuadTreeNodeData<T> currentDataNode = new(new(QuadTreeRound(xDownLeft), QuadTreeRound(yDownLeft)), 
-          new (QuadTreeRound(xUpRight), QuadTreeRound(yDownLeft)), pData);
+          new (QuadTreeRound(xUpRight), QuadTreeRound(yUpRight)), pData);
         
         int depth = 0;
         while (current is not null)
