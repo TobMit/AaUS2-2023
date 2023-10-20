@@ -114,7 +114,7 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
     {
         if (!ContainNode(pdata))
         {
-            throw new Exception("Data is not in this node. This shouldnt happend");
+            throw new Exception("Data is not in this node. This shouldn't happened");
         }
         data.Add(pdata);
     }
@@ -136,6 +136,7 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
 
     public List<QuadTreeNodeData<T>> GetArrayListData()
     {
+        // todo možno v budúcnosti vracať len T
         return data;
     }
     
@@ -147,5 +148,10 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
     public bool DataIsEmpty()
     {
         return data.Count == 0;
+    }
+    
+    public void ClearData()
+    {
+        data.Clear();
     }
 }

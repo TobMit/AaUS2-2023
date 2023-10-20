@@ -5,20 +5,20 @@ public class Utils
     [Test]
     public void QuadTreeRound()
     {
-        Assert.AreEqual(QuadTree<int>.TestQuadTreeRound(1.12345),112345);
-        Assert.AreEqual(QuadTree<int>.TestQuadTreeRound(1.1234),112340);
-        Assert.AreNotEqual(QuadTree<int>.TestQuadTreeRound(1.123456),1123456);
+        Assert.That(QuadTree<int>.TestQuadTreeRound(1.1234567), Is.EqualTo(11234567));
+        Assert.That(QuadTree<int>.TestQuadTreeRound(1.1234), Is.EqualTo(11234000));
+        Assert.That(QuadTree<int>.TestQuadTreeRound(1.12345678), Is.Not.EqualTo(112345678));
     }
 
     [Test]
     public void CheckCoordinates()
     {
-        Assert.True(QuadTree<int>.TestCheckCoordinates(1000000, 1000000));
-        Assert.True(QuadTree<int>.TestCheckCoordinates(-18000000, -9000000));
-        Assert.True(QuadTree<int>.TestCheckCoordinates(18000000, 9000000));
-        Assert.False(QuadTree<int>.TestCheckCoordinates(-18000001, -9000000));
-        Assert.False(QuadTree<int>.TestCheckCoordinates(-18000000, -9000001));
-        Assert.False(QuadTree<int>.TestCheckCoordinates(18000001, 9000000));
-        Assert.False(QuadTree<int>.TestCheckCoordinates(18000000, 9000001));
+        Assert.True(QuadTree<int>.TestCheckCoordinates(100000000, 100000000));
+        Assert.True(QuadTree<int>.TestCheckCoordinates(-1800000000, -900000000));
+        Assert.True(QuadTree<int>.TestCheckCoordinates(1800000000, 900000000));
+        Assert.False(QuadTree<int>.TestCheckCoordinates(-1800000001, -900000000));
+        Assert.False(QuadTree<int>.TestCheckCoordinates(-1800000000, -900000001));
+        Assert.False(QuadTree<int>.TestCheckCoordinates(1800000001, 900000000));
+        Assert.False(QuadTree<int>.TestCheckCoordinates(1800000000, 900000001));
     }
 }

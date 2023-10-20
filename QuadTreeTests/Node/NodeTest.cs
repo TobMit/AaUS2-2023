@@ -39,8 +39,10 @@ public class NodeTest
         Assert.Throws<ArgumentOutOfRangeException>(()=>_testNodeLeaf.GetData(1));
         Assert.NotNull(_testNodeLeaf.GetArrayListData());
         Assert.That(_testNodeLeaf.DataCount(), Is.EqualTo(1));
-        QuadTreeNodeData<string> data = new(new(12, 10), new(21, 21),"data2");
+        QuadTreeNodeData<string> data = new(new(12, 10), new(20, 20),"data2");
+        QuadTreeNodeData<string> dataErr = new(new(12, 10), new(21, 21),"data2");
         _testNodeLeaf.AddData(data);
+        Assert.Throws<Exception>(()=>_testNodeLeaf.AddData(dataErr));
         Assert.That(_testNodeLeaf.GetData(1).Data, Is.EqualTo("data2"));
         Assert.That(_testNodeLeaf.DataCount(), Is.EqualTo(2));
         _testNodeLeaf.RemoveData(data);
@@ -52,6 +54,24 @@ public class NodeTest
         Assert.That(_testNodeLeaf.DataCount(), Is.EqualTo(3));
         Assert.That(_testNodeLeaf.GetData(2).Data, Is.EqualTo("data3"));
         Assert.False(_testNodeLeaf.DataIsEmpty()); 
+    }
+
+    [Test]
+    public void OverlapTest()
+    {
+        QuadTreeNodeLeaf<string> testNodeLeaf2 = new(new(0, 0), new(20, 20), _testNodeLeafData);
+        
+        QuadTreeNodeLeaf<string> testNodeLeaf3 = new(new(10, 10), new(30, 30), _testNodeLeafData);
+        QuadTreeNodeLeaf<string> testNodeLeaf4 = new(new(10, 10), new(15, 15), _testNodeLeafData);
+        QuadTreeNodeLeaf<string> testNodeLeaf5 = new(new(-10, -10), new(15, 15), _testNodeLeafData);
+        QuadTreeNodeLeaf<string> testNodeLeaf6 = new(new(-20, -20), new(0, 0), _testNodeLeafData);
+        QuadTreeNodeLeaf<string> testNodeLeaf7 = new(new(-20, -20), new(-1, -1), _testNodeLeafData);
+        Assert.True(testNodeLeaf2.OverlapNode(testNodeLeaf3));
+        Assert.True(testNodeLeaf2.OverlapNode(testNodeLeaf4));
+        Assert.True(testNodeLeaf2.OverlapNode(testNodeLeaf5));
+        Assert.False(testNodeLeaf2.OverlapNode(testNodeLeaf6));
+        Assert.False(testNodeLeaf2.OverlapNode(testNodeLeaf7));
+
     }
     
 }

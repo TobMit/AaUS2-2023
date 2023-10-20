@@ -28,4 +28,14 @@ public abstract class QuadTreeNode<T>
     {
         return ContainsPoints(nodeLeaf.PointDownLeft, nodeLeaf.PointUpRight);
     }
+    
+    public bool OverpalapPoints(Point pPointDownLeft, Point pPointUpRight) {
+        return PointDownLeft.X < pPointUpRight.X && PointDownLeft.Y < pPointUpRight.Y &&
+               PointUpRight.X > pPointDownLeft.X && PointUpRight.Y > pPointDownLeft.Y;
+    }
+    
+    public bool OverlapNode(QuadTreeNode<T> nodeLeaf)
+    {
+        return OverpalapPoints(nodeLeaf.PointDownLeft, nodeLeaf.PointUpRight);
+    }
 }
