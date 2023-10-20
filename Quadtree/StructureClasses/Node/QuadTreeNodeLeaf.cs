@@ -19,7 +19,7 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
     /// <p> | 1 | 4 | </p>
     /// <p> x-------- </p>
     /// </summary>
-    public QuadTreeNodeLeaf<T>[] Leafs;
+    private QuadTreeNodeLeaf<T>[] Leafs;
 
     private bool _leafsInicialised;
     public bool LeafsInicialised
@@ -46,10 +46,19 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
         data.Add(pData);
         _leafsInicialised = false;
     }
-
-    //todo add tests
-    public bool AnySubNodeContainDataNode(QuadTreeNodeData<T> pData )
+    
+    public bool AnyInitSubNodeContainDataNode(QuadTreeNode<T> pData)
     {
+        return AnySubNodeContainDataNode(pData, false);
+    }
+    
+    public bool AnySubNodeContainDataNode(QuadTreeNode<T> pData)
+    {
+        return AnySubNodeContainDataNode(pData, true);
+    }
+    private bool AnySubNodeContainDataNode(QuadTreeNode<T> pData, bool inicialiseLeafs )
+    {
+        //todo add tests
         // môžu nastať 2 situácie
             // poduzol existuje a porovnáme do ktorého sa zmestí
         if (_leafsInicialised)
@@ -66,6 +75,12 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
             // poduzol neexistuje
         else
         {
+            if (!inicialiseLeafs)
+            {
+                // ak nechceme inicializovať tak vrátime false
+                return false;
+            }
+            
             // inicializuj tmp listy
             InitLeafs();
             // skontroluj či sa zmetie s niektorým z listov
@@ -81,7 +96,7 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
         return false;
     }
 
-    public QuadTreeNodeLeaf<T>? GetLeafeThatCanContainDataNode(QuadTreeNodeData<T> pData)
+    public QuadTreeNodeLeaf<T>? GetLeafeThatCanContainDataNode(QuadTreeNode<T> pData)
     {
         foreach (QuadTreeNodeLeaf<T> leaf in Leafs)
         {
@@ -108,6 +123,20 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
         Leafs[2] = new(new(xS, yS), new(x2, y2));
         Leafs[3] = new(new(xS, y1), new(x2, yS));
         _leafsInicialised = true;
+    }
+    
+    public List<QuadTreeNodeLeaf<T>> GetOverlapingLefs(QuadTreeNode<T> pData)
+    {
+        List<QuadTreeNodeLeaf<T>> returnList = new();
+        foreach (QuadTreeNodeLeaf<T> leaf in Leafs)
+        {
+            if (leaf.OverlapNode(pData))
+            {
+                returnList.Add(leaf);
+            }
+        }
+
+        return returnList;
     }
     
     public void AddData(QuadTreeNodeData<T> pdata)

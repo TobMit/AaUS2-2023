@@ -119,6 +119,71 @@ public class QuadTree<T>
         }
         
     }
+    
+    private class DeleteNodes
+    {
+        public QuadTreeNodeLeaf<T> Node { get; set; }
+        /// <summary>
+        /// <p> 0 - mod vyhľadavanie </p>
+        /// <p> 1 - mod mazania </p>
+        /// </summary>
+        public int Mode { get; set; }
+        public DeleteNodes(QuadTreeNodeLeaf<T> pNode, int pMode)
+        {
+            Node = pNode;
+            Mode = pMode;
+        }
+    }
+
+    public List<QuadTreeNodeData<T>> Delete(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight)
+    {
+        QuadTreeNodeLeaf<T> areaToDelete = new(new(QuadTreeRound(xDownLeft), QuadTreeRound(yDownLeft)),
+            new(QuadTreeRound(xUpRight), QuadTreeRound(yUpRight)));
+        
+        List<QuadTreeNodeData<T>> returnData = new();
+        Stack<DeleteNodes> stack = new();
+        stack.Push(new(root, 0));
+        while (stack.Count != 0)
+        {
+            // Prebieha v 2 režimoch
+            var current = stack.Pop();
+            if (current.Mode == 0)
+            { 
+                // 1. hľadanie poduzla do ktorého sa zmesti vymazávana area
+                if (current.Node.ContainNode(areaToDelete))
+                {
+                    // hľadanie prebieha tak že sa pozeráme ktorý uzol vie obsiahnuť vymazávanú areu a či aj potomkovia dokážu obsiahnuť vymazávanú areu
+                    if (current.Node.AnyInitSubNodeContainDataNode(areaToDelete))
+                    {
+                        // ak áno tak ten poduzol ktorý obsahuje náš objekt pridáme do stacku
+                        var tmp = current.Node.GetLeafeThatCanContainDataNode(areaToDelete);
+                        if (tmp is null) throw new Exception("Error in QuadTree, this shouldnt happend");
+                        stack.Push(new(tmp, 0));
+                    
+                    }
+                    else
+                    {
+                        // ak nie tak pridáme do stacku všetky listy ktoré sa prekrývajú
+                        var tmp = current.Node.GetOverlapingLefs(areaToDelete);
+                        foreach (var leaf in tmp)
+                        {
+                            stack.Push(new(leaf, 1));
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // režim 2
+                // 1. Skontrolujeme či sa nachádzajú nejaké dáta v danom uzle, ak áno tak ich vymažeme a pridáme do returnData
+                    // vymažeme ich tak že skontrolujeme či sú vo vymazávanej arey
+                // 2. skontrolujeme s ktorými potrvkami sa prekrýva vymazávaná area, alebo čiastočne prekrýva
+                    // potomok ktorý sa prekrýva pridáme do staku   
+            }
+        }
+
+        return returnData;
+    }
 
     /// <summary>
     /// Round data and decimal numbers for this structure
