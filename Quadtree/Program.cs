@@ -294,20 +294,27 @@ public class Program
         quadtree.Insert(-45.0, -45.0, -10, -10, 2);
         quadtree.Insert(-20.0, -20.0, -10, -10, 3);
         quadtree.Insert(-10.0, -10.0, -1, -1, 4);
-        Console.WriteLine(quadtree.Count);
-        
-        long hodnota =  90 * 10000000;
-        Console.WriteLine(hodnota);
-        Console.WriteLine(int.MaxValue);
-        Console.WriteLine(double.MaxValue);
-        Console.WriteLine(double.MinValue);
-        int pocetDeleni = 0;
-
-        while (hodnota > 1)
+        Console.WriteLine("Count pred delete: " + quadtree.Count);
+        //var tmp = quadtree.Delete(-20.0, -20.0, -10, -10);
+        var tmp = quadtree.Delete(-20.0, -20.0, -1, -1);
+        Console.WriteLine("Count po delete: " + quadtree.Count);
+        foreach (var i in tmp)
         {
-            hodnota /= 2;
-            pocetDeleni++;
+            Console.WriteLine(i);
         }
-        Console.WriteLine(pocetDeleni);
+
+        // long hodnota =  90 * 10000000;
+        // Console.WriteLine(hodnota);
+        // Console.WriteLine(int.MaxValue);
+        // Console.WriteLine(double.MaxValue);
+        // Console.WriteLine(double.MinValue);
+        // int pocetDeleni = 0;
+
+        // while (hodnota > 1)
+        // {
+            // hodnota /= 2;
+            // pocetDeleni++;
+        // }
+        // Console.WriteLine(pocetDeleni);
     }
 }

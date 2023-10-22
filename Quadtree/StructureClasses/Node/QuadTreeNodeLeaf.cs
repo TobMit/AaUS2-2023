@@ -128,15 +128,34 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
     public List<QuadTreeNodeLeaf<T>> GetOverlapingLefs(QuadTreeNode<T> pData)
     {
         List<QuadTreeNodeLeaf<T>> returnList = new();
-        foreach (QuadTreeNodeLeaf<T> leaf in Leafs)
+        if (_leafsInicialised)
         {
-            if (leaf.OverlapNode(pData))
+            foreach (QuadTreeNodeLeaf<T> leaf in Leafs)
             {
-                returnList.Add(leaf);
+                if (leaf.OverlapNode(pData))
+                {
+                    returnList.Add(leaf);
+                }
             }
         }
 
         return returnList;
+    }
+
+    public List<T> RemoveDataInRange(QuadTreeNode<T> node)
+    {
+        List<T> returnData = new();
+        for (int i = 0; i < data.Count; i++)
+        {
+            if (node.ContainNode(data[i]))
+            {
+                returnData.Add(data[i].Data);
+                data.RemoveAt(i);
+                i--;
+            }
+        }
+
+        return returnData;
     }
     
     public void AddData(QuadTreeNodeData<T> pdata)

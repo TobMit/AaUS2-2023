@@ -135,12 +135,12 @@ public class QuadTree<T>
         }
     }
 
-    public List<QuadTreeNodeData<T>> Delete(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight)
+    public List<T> Delete(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight)
     {
         QuadTreeNodeLeaf<T> areaToDelete = new(new(QuadTreeRound(xDownLeft), QuadTreeRound(yDownLeft)),
             new(QuadTreeRound(xUpRight), QuadTreeRound(yUpRight)));
         
-        List<QuadTreeNodeData<T>> returnData = new();
+        List<T> returnData = new();
         Stack<DeleteNodes> stack = new();
         stack.Push(new(root, 0));
         while (stack.Count != 0)
@@ -163,12 +163,13 @@ public class QuadTree<T>
                     }
                     else
                     {
-                        // ak nie tak pridáme do stacku všetky listy ktoré sa prekrývajú
+                        // ak nie tak pridáme do stacku všetky listy ktoré sa prekrývajú v rátane seba samáho na kontrolu dát
                         var tmp = current.Node.GetOverlapingLefs(areaToDelete);
                         foreach (var leaf in tmp)
                         {
                             stack.Push(new(leaf, 1));
                         }
+                        stack.Push(new (current.Node, 1));
                     }
                 }
             }
@@ -177,8 +178,16 @@ public class QuadTree<T>
                 // režim 2
                 // 1. Skontrolujeme či sa nachádzajú nejaké dáta v danom uzle, ak áno tak ich vymažeme a pridáme do returnData
                     // vymažeme ich tak že skontrolujeme či sú vo vymazávanej arey
+                var tmpList = current.Node.RemoveDataInRange(areaToDelete);
+                returnData.AddRange(tmpList);
+                Count -= tmpList.Count;
                 // 2. skontrolujeme s ktorými potrvkami sa prekrýva vymazávaná area, alebo čiastočne prekrýva
-                    // potomok ktorý sa prekrýva pridáme do staku   
+                    // potomok ktorý sa prekrýva pridáme do staku
+                var tmp = current.Node.GetOverlapingLefs(areaToDelete);
+                foreach (var leaf in tmp)
+                {
+                    stack.Push(new(leaf, 1));
+                }
             }
         }
 
