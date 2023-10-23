@@ -1,8 +1,7 @@
 using System.Collections;
 using System.Drawing;
-using Quadtree.StructureClasses.Node;
 
-namespace Quadtree.StructureClasses;
+namespace Quadtree.StructureClasses.Node;
 
 /// <summary>
 /// Trieda slúži na vytvorenie uzlov
@@ -91,12 +90,16 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
                     return true;
                 }
             }
-            
         }
         return false;
     }
 
-    public QuadTreeNodeLeaf<T>? GetLeafeThatCanContainDataNode(QuadTreeNode<T> pData)
+    /// <summary>
+    /// Vráti list v ktorom sa zmestí daný hladany uzol, čo znamená že vráti vždy iba jeden
+    /// </summary>
+    /// <param name="pData"></param>
+    /// <returns></returns>
+    public QuadTreeNodeLeaf<T>? GetLeafThatCanContainDataNode(QuadTreeNode<T> pData)
     {
         foreach (QuadTreeNodeLeaf<T> leaf in Leafs)
         {
@@ -201,5 +204,15 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
     public void ClearData()
     {
         data.Clear();
+    }
+
+    /// <summary>
+    /// Metóda slúži iba na testovanie, nevolajte ju v kódé, testuje správnu inicializáciu listov
+    /// </summary>
+    /// <returns>Listy či sú spravne inicializované</returns>
+    public QuadTreeNodeLeaf<T>[] TestInitLeafs()
+    {
+        InitLeafs();
+        return Leafs;
     }
 }

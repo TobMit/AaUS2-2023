@@ -81,7 +81,7 @@ public class QuadTree<T>
             else if (current.AnySubNodeContainDataNode(currentDataNode))
             {
                 // Ak sa zmestí tak current = poduzol
-                var tmp = current.GetLeafeThatCanContainDataNode(currentDataNode);
+                var tmp = current.GetLeafThatCanContainDataNode(currentDataNode);
                 if (tmp is null) throw new Exception("Error in QuadTree, this shouldnt happend");
                 current = tmp;
                 depth++;
@@ -109,7 +109,7 @@ public class QuadTree<T>
                     Count++;
                     //potom zmeníme premennu currentData na tento nový objekt
                     currentDataNode = tmpDataNode;
-                    var tmp = current.GetLeafeThatCanContainDataNode(currentDataNode);
+                    var tmp = current.GetLeafThatCanContainDataNode(currentDataNode);
                     if (tmp is null) throw new Exception("Error in QuadTree, this shouldnt happend");
                     // a current = poduzol do ktorého sa zmesti a pokračujeme v cykle
                     current = tmp;
@@ -156,7 +156,7 @@ public class QuadTree<T>
                     if (current.Node.AnyInitSubNodeContainDataNode(areaToDelete))
                     {
                         // ak áno tak ten poduzol ktorý obsahuje náš objekt pridáme do stacku
-                        var tmp = current.Node.GetLeafeThatCanContainDataNode(areaToDelete);
+                        var tmp = current.Node.GetLeafThatCanContainDataNode(areaToDelete);
                         if (tmp is null) throw new Exception("Error in QuadTree, this shouldnt happend");
                         stack.Push(new(tmp, 0));
                     

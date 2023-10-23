@@ -1,6 +1,6 @@
 using System.Drawing;
 
-namespace Quadtree.StructureClasses;
+namespace Quadtree.StructureClasses.Node;
 
 /// <summary>
 /// Abstraktna trieda pre uzly
