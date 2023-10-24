@@ -26,6 +26,8 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
         get => _leafsInicialised;
     }
 
+    public QuadTreeNodeLeaf<T> Parent { get; set; }
+
 
     public QuadTreeNodeLeaf(Point pPointDownLeft, Point pPointUpRight)
     {
@@ -33,6 +35,16 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
         _pointUpRight = pPointUpRight;
         Leafs = new QuadTreeNodeLeaf<T>[4];
         data = new();
+        _leafsInicialised = false;
+    }
+    
+    public QuadTreeNodeLeaf(Point pPointDownLeft, Point pPointUpRight, QuadTreeNodeLeaf<T> parent)
+    {
+        _pointDownLeft = pPointDownLeft;
+        _pointUpRight = pPointUpRight;
+        Leafs = new QuadTreeNodeLeaf<T>[4];
+        data = new();
+        Parent = parent;
         _leafsInicialised = false;
     }
     
@@ -112,7 +124,6 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
         return null;
     }
     
-    //todo add tests
     private void InitLeafs()
     {
         int x1 = _pointDownLeft.X;
@@ -121,10 +132,10 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
         int y2 = _pointUpRight.Y;
         int xS = (x1 + x2) / 2;
         int yS = (y1 + y2) / 2;
-        Leafs[0] = new(new(x1, y1), new(xS, yS));
-        Leafs[1] = new(new(x1, yS), new(xS, y2));
-        Leafs[2] = new(new(xS, yS), new(x2, y2));
-        Leafs[3] = new(new(xS, y1), new(x2, yS));
+        Leafs[0] = new(new(x1, y1), new(xS, yS), this);
+        Leafs[1] = new(new(x1, yS), new(xS, y2), this);
+        Leafs[2] = new(new(xS, yS), new(x2, y2), this);
+        Leafs[3] = new(new(xS, y1), new(x2, yS), this);
         _leafsInicialised = true;
     }
     
@@ -147,19 +158,34 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
 
     public List<T> RemoveDataInRange(QuadTreeNode<T> node)
     {
+        return DataInRange(node, true);
+    }
+    
+    public List<T> GetDataInRange(QuadTreeNode<T> node)
+    {
+        return DataInRange(node, false);
+    }
+    
+    private List<T> DataInRange(QuadTreeNode<T> node, bool removeData)
+    {
         List<T> returnData = new();
         for (int i = 0; i < data.Count; i++)
         {
             if (node.ContainNode(data[i]))
             {
                 returnData.Add(data[i].Data);
-                data.RemoveAt(i);
-                i--;
+                if (removeData)
+                {
+                    data.RemoveAt(i);
+                    i--;   
+                }
             }
         }
 
         return returnData;
     }
+    
+    
     
     public void AddData(QuadTreeNodeData<T> pdata)
     {

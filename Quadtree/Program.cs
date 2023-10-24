@@ -296,7 +296,29 @@ public class Program
         quadtree.Insert(-10.0, -10.0, -1, -1, 4);
         Console.WriteLine("Count pred delete: " + quadtree.Count);
         //var tmp = quadtree.Delete(-20.0, -20.0, -10, -10);
-        var tmp = quadtree.Delete(-20.0, -20.0, -1, -1);
+        var tmp = quadtree.DeleteInterval(-20.0, -20.0, -1, -1);
+        Console.WriteLine("Count po delete: " + quadtree.Count);
+        foreach (var i in tmp)
+        {
+            Console.WriteLine(i);
+        }
+        tmp = quadtree.DeleteInterval(-20.0, -20.0, -1, -1);
+        Console.WriteLine("Count po delete: " + quadtree.Count);
+        foreach (var i in tmp)
+        {
+            Console.WriteLine(i);
+        }
+        
+        tmp = quadtree.DeleteInterval(-50, -50, 50, 50);
+        Console.WriteLine("Count po delete: " + quadtree.Count);
+        foreach (var i in tmp)
+        {
+            Console.WriteLine(i);
+        }
+        
+        quadtree.Insert(-5.0, -5.0, -1, -1, 5);
+        Console.WriteLine("Count po inserte: " + quadtree.Count);
+        tmp = quadtree.DeleteInterval(-50, -50, 50, 50);
         Console.WriteLine("Count po delete: " + quadtree.Count);
         foreach (var i in tmp)
         {

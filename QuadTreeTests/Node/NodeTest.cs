@@ -197,4 +197,19 @@ public class NodeTest
         Assert.That(testNodeLeaf2.DataCount(), Is.EqualTo(1));
     }
     
+    [Test]
+    public void GetDataInRange()
+    {
+        QuadTreeNodeLeaf<int> testNodeLeaf2 = new(new(0, 0), new(20, 20));
+        testNodeLeaf2.TestInitLeafs();
+        QuadTreeNodeData<int> data = new(new(15, 15), new(20, 20), 1);
+        QuadTreeNodeData<int> data2 = new(new(10, 10), new(20, 20), 2);
+        testNodeLeaf2.AddData(data);
+        testNodeLeaf2.AddData(data2);
+        QuadTreeNodeLeaf<int> searchArea = new(new(15, 15), new(20, 20));
+        Assert.That(testNodeLeaf2.DataCount(), Is.EqualTo(2));
+        var tmp = testNodeLeaf2.GetDataInRange(searchArea);
+        Assert.That(tmp.Count, Is.EqualTo(1));
+        Assert.That(tmp[0], Is.EqualTo(1));
+    }
 }
