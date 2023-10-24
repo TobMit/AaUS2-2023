@@ -290,7 +290,8 @@ public class Program
         QuadTree<int> quadtree = new QuadTree<int>(-50, -50, 100, 100, 4);
         quadtree.Insert(-5.0, -5.0, -1, -1, 5);
         quadtree.Insert(-5.0, -5.0, -1, -1, 6);
-        quadtree.Insert(-45.0, -45.0, 30, 30, 1);
+        Console.WriteLine("Count po delete: " + quadtree.Count);
+        /*quadtree.Insert(-45.0, -45.0, 30, 30, 1);
         quadtree.Insert(-45.0, -45.0, -10, -10, 2);
         quadtree.Insert(-20.0, -20.0, -10, -10, 3);
         quadtree.Insert(-10.0, -10.0, -1, -1, 4);
@@ -323,7 +324,7 @@ public class Program
         foreach (var i in tmp)
         {
             Console.WriteLine(i);
-        }
+        }*/
 
         // long hodnota =  90 * 10000000;
         // Console.WriteLine(hodnota);

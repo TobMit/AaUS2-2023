@@ -221,4 +221,65 @@ public class NodeTest
         Assert.True(_testNodeLeaf.HaveSamePoints(testNodeData));
         Assert.False(_testNodeLeaf.HaveSamePoints(testNodeData2));
     }
+
+    [Test]
+    public void DataWithSamePoints()
+    {
+        QuadTreeNodeLeaf<int> testNodeLeaf2 = new(new(10, 10), new(20, 20));
+        QuadTreeNodeData<int> testNodeData = new(new(10, 10), new(20, 20), 1);
+        QuadTreeNodeData<int> testNodeData2 = new(new(10, 10), new(20, 20), 2);
+        QuadTreeNodeData<int> testNodeData3 = new(new(11, 10), new(20, 20), 3);
+
+        QuadTreeNodeLeaf<int> searchData = new(new(10, 10), new(20, 20));
+        QuadTreeNodeLeaf<int> searchData2 = new(new(11, 10), new(20, 20));
+        
+        testNodeLeaf2.AddData(testNodeData);
+        testNodeLeaf2.AddData(testNodeData2);
+        testNodeLeaf2.AddData(testNodeData3);
+
+        var tmp = testNodeLeaf2.GetDataWithSamePoints(searchData);
+        Assert.That(tmp.Count, Is.EqualTo(2));
+        Assert.True(tmp.Contains(1));
+        Assert.True(tmp.Contains(2));
+        
+        tmp = testNodeLeaf2.GetDataWithSamePoints(searchData2);
+        Assert.That(tmp.Count, Is.EqualTo(1));
+        Assert.True(tmp.Contains(3));
+        
+        tmp = testNodeLeaf2.RemoveDataWithSamePoints(searchData);
+        Assert.That(tmp.Count, Is.EqualTo(2));
+        Assert.True(tmp.Contains(1));
+        Assert.True(tmp.Contains(2));
+        Assert.That(testNodeLeaf2.DataCount(), Is.EqualTo(1));
+        
+        tmp = testNodeLeaf2.RemoveDataWithSamePoints(searchData2);
+        Assert.That(tmp.Count, Is.EqualTo(1));
+        Assert.True(tmp.Contains(3));
+        Assert.That(testNodeLeaf2.DataCount(), Is.EqualTo(0));
+    }
+
+
+    [Test]
+    public void CanBeRemoved()
+    {
+        QuadTreeNodeLeaf<int> testNodeLeaf2 = new(new(10, 10), new(20, 20));
+        Assert.True(testNodeLeaf2.CanBeRemoved());
+        Assert.False(testNodeLeaf2.LeafsInicialised);
+        testNodeLeaf2.TestInitLeafs();
+        Assert.True(testNodeLeaf2.LeafsInicialised);
+        Assert.True(testNodeLeaf2.CanBeRemoved());
+        Assert.False(testNodeLeaf2.LeafsInicialised);
+        
+        var tmpLeafs = testNodeLeaf2.TestInitLeafs();
+        tmpLeafs[0].AddData(new QuadTreeNodeData<int>(new(10, 10), new(15, 15), 1));
+        Assert.False(testNodeLeaf2.CanBeRemoved());
+        Assert.True(testNodeLeaf2.LeafsInicialised);
+        
+        tmpLeafs = testNodeLeaf2.TestInitLeafs();
+        tmpLeafs[0].TestInitLeafs();
+        Assert.False(testNodeLeaf2.CanBeRemoved());
+        Assert.True(testNodeLeaf2.LeafsInicialised);
+        Assert.True(tmpLeafs[0].LeafsInicialised);
+    }
+    
 }

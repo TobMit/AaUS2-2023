@@ -233,20 +233,94 @@ public class QuadTree<T>
         return returnData;
     }
     
-    //Find Interval / Delete interval
-    // flaga sa môže nachádzať v 2 režimoch
-    // ak je nastavená na vyhľadávanie bodu
-        // pozriem či sa hladaný objekt nachádza v danom uzle
-        // ak áno tak skontrolujem či sa nenacháda hľadaný objekt/objekty v uložených dátach
-            // ak áno tak ich pridám k vráteným objektom
-        // skontrolujem či sa hladaný objekt nevie zmestiť do niektorého poduzla
-            // ak áno ta current = poduzol
-        // ak sa stane že nemáme už žiadné dáta a ani potomka tak vrátime do current = predka a flag označíme na vymazávanie nodu
-    // ak je flag nastavený na vymazávanie nodu tak sa pozrieme či niektorý s potomkov má dáta
-        // ak nemá dáta tak ich zmažeme a current = predok flaga ostáva označená na mazanie node
-        // ak má dáta tak current = null
+    public List<T> Delete(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight)
+    {
+        return Point(xDownLeft, yDownLeft, xUpRight, yUpRight, true);
+    }
     
-    
+    public List<T> Find(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight)
+    {
+        return Point(xDownLeft, yDownLeft, xUpRight, yUpRight, false);
+    }
+
+    private List<T> Point(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight, bool delete)
+    {
+        // Flag = 0 tak vyhľadávame
+        // Flag = 1 tak mazeme
+        int flag = 0;
+        QuadTreeNodeLeaf<T> objectToFind = new(new(QuadTreeRound(xDownLeft), QuadTreeRound(yDownLeft)),
+            new(QuadTreeRound(xUpRight), QuadTreeRound(yUpRight)));
+        
+        QuadTreeNodeLeaf<T>? current;
+
+        List<T> returnData = new();
+
+        current = root;
+        while (current is not null)
+        {
+            // flaga sa môže nachádzať v 2 režimoch
+            if (flag == 0)
+            {
+                // ak je nastavená na vyhľadávanie bodu
+                // pozriem či sa hladaný objekt nachádza v danom uzle
+                if (current.ContainNode(objectToFind))
+                {
+                    // ak áno tak skontrolujem či sa nenacháda hľadaný objekt/objekty v uložených dátach
+                    // ak áno tak ich pridám k vráteným objektom
+                    if (delete)
+                    {
+                        var tmpData = current.RemoveDataWithSamePoints(objectToFind);
+                        Count -= tmpData.Count;
+                        returnData.AddRange(tmpData);
+                    }
+                    else
+                    {
+                        returnData.AddRange(current.GetDataWithSamePoints(objectToFind));
+                    }
+                    
+                    // skontrolujem či sa hladaný objekt nevie zmestiť do niektorého poduzla
+                    if (current.AnyInitSubNodeContainDataNode(objectToFind))
+                    {
+                        // ak áno ta current = poduzol
+                        current = current.GetLeafThatCanContainDataNode(objectToFind);
+                    }
+                    // ak sa stane že nemáme už žiadné dáta a ani potomka tak vrátime do current = predka a flag označíme na vymazávanie nodu
+                    //todo tu to môže spôsobovať bug ak sa objavý
+                    //else if (current.DataIsEmpty() && !current.LeafsInicialised)
+                    else if (current.DataIsEmpty())
+                    {
+                        //current = current.Parent;
+                        flag = 1;
+                    }
+                    else
+                    {
+                        current = null;
+                    }
+                }
+                else
+                {
+                    //je to tu skôr pre istotu ak by sa stala niekde chyba a priradil by sa zlý leafs
+                    current = null;
+                }
+            }
+            else
+            {
+                // ak je flag nastavený na vymazávanie nodu tak sa pozrieme či niektorý s potomkov má dáta
+                    // ak nemá dáta tak ich zmažeme a current = predok flaga ostáva označená na mazanie node
+                    // ak má dáta tak current = null
+                if (current.CanBeRemoved())
+                {
+                    current = current.Parent;
+                }
+                else
+                {
+                    current = null;
+                }
+            }
+        }
+
+        return returnData;
+    }
 
     /// <summary>
     /// Round data and decimal numbers for this structure

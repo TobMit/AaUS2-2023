@@ -184,8 +184,62 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
 
         return returnData;
     }
+
     
+    public List<T> RemoveDataWithSamePoints(QuadTreeNode<T> node)
+    {
+        return DataWithSamePoints(node, true);
+    }
     
+    public List<T> GetDataWithSamePoints(QuadTreeNode<T> node)
+    {
+        return DataWithSamePoints(node, false);
+    }
+    
+    private List<T> DataWithSamePoints(QuadTreeNode<T> node, bool removeData)
+    {
+        List<T> returnData = new();
+        for (int i = 0; i < data.Count; i++)
+        {
+            if (node.HaveSamePoints(data[i]))
+            {
+                returnData.Add(data[i].Data);
+                if (removeData)
+                {
+                    data.RemoveAt(i);
+                    i--;   
+                }
+            }
+        }
+
+        return returnData;
+    }
+    
+    public bool CanBeRemoved()
+    {
+        if (!_leafsInicialised)
+        {
+            return true;
+        }
+        
+        bool canBeRemoved = true;
+        foreach (var leaf in Leafs)
+        {
+            canBeRemoved = canBeRemoved && !leaf.LeafsInicialised && leaf.DataIsEmpty();
+        }
+
+        if (canBeRemoved)
+        {
+            for (int i = 0; i < Leafs.Length; i++)
+            {
+                Leafs[i] = null;
+            }
+
+            _leafsInicialised = false;
+        }
+
+        return canBeRemoved;
+    }
     
     public void AddData(QuadTreeNodeData<T> pdata)
     {
@@ -241,4 +295,5 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
         InitLeafs();
         return Leafs;
     }
+    
 }
