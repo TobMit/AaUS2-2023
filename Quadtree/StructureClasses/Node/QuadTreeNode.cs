@@ -38,4 +38,9 @@ public abstract class QuadTreeNode<T>
     {
         return OverpalapPoints(nodeLeaf.PointDownLeft, nodeLeaf.PointUpRight);
     }
+
+    public bool HaveSamePoints(QuadTreeNode<T> node)
+    {
+        return node.PointDownLeft == PointDownLeft && node.PointUpRight == PointUpRight;
+    }
 }

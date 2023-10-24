@@ -212,4 +212,13 @@ public class NodeTest
         Assert.That(tmp.Count, Is.EqualTo(1));
         Assert.That(tmp[0], Is.EqualTo(1));
     }
+
+    [Test]
+    public void SamePoints()
+    {
+        QuadTreeNodeData<string> testNodeData = new(new(10, 10), new(20, 20), "data");
+        QuadTreeNodeData<string> testNodeData2 = new(new(11, 10), new(20, 20), "data");
+        Assert.True(_testNodeLeaf.HaveSamePoints(testNodeData));
+        Assert.False(_testNodeLeaf.HaveSamePoints(testNodeData2));
+    }
 }

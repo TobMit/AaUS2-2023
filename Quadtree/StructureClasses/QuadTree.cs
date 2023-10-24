@@ -145,16 +145,26 @@ public class QuadTree<T>
         /// <p> 1 - mod mazania </p>
         /// </summary>
         public int Mode { get; }
+        
+        public bool LeafsAlreadyInStack { get; }
         public RangeNodes(QuadTreeNodeLeaf<T> pNode, int pMode)
         {
             Node = pNode;
             Mode = pMode;
+            LeafsAlreadyInStack = false;
+        }
+        
+        public RangeNodes(QuadTreeNodeLeaf<T> pNode, int pMode, bool pLeafsAlreadyInStack)
+        {
+            Node = pNode;
+            Mode = pMode;
+            LeafsAlreadyInStack = pLeafsAlreadyInStack;
         }
     }
 
     private List<T> Interval(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight, bool delete)
     {
-        QuadTreeNodeLeaf<T> areaToDelete = new(new(QuadTreeRound(xDownLeft), QuadTreeRound(yDownLeft)),
+        QuadTreeNodeLeaf<T> areaToFind = new(new(QuadTreeRound(xDownLeft), QuadTreeRound(yDownLeft)),
             new(QuadTreeRound(xUpRight), QuadTreeRound(yUpRight)));
         
         List<T> returnData = new();
@@ -167,13 +177,13 @@ public class QuadTree<T>
             if (current.Mode == 0)
             { 
                 // 1. hľadanie poduzla do ktorého sa zmesti hladaná area
-                if (current.Node.ContainNode(areaToDelete))
+                if (current.Node.ContainNode(areaToFind))
                 {
                     // hľadanie prebieha tak že sa pozeráme ktorý uzol vie obsiahnuť vymazávanú areu a či aj potomkovia dokážu obsiahnuť hľadanú areu
-                    if (current.Node.AnyInitSubNodeContainDataNode(areaToDelete))
+                    if (current.Node.AnyInitSubNodeContainDataNode(areaToFind))
                     {
                         // ak áno tak ten poduzol ktorý obsahuje náš objekt pridáme do stacku
-                        var tmp = current.Node.GetLeafThatCanContainDataNode(areaToDelete);
+                        var tmp = current.Node.GetLeafThatCanContainDataNode(areaToFind);
                         if (tmp is null) throw new Exception("Error in QuadTree, this shouldnt happend");
                         stack.Push(new(tmp, 0));
                     
@@ -181,12 +191,12 @@ public class QuadTree<T>
                     else
                     {
                         // ak nie tak pridáme do stacku všetky listy ktoré sa prekrývajú v rátane seba samáho na kontrolu dát
-                        var tmp = current.Node.GetOverlapingLefs(areaToDelete);
+                        var tmp = current.Node.GetOverlapingLefs(areaToFind);
                         foreach (var leaf in tmp)
                         {
                             stack.Push(new(leaf, 1));
                         }
-                        stack.Push(new (current.Node, 1));
+                        stack.Push(new (current.Node, 1, true));
                     }
                 }
             }
@@ -198,20 +208,24 @@ public class QuadTree<T>
                 List<T> tmpList = new();
                 if (delete)
                 {
-                    tmpList = current.Node.RemoveDataInRange(areaToDelete);
+                    tmpList = current.Node.RemoveDataInRange(areaToFind);
                     Count -= tmpList.Count;
                 }
                 else
                 {
-                    tmpList = current.Node.GetDataInRange(areaToDelete);
+                    tmpList = current.Node.GetDataInRange(areaToFind);
                 }
                 returnData.AddRange(tmpList);
-                // 2. skontrolujeme s ktorými potrvkami sa prekrýva vymazávaná area, alebo čiastočne prekrýva
-                    // potomok ktorý sa prekrýva pridáme do staku
-                var tmp = current.Node.GetOverlapingLefs(areaToDelete);
-                foreach (var leaf in tmp)
+                // ak sa už nachádzajú vo staku tak už ich nemusíme pridávať
+                if (!current.LeafsAlreadyInStack)
                 {
-                    stack.Push(new(leaf, 1));
+                    // 2. skontrolujeme s ktorými potrvkami sa prekrýva vymazávaná area, alebo čiastočne prekrýva
+                        // potomok ktorý sa prekrýva pridáme do staku
+                    var tmp = current.Node.GetOverlapingLefs(areaToFind);
+                    foreach (var leaf in tmp)
+                    {
+                        stack.Push(new(leaf, 1));
+                    }
                 }
             }
         }
@@ -224,9 +238,9 @@ public class QuadTree<T>
     // ak je nastavená na vyhľadávanie bodu
         // pozriem či sa hladaný objekt nachádza v danom uzle
         // ak áno tak skontrolujem či sa nenacháda hľadaný objekt/objekty v uložených dátach
-        // ak áno tak ich pridám k vráteným objektom
+            // ak áno tak ich pridám k vráteným objektom
         // skontrolujem či sa hladaný objekt nevie zmestiť do niektorého poduzla
-        // ak áno ta current = poduzol
+            // ak áno ta current = poduzol
         // ak sa stane že nemáme už žiadné dáta a ani potomka tak vrátime do current = predka a flag označíme na vymazávanie nodu
     // ak je flag nastavený na vymazávanie nodu tak sa pozrieme či niektorý s potomkov má dáta
         // ak nemá dáta tak ich zmažeme a current = predok flaga ostáva označená na mazanie node
