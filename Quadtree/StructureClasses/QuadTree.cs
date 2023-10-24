@@ -8,7 +8,7 @@ public class QuadTree<T>
 {
     private QuadTreeNodeLeaf<T> root;
     private const int HODNOTA = 10000000;
-    private const int MAX_DEPTH = 29; // je to kôli tomu že keď zoberiem max rozmer tak ho viem deliť iba 29 krát kým by som nedostal samé 1
+    private const int MAX_DEPTH = 28; // je to kôli tomu že keď zoberiem max rozmer tak ho viem deliť iba 29 krát kým by som nedostal samé 1 a z bezpečnostných dôvodou iba 28
     private int max_depth;
     public int Count { get; set; }
 
@@ -30,7 +30,7 @@ public class QuadTree<T>
 
         if (pMaxDepth > MAX_DEPTH)
         {
-            throw new Exception("Max depth is 29");
+            throw new Exception("Max depth is 28");
         }
         
         root = new(new(QuadTreeRound(pX), QuadTreeRound(pY)),
