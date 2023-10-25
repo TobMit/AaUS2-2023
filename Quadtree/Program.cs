@@ -8,7 +8,7 @@ public class Program
 {
     public static void Main()
     {
-        int MAX_UNITS = 100000;
+        int MAX_UNITS = 1000000;
         int MAX_TEST = 100000;
         double PROBABILITY = 0.6;
         int MAX_X = 180;
@@ -25,12 +25,7 @@ public class Program
             Random rnd = new Random(seed);
             List<int> toInsert = new(MAX_UNITS);
             List<QuadTreeNodeData<int>> toDelete = new(MAX_UNITS);
-
-            if (seed % 100 == 0)
-            {
-                Console.WriteLine(seed);
-            }
-
+            
             for (int i = 0; i < MAX_UNITS; i++)
             {
                 toInsert.Add(i);
@@ -44,7 +39,7 @@ public class Program
                 int x2 = rnd.Next(x, MAX_X);
                 int y2 = rnd.Next(y, MAX_Y);
 
-                // Console.WriteLine(quadtree.Count);
+                //Console.WriteLine("Iteration: " + i);
 
 
                 if (rnd.NextDouble() < PROBABILITY)
@@ -57,6 +52,7 @@ public class Program
                         toInsert.RemoveAt(index);
                         toDelete.Add(new(new(x, y), new(x2, y2), value));
                         quadtree.Insert(x, y, x2, y2, value);
+                        
                         var insertedValue = quadtree.Find(x, y, x2, y2);
                         if (!insertedValue.Contains(value))
                         {
@@ -85,7 +81,7 @@ public class Program
                         var value = toDelete[index];
                         toDelete.RemoveAt(index);
                         toInsert.Add(value.Data);
-                        var deltedValue = quadtree.Find(value.PointDownLeft.X, value.PointDownLeft.Y,
+                        /*var deltedValue = quadtree.Find(value.PointDownLeft.X, value.PointDownLeft.Y,
                             value.PointUpRight.X, value.PointUpRight.Y);
                         
                         if (deltedValue.Count == 0)
@@ -97,14 +93,8 @@ public class Program
                             Console.WriteLine("SEED: " + seed);
                             tieKtoreSaSemDostali.Add(seed);
                             break;
-                        }
-                        else if (deltedValue.Count >= 1)
-                        {
-                            Console.WriteLine("Lastest lowest in find in delete returned multiple: " + lastestLovest);
-                            Console.WriteLine("SEED: " + seed);
-                            //todo vymazať z toDelete hodnoty ktoré sa tu vrátili viac krát
-                        }
-                        deltedValue = quadtree.Delete(value.PointDownLeft.X, value.PointDownLeft.Y,
+                        }*/
+                        var deltedValue = quadtree.Delete(value.PointDownLeft.X, value.PointDownLeft.Y,
                             value.PointUpRight.X, value.PointUpRight.Y);
                         if (deltedValue.Count == 0)
                         {
@@ -126,6 +116,24 @@ public class Program
                             tieKtoreSaSemDostali.Add(seed);
                             break;
                         }
+
+                        foreach (var returnedValue in deltedValue)
+                        {
+                            if (returnedValue != value.Data)
+                            {
+                                for (int j = 0; j < toDelete.Count; j++)
+                                {
+                                    if (toDelete[j].Data == returnedValue)
+                                    {
+                                        toDelete.RemoveAt(j);
+                                        toInsert.Add(returnedValue);
+                                        break;
+                                    }
+                                }
+                                //Console.WriteLine("Hodnota sa nenachádza v toDelete so seedom: " + seed);
+                            }
+                        }
+                        
                     }
                     else
                     {
@@ -134,7 +142,7 @@ public class Program
                     }
                 }
             }
-            //Console.WriteLine("SEED: " + seed);
+            Console.WriteLine("SEED: " + seed);
             seed++;
         }
         
