@@ -8,8 +8,8 @@ public class Program
 {
     public static void Main()
     {
-        int MAX_UNITS = 10000000;
-        int MAX_TEST = 100 ;
+        int MAX_UNITS = 100000;
+        int MAX_TEST = 100000;
         double PROBABILITY = 0.6;
         int MAX_X = 180;
         int MIN_X = -180;
@@ -17,13 +17,19 @@ public class Program
         int MIN_Y = -90;
 
         int lastestLovest = int.MaxValue;
-        int seed = 2;
+        List<int> tieKtoreSaSemDostali = new();
+        int seed = 0;
 
         while (lastestLovest >= 30)
         {
             Random rnd = new Random(seed);
             List<int> toInsert = new(MAX_UNITS);
             List<QuadTreeNodeData<int>> toDelete = new(MAX_UNITS);
+
+            if (seed % 100 == 0)
+            {
+                Console.WriteLine(seed);
+            }
 
             for (int i = 0; i < MAX_UNITS; i++)
             {
@@ -45,11 +51,21 @@ public class Program
                 {
                     if (toInsert.Count > 0)
                     {
+                        
                         int index = rnd.Next(0, toInsert.Count);
                         int value = toInsert[index];
                         toInsert.RemoveAt(index);
                         toDelete.Add(new(new(x, y), new(x2, y2), value));
                         quadtree.Insert(x, y, x2, y2, value);
+                        var insertedValue = quadtree.Find(x, y, x2, y2);
+                        if (!insertedValue.Contains(value))
+                        {
+                            lastestLovest = i;
+                            //Console.WriteLine();
+                            Console.WriteLine("Lastest lowest in insert: " + lastestLovest);
+                            tieKtoreSaSemDostali.Add(seed);
+                            break;
+                        }
                     }
                     else
                     {
@@ -61,18 +77,53 @@ public class Program
                 {
                     if (toDelete.Count > 0)
                     {
+                        if (i == 50737)
+                        {
+                            //Console.WriteLine();
+                        }
                         int index = rnd.Next(0, toDelete.Count);
                         var value = toDelete[index];
                         toDelete.RemoveAt(index);
                         toInsert.Add(value.Data);
-                        var deltedValue = quadtree.Delete(value.PointDownLeft.X, value.PointDownLeft.Y,
+                        var deltedValue = quadtree.Find(value.PointDownLeft.X, value.PointDownLeft.Y,
                             value.PointUpRight.X, value.PointUpRight.Y);
+                        
+                        if (deltedValue.Count == 0)
+                        {
+                            //throw new Exception("Deleted value is not the same as inserted value");}}
+                            lastestLovest = i;
+                            //Console.WriteLine();
+                            Console.WriteLine("Lastest lowest in find in delete returned empty: " + lastestLovest);
+                            Console.WriteLine("SEED: " + seed);
+                            tieKtoreSaSemDostali.Add(seed);
+                            break;
+                        }
+                        else if (deltedValue.Count >= 1)
+                        {
+                            Console.WriteLine("Lastest lowest in find in delete returned multiple: " + lastestLovest);
+                            Console.WriteLine("SEED: " + seed);
+                            //todo vymazať z toDelete hodnoty ktoré sa tu vrátili viac krát
+                        }
+                        deltedValue = quadtree.Delete(value.PointDownLeft.X, value.PointDownLeft.Y,
+                            value.PointUpRight.X, value.PointUpRight.Y);
+                        if (deltedValue.Count == 0)
+                        {
+                            //throw new Exception("Deleted value is not the same as inserted value");}}
+                            lastestLovest = i;
+                            //Console.WriteLine();
+                            Console.WriteLine("Lastest lowest in delete returned empty: " + lastestLovest);
+                            Console.WriteLine("SEED: " + seed);
+                            tieKtoreSaSemDostali.Add(seed);
+                            break;
+                        }
                         if (!deltedValue.Contains(value.Data))
                         {
                             //throw new Exception("Deleted value is not the same as inserted value");}}
                             lastestLovest = i;
-                            Console.WriteLine();
-                            Console.WriteLine("Lastest lowest: " + lastestLovest);
+                            //Console.WriteLine();
+                            Console.WriteLine("Lastest lowest in delete: " + lastestLovest);
+                            Console.WriteLine("SEED: " + seed);
+                            tieKtoreSaSemDostali.Add(seed);
                             break;
                         }
                     }
@@ -83,9 +134,11 @@ public class Program
                     }
                 }
             }
-            Console.WriteLine("SEED: " + seed);
+            //Console.WriteLine("SEED: " + seed);
             seed++;
         }
+        
+        Console.WriteLine("Najdeny SEED: " + seed);
 
         /*
         QuadTree<int> quadtree = new QuadTree<int>(-50, -50, 100, 100, 4);
