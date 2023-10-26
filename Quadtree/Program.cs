@@ -10,7 +10,8 @@ public class Program
     {
         int MAX_UNITS = 1000000;
         int MAX_TEST = 100000;
-        double PROBABILITY = 0.6;
+        double PROBABILITY_FD = 0.6;
+        double PROBABILITY_FO_FR = 0.1;
         int MAX_X = 180;
         int MIN_X = -180;
         int MAX_Y = 90;
@@ -34,15 +35,41 @@ public class Program
             QuadTree<int> quadtree = new QuadTree<int>(MIN_X, MIN_Y, 360, 180, 28);
             for (int i = 0; i < MAX_TEST; i++)
             {
-                int x = rnd.Next(MIN_X, MAX_X);
-                int y = rnd.Next(MIN_Y, MAX_Y);
-                int x2 = rnd.Next(x, MAX_X);
-                int y2 = rnd.Next(y, MAX_Y);
+                int x = rnd.Next(MIN_X, MAX_X-1);
+                int y = rnd.Next(MIN_Y, MAX_Y-1);
+                int x2 = rnd.Next(x+1, MAX_X);
+                int y2 = rnd.Next(y+1, MAX_Y);
 
-                //Console.WriteLine("Iteration: " + i);
-
-
-                if (rnd.NextDouble() < PROBABILITY)
+                var rndValue = rnd.NextDouble();
+                if (rndValue < PROBABILITY_FO_FR)
+                {
+                    
+                    if (rnd.NextDouble() < 0.5)
+                    {
+                        var tmpData = quadtree.FindInterval(MIN_X, MIN_Y, 180, 90);
+                        if (tmpData.Count != toDelete.Count)
+                        {
+                            lastestLovest = i;
+                            Console.WriteLine("Lastest lowest in find interval: " + lastestLovest + " in seed: " + seed);
+                            Console.WriteLine("     Find: " + tmpData.Count + " toDelete: " + toDelete.Count + " realCount " + quadtree.Recount());
+                            tieKtoreSaSemDostali.Add(seed);
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        var tmpData = quadtree.FindOverlapingData(MIN_X, MIN_Y, 180, 90);
+                        if (tmpData.Count != toDelete.Count)
+                        {
+                            lastestLovest = i;
+                            Console.WriteLine("Lastest lowest in find overlaping: " + lastestLovest + " in seed: " + seed);
+                            Console.WriteLine("     Find: " + tmpData.Count + " toDelete: " + toDelete.Count + " realCount " + quadtree.Recount());
+                            tieKtoreSaSemDostali.Add(seed);
+                            break;
+                        }
+                    }
+                }
+                else if (rndValue < PROBABILITY_FD)
                 {
                     if (toInsert.Count > 0)
                     {
@@ -57,8 +84,17 @@ public class Program
                         if (!insertedValue.Contains(value))
                         {
                             lastestLovest = i;
-                            //Console.WriteLine();
-                            Console.WriteLine("Lastest lowest in insert: " + lastestLovest);
+                            Console.WriteLine("Lastest lowest in insert: " + lastestLovest + " in seed: " + seed);
+                            tieKtoreSaSemDostali.Add(seed);
+                            break;
+                        }
+
+                        var realCount = quadtree.Recount();
+                        if (realCount != toDelete.Count)
+                        {
+                            lastestLovest = i;
+                            Console.WriteLine("Lastest lowest in insert: " + lastestLovest + " in seed: " + seed);
+                            Console.WriteLine("real count: " + realCount + " toDelete: " + toDelete.Count);
                             tieKtoreSaSemDostali.Add(seed);
                             break;
                         }
@@ -73,45 +109,25 @@ public class Program
                 {
                     if (toDelete.Count > 0)
                     {
-                        if (i == 50737)
-                        {
-                            //Console.WriteLine();
-                        }
+                        
                         int index = rnd.Next(0, toDelete.Count);
                         var value = toDelete[index];
                         toDelete.RemoveAt(index);
                         toInsert.Add(value.Data);
-                        /*var deltedValue = quadtree.Find(value.PointDownLeft.X, value.PointDownLeft.Y,
-                            value.PointUpRight.X, value.PointUpRight.Y);
-                        
-                        if (deltedValue.Count == 0)
-                        {
-                            //throw new Exception("Deleted value is not the same as inserted value");}}
-                            lastestLovest = i;
-                            //Console.WriteLine();
-                            Console.WriteLine("Lastest lowest in find in delete returned empty: " + lastestLovest);
-                            Console.WriteLine("SEED: " + seed);
-                            tieKtoreSaSemDostali.Add(seed);
-                            break;
-                        }*/
                         var deltedValue = quadtree.Delete(value.PointDownLeft.X, value.PointDownLeft.Y,
                             value.PointUpRight.X, value.PointUpRight.Y);
                         if (deltedValue.Count == 0)
                         {
-                            //throw new Exception("Deleted value is not the same as inserted value");}}
                             lastestLovest = i;
-                            //Console.WriteLine();
-                            Console.WriteLine("Lastest lowest in delete returned empty: " + lastestLovest);
+                            Console.WriteLine("Lastest lowest in delete returned empty: " + lastestLovest + " in seed: " + seed);
                             Console.WriteLine("SEED: " + seed);
                             tieKtoreSaSemDostali.Add(seed);
                             break;
                         }
                         if (!deltedValue.Contains(value.Data))
                         {
-                            //throw new Exception("Deleted value is not the same as inserted value");}}
                             lastestLovest = i;
-                            //Console.WriteLine();
-                            Console.WriteLine("Lastest lowest in delete: " + lastestLovest);
+                            Console.WriteLine("Lastest lowest in delete: " + lastestLovest + " in seed: " + seed);
                             Console.WriteLine("SEED: " + seed);
                             tieKtoreSaSemDostali.Add(seed);
                             break;
@@ -130,8 +146,17 @@ public class Program
                                         break;
                                     }
                                 }
-                                //Console.WriteLine("Hodnota sa nenachádza v toDelete so seedom: " + seed);
                             }
+                        }
+                        
+                        var realCount = quadtree.Recount();
+                        if (realCount != toDelete.Count)
+                        {
+                            lastestLovest = i;
+                            Console.WriteLine("Lastest lowest in delete: " + lastestLovest + " in seed: " + seed);
+                            Console.WriteLine("real count: " + realCount + " toDelete: " + toDelete.Count + " in seed: " + seed);
+                            tieKtoreSaSemDostali.Add(seed);
+                            break;
                         }
                         
                     }
@@ -146,7 +171,7 @@ public class Program
             seed++;
         }
         
-        Console.WriteLine("Najdeny SEED: " + seed);
+        Console.WriteLine("Najdeny SEED: " + --seed);
 
         /*
         QuadTree<int> quadtree = new QuadTree<int>(-50, -50, 100, 100, 4);

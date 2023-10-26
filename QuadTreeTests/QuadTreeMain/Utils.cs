@@ -21,4 +21,18 @@ public class Utils
         Assert.False(QuadTree<int>.TestCheckCoordinates(1800000001, 900000000));
         Assert.False(QuadTree<int>.TestCheckCoordinates(1800000000, 900000001));
     }
+
+    [Test]
+    public void Recount()
+    {
+        QuadTree<int> quadtree = new QuadTree<int>(-50, -50, 100, 100, 4);
+        quadtree.Insert(-5.0, -5.0, -1, -1, 5);
+        quadtree.Insert(-5.0, -5.0, -1, -1, 6);
+        quadtree.Insert(-45.0, -45.0, 30, 30, 1);
+        quadtree.Insert(-45.0, -45.0, -10, -10, 2);
+        quadtree.Insert(-20.0, -20.0, -10, -10, 3);
+        quadtree.Insert(-10.0, -10.0, -1, -1, 4);
+        Assert.That(quadtree.Count, Is.EqualTo(quadtree.Recount()));
+        Assert.That(quadtree.Recount(), Is.EqualTo(6));
+    }
 }

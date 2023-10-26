@@ -146,7 +146,7 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
         {
             foreach (QuadTreeNodeLeaf<T> leaf in Leafs)
             {
-                if (leaf.OverlapNode(pData))
+                if (leaf.OverlapNode(pData) || pData.OverlapNode(leaf) || leaf.ContainNode(pData) || pData.ContainNode(leaf))
                 {
                     returnList.Add(leaf);
                 }
@@ -307,6 +307,11 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
     public QuadTreeNodeLeaf<T>[] TestInitLeafs()
     {
         InitLeafs();
+        return Leafs;
+    }
+
+    public QuadTreeNodeLeaf<T>[] TestGetLeafs()
+    {
         return Leafs;
     }
     

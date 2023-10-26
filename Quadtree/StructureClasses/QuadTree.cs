@@ -337,7 +337,7 @@ public class QuadTree<T>
         {
             var current = stack.Pop();
             // 1. skontrolujeme či na naše dva objekty prekrývajú
-            if (current.OverlapNode(objectToFind))
+            if (current.OverlapNode(objectToFind) || objectToFind.OverlapNode(current))
             {
                 // pridáme dáta ktoré sa prekrývajú
                 // do staku pridáme listy ktoré sa prekrývajú
@@ -353,6 +353,29 @@ public class QuadTree<T>
         }
 
         return returnData;
+    }
+    
+    public int Recount()
+    {
+        int newCount = 0;
+        Stack<QuadTreeNodeLeaf<T>> stack = new();
+        // prdidáme do stakú root
+        stack.Push(root);
+        while (stack.Count != 0)
+        {
+            var current = stack.Pop();
+            newCount += current.DataCount();
+            if (current.LeafsInicialised)
+            {
+                var tmpLeafs = current.TestGetLeafs();
+                foreach (var leaf in tmpLeafs)
+                {
+                    stack.Push(leaf);
+                }
+            }
+        }
+
+        return newCount;
     }
 
     /// <summary>
