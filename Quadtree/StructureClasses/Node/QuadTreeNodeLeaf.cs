@@ -156,6 +156,20 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
         return returnList;
     }
 
+    public List<T> GetOverlapingData(QuadTreeNode<T> pNode)
+    {
+        List<T> returnList = new();
+        foreach (QuadTreeNodeData<T> dataNode in data)
+        {
+            if (dataNode.OverlapNode(pNode))
+            {
+                returnList.Add(dataNode.Data);
+            }
+        }
+
+        return returnList;
+    }
+
     public List<T> RemoveDataInRange(QuadTreeNode<T> node)
     {
         return DataInRange(node, true);

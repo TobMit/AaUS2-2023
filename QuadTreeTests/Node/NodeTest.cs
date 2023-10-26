@@ -66,11 +66,19 @@ public class NodeTest
         QuadTreeNodeLeaf<string> testNodeLeaf5 = new(new(-10, -10), new(15, 15), _testNodeLeafData);
         QuadTreeNodeLeaf<string> testNodeLeaf6 = new(new(-20, -20), new(0, 0), _testNodeLeafData);
         QuadTreeNodeLeaf<string> testNodeLeaf7 = new(new(-20, -20), new(-1, -1), _testNodeLeafData);
+        QuadTreeNodeLeaf<string> testNodeLeaf8 = new(new(-45, -45), new (-10, -10), _testNodeLeafData);
+        QuadTreeNodeLeaf<string> testNodeLeaf9 = new(new(-80, -80), new (80, 80), _testNodeLeafData);
         Assert.True(testNodeLeaf2.OverlapNode(testNodeLeaf3));
+        Assert.True(testNodeLeaf3.OverlapNode(testNodeLeaf2));
         Assert.True(testNodeLeaf2.OverlapNode(testNodeLeaf4));
         Assert.True(testNodeLeaf2.OverlapNode(testNodeLeaf5));
+        Assert.True(testNodeLeaf5.OverlapNode(testNodeLeaf2));
         Assert.False(testNodeLeaf2.OverlapNode(testNodeLeaf6));
         Assert.False(testNodeLeaf2.OverlapNode(testNodeLeaf7));
+        Assert.True(testNodeLeaf8.OverlapNode(testNodeLeaf7));
+        Assert.True(testNodeLeaf7.OverlapNode(testNodeLeaf8));
+        Assert.True(testNodeLeaf9.OverlapNode(testNodeLeaf2));
+        Assert.True(testNodeLeaf2.OverlapNode(testNodeLeaf9));
     }
 
     [Test]
@@ -280,6 +288,41 @@ public class NodeTest
         Assert.False(testNodeLeaf2.CanBeRemoved());
         Assert.True(testNodeLeaf2.LeafsInicialised);
         Assert.True(tmpLeafs[0].LeafsInicialised);
+    }
+
+    [Test]
+    public void GetOverlapingData()
+    {
+        QuadTreeNodeLeaf<int> testNodeLeaf2 = new(new(0, 0), new(20, 20));
+        testNodeLeaf2.AddData(new QuadTreeNodeData<int>(new(0,0), new (10,10), 1));
+        testNodeLeaf2.AddData(new QuadTreeNodeData<int>(new(5,5), new (15,15), 2));
+        testNodeLeaf2.AddData(new QuadTreeNodeData<int>(new(10,10), new (20,20), 3));
+        
+        var tmpData = testNodeLeaf2.GetOverlapingData(new QuadTreeNodeLeaf<int>(new(0,0), new (10,10)));
+        Assert.That(tmpData.Count, Is.EqualTo(2));
+        Assert.That(tmpData[0], Is.EqualTo(1));
+        Assert.That(tmpData[1], Is.EqualTo(2));
+        
+        tmpData = testNodeLeaf2.GetOverlapingData(new QuadTreeNodeLeaf<int>(new(5,5), new (15,15)));
+        Assert.That(tmpData.Count, Is.EqualTo(3));
+        Assert.That(tmpData[0], Is.EqualTo(1));
+        Assert.That(tmpData[1], Is.EqualTo(2));
+        Assert.That(tmpData[2], Is.EqualTo(3));
+        
+        tmpData = testNodeLeaf2.GetOverlapingData(new QuadTreeNodeLeaf<int>(new(12,12), new (30,30)));
+        Assert.That(tmpData.Count, Is.EqualTo(2));
+        Assert.That(tmpData[0], Is.EqualTo(2));
+        Assert.That(tmpData[1], Is.EqualTo(3));
+        
+        tmpData = testNodeLeaf2.GetOverlapingData(new QuadTreeNodeLeaf<int>(new(15,15), new (30,30)));
+        Assert.That(tmpData.Count, Is.EqualTo(1));
+        Assert.That(tmpData[0], Is.EqualTo(3));
+        
+        tmpData = testNodeLeaf2.GetOverlapingData(new QuadTreeNodeLeaf<int>(new(20,20), new (30,30)));
+        Assert.That(tmpData.Count, Is.EqualTo(0));
+        
+        tmpData = testNodeLeaf2.GetOverlapingData(new QuadTreeNodeLeaf<int>(new(-20,-20), new (0,0)));
+        Assert.That(tmpData.Count, Is.EqualTo(0));
     }
     
 }

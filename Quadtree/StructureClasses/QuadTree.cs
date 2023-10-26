@@ -322,6 +322,39 @@ public class QuadTree<T>
         return returnData;
     }
 
+    public List<T> FindOverlapingData(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight)
+    {
+        QuadTreeNodeLeaf<T> objectToFind = new(new(QuadTreeRound(xDownLeft), QuadTreeRound(yDownLeft)),
+            new(QuadTreeRound(xUpRight), QuadTreeRound(yUpRight)));
+        
+        List<T> returnData = new();
+        
+        Stack<QuadTreeNodeLeaf<T>> stack = new();
+        // prdidáme do stakú root
+        stack.Push(root);
+        
+        while (stack.Count!= 0)
+        {
+            var current = stack.Pop();
+            // 1. skontrolujeme či na naše dva objekty prekrývajú
+            if (current.OverlapNode(objectToFind))
+            {
+                // pridáme dáta ktoré sa prekrývajú
+                // do staku pridáme listy ktoré sa prekrývajú
+                returnData.AddRange(current.GetOverlapingData(objectToFind));
+                
+                // do staku pridáme listy ktoré sa prekrývajú
+                var tmpLeafs = current.GetOverlapingLefs(objectToFind);
+                foreach (var leaf in tmpLeafs)
+                {
+                    stack.Push(leaf);
+                }
+            }
+        }
+
+        return returnData;
+    }
+
     /// <summary>
     /// Round data and decimal numbers for this structure
     /// </summary>
