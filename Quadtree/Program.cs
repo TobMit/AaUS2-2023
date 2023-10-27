@@ -12,6 +12,7 @@ public class Program
         int MAX_TEST = 100000;
         double PROBABILITY_FD = 0.6;
         double PROBABILITY_FO_FR = 0.1;
+        double PROBABILITY_DEPTH = 0.01;
         int MAX_X = 180;
         int MIN_X = -180;
         int MAX_Y = 90;
@@ -41,7 +42,19 @@ public class Program
                 int y2 = rnd.Next(y+1, MAX_Y);
 
                 var rndValue = rnd.NextDouble();
-                if (rndValue < PROBABILITY_FO_FR)
+                if (rndValue < PROBABILITY_DEPTH)
+                {
+                    var newDepth = rnd.Next(15, 28);
+                    quadtree.setQuadTreeDepth(newDepth);
+                    if (quadtree.Count != quadtree.Recount())
+                    {
+                        lastestLovest = i;
+                        Console.WriteLine("Lastest lowest in set depth: " + lastestLovest + " in seed: " + seed);
+                        tieKtoreSaSemDostali.Add(seed);
+                        break;
+                    }
+                }
+                else if (rndValue < PROBABILITY_FO_FR)
                 {
                     
                     if (rnd.NextDouble() < 0.5)
