@@ -1,10 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AaUS2", "AaUS2\AaUS2.csproj", "{C95D7422-4EB2-4DD7-8351-F1602B3EC56C}"
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AaUS2", "AaUS2\AaUS2.csproj", "{C95D7422-4EB2-4DD7-8351-F1602B3EC56C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quadtree", "Quadtree\Quadtree.csproj", "{EDB67729-A5BB-4AFC-ACC4-D564DDAD5B22}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Quadtree", "Quadtree\Quadtree.csproj", "{EDB67729-A5BB-4AFC-ACC4-D564DDAD5B22}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuadTreeTests", "QuadTreeTests\QuadTreeTests.csproj", "{E41D6857-84AD-45E6-82D5-B73B6E4F6DFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuadTreeTests", "QuadTreeTests\QuadTreeTests.csproj", "{E41D6857-84AD-45E6-82D5-B73B6E4F6DFC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PDAAplication", "PDAAplication\PDAAplication.csproj", "{C6B1F375-1C36-49C5-9FDD-14DC8DA0DC72}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,5 +29,15 @@ Global
 		{E41D6857-84AD-45E6-82D5-B73B6E4F6DFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E41D6857-84AD-45E6-82D5-B73B6E4F6DFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E41D6857-84AD-45E6-82D5-B73B6E4F6DFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6B1F375-1C36-49C5-9FDD-14DC8DA0DC72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6B1F375-1C36-49C5-9FDD-14DC8DA0DC72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6B1F375-1C36-49C5-9FDD-14DC8DA0DC72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6B1F375-1C36-49C5-9FDD-14DC8DA0DC72}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B792851E-134E-401B-B3FC-6858BFC4BE30}
 	EndGlobalSection
 EndGlobal
