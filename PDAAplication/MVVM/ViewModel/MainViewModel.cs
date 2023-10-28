@@ -14,6 +14,8 @@ namespace PDAAplication.MVVM.ViewModel
         public RelayCommand FindObjectCommand { get; set; }
         public RelayCommand AddBuildingCommand { get; set; }
 
+
+
         public MainViewModel()
         {
             InicializeButtons();

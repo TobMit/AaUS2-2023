@@ -24,18 +24,22 @@
                 <Button
                     Margin="4"
                     Padding="4"
+                    Command="{Binding GenerateDataCommand}"
                     > Vygenerovať dáta</Button>
                 <Button
                     Margin="4"
                     Padding="4"
+                    Command="{Binding FindBuildingsCommand}"
                 >Vyhľadanie nehnuteľnosti</Button>
                 <Button
                     Margin="4"
                     Padding="4"
+                    Command="{Binding FindObjectCommand}"
                 >Vyhľadanie objektov</Button>
                 <Button
                     Margin="4"
                     Padding="4"
+                    Command="{Binding AddBuildingCommand}"
                 >Pridanie nehnuteľnosti</Button>
             </StackPanel>
 
