@@ -281,7 +281,6 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
 
     public List<QuadTreeNodeData<T>> GetArrayListData()
     {
-        // todo možno v budúcnosti vracať len T
         return data;
     }
     

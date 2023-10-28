@@ -13,18 +13,33 @@ public class Program
         double PROBABILITY_FD = 0.6;
         double PROBABILITY_FO_FR = 0.1;
         double PROBABILITY_DEPTH = 0.01;
-        int MAX_X = 180;
-        int MIN_X = -180;
-        int MAX_Y = 90;
-        int MIN_Y = -90;
-
+        
+        
+        int HODNOTA = 10000000; // !! Nemeniť inak nebudú spravné súradnice
         int lastestLovest = int.MaxValue;
         List<int> tieKtoreSaSemDostali = new();
         int seed = 0;
-
+        
+        
         while (lastestLovest >= 30)
         {
             Random rnd = new Random(seed);
+            
+            
+            double MIN_X = NextDouble(-180, 175, rnd);
+            double MAX_X = NextDouble(MIN_X+1,180, rnd );
+            double MIN_Y = NextDouble(-90, 85, rnd);
+            double MAX_Y = NextDouble(MIN_Y+1,90, rnd );
+            int startDepth = rnd.Next(10, 22);
+            
+            Console.WriteLine("SEED: " + seed);
+            Console.WriteLine(" Min x: " + MIN_X);
+            Console.WriteLine(" Max x: " + MAX_X);
+            Console.WriteLine(" Min y: " + MIN_Y);
+            Console.WriteLine(" Max y: " + MAX_Y);
+            Console.WriteLine(" Start depth: " + startDepth);
+            
+            
             List<int> toInsert = new(MAX_UNITS);
             List<QuadTreeNodeData<int>> toDelete = new(MAX_UNITS);
             
@@ -33,18 +48,19 @@ public class Program
                 toInsert.Add(i);
             }
 
-            QuadTree<int> quadtree = new QuadTree<int>(MIN_X, MIN_Y, 360, 180, 28);
+            QuadTree<int> quadtree = new QuadTree<int>(MIN_X, MIN_Y, 
+                Math.Abs(MIN_X - MAX_X), Math.Abs(MIN_Y - MAX_Y), startDepth);
             for (int i = 0; i < MAX_TEST; i++)
             {
-                int x = rnd.Next(MIN_X, MAX_X-1);
-                int y = rnd.Next(MIN_Y, MAX_Y-1);
-                int x2 = rnd.Next(x+1, MAX_X);
-                int y2 = rnd.Next(y+1, MAX_Y);
+                double x = NextDouble(MIN_X, MAX_X-2, rnd);
+                double y = NextDouble(MIN_Y, MAX_Y-2, rnd);
+                double x2 = NextDouble(x+1, MAX_X, rnd);
+                double y2 = NextDouble(y+1, MAX_Y, rnd);
 
                 var rndValue = rnd.NextDouble();
                 if (rndValue < PROBABILITY_DEPTH)
                 {
-                    var newDepth = rnd.Next(15, 28);
+                    var newDepth = rnd.Next(10, 22);
                     quadtree.setQuadTreeDepth(newDepth);
                     if (quadtree.Count != quadtree.Recount())
                     {
@@ -59,7 +75,7 @@ public class Program
                     
                     if (rnd.NextDouble() < 0.5)
                     {
-                        var tmpData = quadtree.FindInterval(MIN_X, MIN_Y, 180, 90);
+                        var tmpData = quadtree.FindInterval(MIN_X, MIN_Y, MAX_X, MAX_Y);
                         if (tmpData.Count != toDelete.Count)
                         {
                             lastestLovest = i;
@@ -71,7 +87,7 @@ public class Program
                     }
                     else
                     {
-                        var tmpData = quadtree.FindOverlapingData(MIN_X, MIN_Y, 180, 90);
+                        var tmpData = quadtree.FindOverlapingData(MIN_X, MIN_Y, MAX_X, MAX_Y);
                         if (tmpData.Count != toDelete.Count)
                         {
                             lastestLovest = i;
@@ -86,14 +102,17 @@ public class Program
                 {
                     if (toInsert.Count > 0)
                     {
-                        
                         int index = rnd.Next(0, toInsert.Count);
                         int value = toInsert[index];
                         toInsert.RemoveAt(index);
-                        toDelete.Add(new(new(x, y), new(x2, y2), value));
-                        quadtree.Insert(x, y, x2, y2, value);
+                        toDelete.Add(new(new(QuadTree<int>.QuadTreeRound(x), QuadTree<int>.QuadTreeRound(y)), 
+                            new(QuadTree<int>.QuadTreeRound(x2), QuadTree<int>.QuadTreeRound(y2)), value));
                         
-                        var insertedValue = quadtree.Find(x, y, x2, y2);
+                        quadtree.Insert(x, y, 
+                            x2, y2, value);
+                        
+                        var insertedValue = quadtree.Find(x , y, 
+                            x2, y2);
                         if (!insertedValue.Contains(value))
                         {
                             lastestLovest = i;
@@ -127,8 +146,8 @@ public class Program
                         var value = toDelete[index];
                         toDelete.RemoveAt(index);
                         toInsert.Add(value.Data);
-                        var deltedValue = quadtree.Delete(value.PointDownLeft.X, value.PointDownLeft.Y,
-                            value.PointUpRight.X, value.PointUpRight.Y);
+                        var deltedValue = quadtree.Delete((double)value.PointDownLeft.X / HODNOTA, (double)value.PointDownLeft.Y / HODNOTA,
+                            (double)value.PointUpRight.X / HODNOTA, (double)value.PointUpRight.Y / HODNOTA);
                         if (deltedValue.Count == 0)
                         {
                             lastestLovest = i;
@@ -180,7 +199,6 @@ public class Program
                     }
                 }
             }
-            Console.WriteLine("SEED: " + seed);
             seed++;
         }
         
@@ -225,7 +243,7 @@ public class Program
             Console.WriteLine(i);
         }*/
 
-        // long hodnota =  90 * 10000000;
+        // long hodnota =  1 * 10000000;
         // Console.WriteLine(hodnota);
         // Console.WriteLine(int.MaxValue);
         // Console.WriteLine(double.MaxValue);
@@ -238,5 +256,10 @@ public class Program
         // pocetDeleni++;
         // }
         // Console.WriteLine(pocetDeleni);
+    }
+
+    private static double NextDouble(double min, double max, Random rnd)
+    {
+        return rnd.NextDouble() * (max - min) + min;
     }
 }
