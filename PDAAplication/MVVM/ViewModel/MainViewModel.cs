@@ -207,7 +207,39 @@ namespace PDAAplication.MVVM.ViewModel
             {
                 return;
             }
-            //todo add functionality
+            var dlg = new AddNehnutelnost();
+            dlg.ShowDialog();
+            GPS juhoZapadneGPS = new GPS();
+            GPS severoVýchodneGPS = new GPS();
+            string popis = "";
+            int supisneCislo = 0;
+            bool cancel = true;
+            if (dlg.DialogResult == true)
+            {
+                juhoZapadneGPS = new(Math.Round(dlg.x), Math.Round(dlg.y));
+                severoVýchodneGPS = new(Math.Round(dlg.x2), Math.Round(dlg.y2));
+                popis = dlg.popis;
+                supisneCislo = dlg.supisneCislo;
+                cancel = false;
+            }
+
+            if (cancel)
+            {
+                return;
+            }
+            // musím nájsť všetky parcely, ktoré obsahujú túto nehnuteľnosť
+            // pridať tam tú nehnuteľnosť
+            // pridať nehnuteľnosť do zoznamu všetkých nehnutelností a všetky parcely do nehnuteľnosti
+            // pridať nehnuteľnosť do quad tree
+            Nehnutelnost tmpNehnutelnost = new(supisneCislo, popis, juhoZapadneGPS, severoVýchodneGPS);
+            var tmpListParciel = _quadTreeParcela.FindOverlapingData(juhoZapadneGPS.X, juhoZapadneGPS.Y, severoVýchodneGPS.X, severoVýchodneGPS.Y);
+            foreach (Parcela parcela in tmpListParciel)
+            {
+                tmpNehnutelnost.ZoznamParciel.Add(parcela);
+                parcela.ZoznamNehnutelnosti.Add(tmpNehnutelnost);
+            }
+            _quadTreeNehnutelnost.Insert(juhoZapadneGPS.X, juhoZapadneGPS.Y, severoVýchodneGPS.X, severoVýchodneGPS.Y, tmpNehnutelnost);
+            _allNehnutelnosti.Add(tmpNehnutelnost);
         }
 
         private void ShowAll()
