@@ -89,22 +89,22 @@ namespace PDAAplication.MVVM.ViewModel
             GPS serveroVychodneGPS = new(juhoZapadneGPS.X + sirka, juhoZapadneGPS.Y + dlzka);
             for (int i = 0; i < pocetNehnutelnosti; i++)
             {
-                GPS tmpGps1 = new(NextDouble(juhoZapadneGPS.X + 1, serveroVychodneGPS.X - 3, rnd),
-                    NextDouble(juhoZapadneGPS.Y + 1, serveroVychodneGPS.Y - 3, rnd));
-                GPS tmpGps2 = new(NextDouble(tmpGps1.X + 1, serveroVychodneGPS.X - 1, rnd),
-                    NextDouble(tmpGps1.Y + 1, serveroVychodneGPS.Y - 1, rnd));
+                GPS tmpGps1 = new(Math.Round(NextDouble(juhoZapadneGPS.X + 1, serveroVychodneGPS.X - 3, rnd), 6),
+                    Math.Round(NextDouble(juhoZapadneGPS.Y + 1, serveroVychodneGPS.Y - 3, rnd),6));
+                GPS tmpGps2 = new(Math.Round(NextDouble(tmpGps1.X + 1, serveroVychodneGPS.X - 1, rnd),6),
+                    Math.Round(NextDouble(tmpGps1.Y + 1, serveroVychodneGPS.Y - 1, rnd), 6));
 
-                tmpNehnutelnosti.Add(new(i, "Nehnutelnost " + i, tmpGps1, tmpGps2));
+                tmpNehnutelnosti.Add(new(i, "Nehnutelnost: " + i, tmpGps1, tmpGps2));
             }
 
             for (int i = 0; i < pocetParciel; i++)
             {
-                GPS tmpGps1 = new(NextDouble(juhoZapadneGPS.X + 1, serveroVychodneGPS.X - 3, rnd),
-                    NextDouble(juhoZapadneGPS.Y + 1, serveroVychodneGPS.Y - 3, rnd));
-                GPS tmpGps2 = new(NextDouble(tmpGps1.X + 1, serveroVychodneGPS.X - 1, rnd),
-                    NextDouble(tmpGps1.Y + 1, serveroVychodneGPS.Y - 1, rnd));
+                GPS tmpGps1 = new(Math.Round(NextDouble(juhoZapadneGPS.X + 1, serveroVychodneGPS.X - 3, rnd), 6),
+                    Math.Round(NextDouble(juhoZapadneGPS.Y + 1, serveroVychodneGPS.Y - 3, rnd), 6));
+                GPS tmpGps2 = new(Math.Round(NextDouble(tmpGps1.X + 1, serveroVychodneGPS.X - 1, rnd), 6),
+                    Math.Round(NextDouble(tmpGps1.Y + 1, serveroVychodneGPS.Y - 1, rnd), 6));
 
-                tmpParcely.Add(new(i, "Parcely " + i, tmpGps1, tmpGps2));
+                tmpParcely.Add(new(i, "Parcela: " + i, tmpGps1, tmpGps2));
             }
 
             _quadTreeNehnutelnost = new QuadTree<Nehnutelnost>(juhoZapadneGPS.X, juhoZapadneGPS.Y, sirka, dlzka, 22);

@@ -8,10 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="DialogWindow\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Quadtree\Quadtree.csproj" />
   </ItemGroup>
 

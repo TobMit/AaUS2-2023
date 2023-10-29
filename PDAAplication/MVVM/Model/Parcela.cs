@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ namespace PDAAplication.MVVM.Model
     {
         public int CisloParcely { get; set; }
         public string Popis { get; set; }
-        public List<Nehnutelnost> ZoznamNehnutelnosti { get; set; }
+        public ObservableCollection<Nehnutelnost> ZoznamNehnutelnosti { get; set; }
         public GPS JuhoZapadnyBod { get; set; }
         public GPS SeveroVychodnyBod { get; set; }
 

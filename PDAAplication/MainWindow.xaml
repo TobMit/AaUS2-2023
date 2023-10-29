@@ -54,11 +54,31 @@
             <Border Grid.Column="0"
                     BorderThickness="0,0,0.5,0"
                     BorderBrush="Black">
+                <TreeView>
+                    <ListView
+                        ItemsSource="{Binding ListNehnutelnost}"
+                        ItemContainerStyle="{StaticResource NehnutelnostTheme}"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        KeyboardNavigation.ControlTabNavigation="none"
+                        FocusVisualStyle="{x:Null}"
+                        BorderThickness="0"/>
+                </TreeView>
 
             </Border>
-            <Border Grid.Column="0"
+            <Border Grid.Column="1"
                     BorderThickness="0.5,0,0,0"
                     BorderBrush="Black">
+                <TreeView>
+                    <ListView
+                        ItemsSource="{Binding ListParcela}"
+                        ItemContainerStyle="{StaticResource ParcelaTheme}"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        KeyboardNavigation.ControlTabNavigation="none"
+                        FocusVisualStyle="{x:Null}"
+                        BorderThickness="0"/>
+                </TreeView>
 
             </Border>
         </Grid>
