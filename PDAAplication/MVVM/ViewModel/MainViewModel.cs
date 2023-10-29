@@ -155,7 +155,7 @@ namespace PDAAplication.MVVM.ViewModel
             {
                 return;
             }
-            var dlg = new FindObjects("Vyhľadanie budovy");
+            var dlg = new FindBuilding();
             dlg.ShowDialog();
             GPS juhoZapadneGPS = new GPS();
             GPS severoVýchodneGPS = new GPS();
@@ -163,7 +163,7 @@ namespace PDAAplication.MVVM.ViewModel
             if (dlg.DialogResult == true)
             {
                 juhoZapadneGPS = new(dlg.x, dlg.y);
-                severoVýchodneGPS = new(dlg.x2, dlg.y2);
+                severoVýchodneGPS = new(dlg.x, dlg.y);
                 cancel = false;
             }
 
@@ -171,7 +171,7 @@ namespace PDAAplication.MVVM.ViewModel
             {
                 return;
             }
-            ListNehnutelnost = new ObservableCollection<Nehnutelnost>(_quadTreeNehnutelnost.Find(juhoZapadneGPS.X, juhoZapadneGPS.Y, severoVýchodneGPS.X, severoVýchodneGPS.Y));
+            ListNehnutelnost = new ObservableCollection<Nehnutelnost>(_quadTreeNehnutelnost.FindOverlapingData(juhoZapadneGPS.X, juhoZapadneGPS.Y, severoVýchodneGPS.X, severoVýchodneGPS.Y));
             ListParcela = new();
         }
 
