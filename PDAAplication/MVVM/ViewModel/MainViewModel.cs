@@ -16,10 +16,14 @@ namespace PDAAplication.MVVM.ViewModel
         private QuadTree<Nehnutelnost> _quadTreeNehnutelnost;
         private QuadTree<Parcela> _quadTreeParcela;
 
+        private List<Nehnutelnost> _allNehnutelnosti;
+        private List<Parcela> _allParcelas;
+
         public RelayCommand GenerateDataCommand { get; set; }
         public RelayCommand FindBuildingsCommand { get; set; }
         public RelayCommand FindObjectCommand { get; set; }
         public RelayCommand AddBuildingCommand { get; set; }
+        public RelayCommand ShowAllComand { get; set; }
 
         private ObservableCollection<Nehnutelnost> _listNehnutelnost;
 
@@ -50,6 +54,8 @@ namespace PDAAplication.MVVM.ViewModel
         public MainViewModel()
         {
             InicializeButtons();
+            _allNehnutelnosti = new();
+            _allParcelas = new();
         }
 
         private void InicializeButtons()
@@ -58,6 +64,7 @@ namespace PDAAplication.MVVM.ViewModel
             FindBuildingsCommand = new RelayCommand(o => { FindBuildings(); });
             FindObjectCommand = new RelayCommand(o => { FindObject(); });
             AddBuildingCommand = new RelayCommand(o => { AddBuilding(); });
+            ShowAllComand = new RelayCommand(o => { ShowAll(); });
         }
 
         private void GenerateData()
@@ -135,6 +142,9 @@ namespace PDAAplication.MVVM.ViewModel
             // Aby sme si zobrazili nehnutelnosti a parcely tak ich pridáme do observable kolekcie
             ListNehnutelnost = new ObservableCollection<Nehnutelnost>(tmpNehnutelnosti);
             ListParcela = new ObservableCollection<Parcela>(tmpParcely);
+            
+            _allNehnutelnosti = tmpNehnutelnosti;
+            _allParcelas = tmpParcely;
 
 
         }
@@ -145,7 +155,24 @@ namespace PDAAplication.MVVM.ViewModel
             {
                 return;
             }
-            //todo add functionality
+            var dlg = new FindBuilding();
+            dlg.ShowDialog();
+            GPS juhoZapadneGPS = new GPS();
+            GPS severoVýchodneGPS = new GPS();
+            bool cancel = true;
+            if (dlg.DialogResult == true)
+            {
+                juhoZapadneGPS = new(dlg.x, dlg.y);
+                severoVýchodneGPS = new(dlg.x2, dlg.y2);
+                cancel = false;
+            }
+
+            if (cancel)
+            {
+                return;
+            }
+            ListNehnutelnost = new ObservableCollection<Nehnutelnost>(_quadTreeNehnutelnost.Find(juhoZapadneGPS.X, juhoZapadneGPS.Y, severoVýchodneGPS.X, severoVýchodneGPS.Y));
+            ListParcela = new();
         }
 
         private void FindObject()
@@ -164,6 +191,12 @@ namespace PDAAplication.MVVM.ViewModel
                 return;
             }
             //todo add functionality
+        }
+
+        private void ShowAll()
+        {
+            ListNehnutelnost = new ObservableCollection<Nehnutelnost>(_allNehnutelnosti);
+            ListParcela = new ObservableCollection<Parcela>(_allParcelas);
         }
 
         private static double NextDouble(double min, double max, Random rnd)

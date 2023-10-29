@@ -41,6 +41,11 @@
                     Padding="4"
                     Command="{Binding AddBuildingCommand}"
                 >Pridanie nehnuteľnosti</Button>
+                <Button
+                    Margin="4"
+                    Padding="4"
+                    Command="{Binding ShowAllComand}"
+                >Zobraziť všetko</Button>
             </StackPanel>
 
 
