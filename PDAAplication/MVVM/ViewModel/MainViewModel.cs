@@ -7,12 +7,14 @@ using System.Threading.Tasks;
 using PDAAplication.Core;
 using PDAAplication.MVVM.Model;
 using PDAAplication.MVVM.View;
+using Quadtree.StructureClasses;
 
 namespace PDAAplication.MVVM.ViewModel
 {
     class MainViewModel : ObservableObjects
     {
-
+        private QuadTree<Nehnutelnost> _quadTreeNehnutelnost;
+        private QuadTree<Parcela> _quadTreeParcela;
 
         public RelayCommand GenerateDataCommand { get; set; }
         public RelayCommand FindBuildingsCommand { get; set; }
@@ -64,7 +66,7 @@ namespace PDAAplication.MVVM.ViewModel
             dlg.ShowDialog();
             int pocetNehnutelnosti = 0;
             int pocetParciel = 0;
-            GPS juhoZapadneGPS;
+            GPS juhoZapadneGPS = new GPS();
             int dlzka = 0;
             int sirka = 0;
             if (dlg.DialogResult == true)
@@ -81,24 +83,86 @@ namespace PDAAplication.MVVM.ViewModel
                 return;
             }
 
-            Random rnd = new Random();
+            Random rnd = new Random(0);
             var tmpNehnutelnosti = new List<Nehnutelnost>(pocetNehnutelnosti);
             var tmpParcely = new List<Parcela>(pocetParciel);
+            GPS serveroVychodneGPS = new(juhoZapadneGPS.X + sirka, juhoZapadneGPS.Y + dlzka);
+            for (int i = 0; i < pocetNehnutelnosti; i++)
+            {
+                GPS tmpGps1 = new(NextDouble(juhoZapadneGPS.X + 1, serveroVychodneGPS.X - 3, rnd),
+                    NextDouble(juhoZapadneGPS.Y + 1, serveroVychodneGPS.Y - 3, rnd));
+                GPS tmpGps2 = new(NextDouble(tmpGps1.X + 1, serveroVychodneGPS.X - 1, rnd),
+                    NextDouble(tmpGps1.Y + 1, serveroVychodneGPS.Y - 1, rnd));
+
+                tmpNehnutelnosti.Add(new(i, "Nehnutelnost " + i, tmpGps1, tmpGps2));
+            }
+
+            for (int i = 0; i < pocetParciel; i++)
+            {
+                GPS tmpGps1 = new(NextDouble(juhoZapadneGPS.X + 1, serveroVychodneGPS.X - 3, rnd),
+                    NextDouble(juhoZapadneGPS.Y + 1, serveroVychodneGPS.Y - 3, rnd));
+                GPS tmpGps2 = new(NextDouble(tmpGps1.X + 1, serveroVychodneGPS.X - 1, rnd),
+                    NextDouble(tmpGps1.Y + 1, serveroVychodneGPS.Y - 1, rnd));
+
+                tmpParcely.Add(new(i, "Parcely " + i, tmpGps1, tmpGps2));
+            }
+
+            _quadTreeNehnutelnost = new QuadTree<Nehnutelnost>(juhoZapadneGPS.X, juhoZapadneGPS.Y, sirka, dlzka, 22);
+            _quadTreeParcela = new QuadTree<Parcela>(juhoZapadneGPS.X, juhoZapadneGPS.Y, sirka, dlzka, 22);
+            
+            //Parcely vložíme do quad tree
+            foreach (Parcela parcela in tmpParcely)
+            {
+                _quadTreeParcela.Insert(parcela.JuhoZapadnyBod.X, parcela.JuhoZapadnyBod.Y, parcela.SeveroVychodnyBod.X, parcela.SeveroVychodnyBod.Y, parcela);
+            }
+            
+            // Budeme prechádzať všetky nehnutelnosti
+            // pre každú nehnuteľnosť zýskame všetky parcely, ktoré ju obsahujú
+            // potom pridáme túto parcelu do zoznamu pre nehnutelnosť
+            // a zase parcelu pridáme do nehnuteľnosti
+            // na záver vložíme nehnuteľnosť do quad tree
+            foreach (Nehnutelnost nehnutelnost in tmpNehnutelnosti)
+            {
+                var tmpListParciel = _quadTreeParcela.FindOverlapingData(nehnutelnost.JuhoZapadnyBod.X, nehnutelnost.JuhoZapadnyBod.Y, nehnutelnost.SeveroVychodnyBod.X, nehnutelnost.SeveroVychodnyBod.Y);
+                foreach (Parcela parcela in tmpListParciel)
+                {
+                    nehnutelnost.ZoznamParciel.Add(parcela);
+                    parcela.ZoznamNehnutelnosti.Add(nehnutelnost);
+                }
+                _quadTreeNehnutelnost.Insert(nehnutelnost.JuhoZapadnyBod.X, nehnutelnost.JuhoZapadnyBod.Y, nehnutelnost.SeveroVychodnyBod.X, nehnutelnost.SeveroVychodnyBod.Y, nehnutelnost);
+            }
+            
+            // Aby sme si zobrazili nehnutelnosti a parcely tak ich pridáme do observable kolekcie
+            ListNehnutelnost = new ObservableCollection<Nehnutelnost>(tmpNehnutelnosti);
+            ListParcela = new ObservableCollection<Parcela>(tmpParcely);
+
 
         }
 
         private void FindBuildings()
         {
+            if (_quadTreeNehnutelnost is null)
+            {
+                return;
+            }
             //todo add functionality
         }
 
         private void FindObject()
         {
+            if (_quadTreeNehnutelnost is null || _quadTreeParcela is null)
+            {
+                return;
+            }
             //todo add functionality
         }
 
         private void AddBuilding()
         {
+            if (_quadTreeNehnutelnost is null)
+            {
+                return;
+            }
             //todo add functionality
         }
 

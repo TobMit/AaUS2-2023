@@ -28,14 +28,14 @@
             PreviewTextInput="UIElement_OnPreviewTextInput" />
         <Label>Juhozápadny Bod X</Label>
         <TextBox
-            Text="0.0"
+            Text="0,0"
             Margin="5,0,5,0"
             TextAlignment="Right"
             Name="xPoint"
             PreviewTextInput="XPoint_OnPreviewTextInput" />
         <Label>Juhozapadny Bod Y</Label>
         <TextBox
-            Text="0.0"
+            Text="0,0"
             Margin="5,0,5,0"
             TextAlignment="Right"
             Name="yPoint"

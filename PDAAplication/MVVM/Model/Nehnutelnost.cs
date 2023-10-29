@@ -13,5 +13,14 @@ namespace PDAAplication.MVVM.Model
         public List<Parcela> ZoznamParciel { get; set; }
         public GPS JuhoZapadnyBod { get; set; }
         public GPS SeveroVychodnyBod { get; set; }
+
+        public Nehnutelnost(int pSupisneCislo, string pPopis, GPS pJuhoZapadnyBod, GPS pSeveroVychodnyBod)
+        {
+            SupisneCislo = pSupisneCislo;
+            Popis = pPopis;
+            ZoznamParciel = new();
+            JuhoZapadnyBod = pJuhoZapadnyBod;
+            SeveroVychodnyBod = pSeveroVychodnyBod;
+        }
     }
 }

@@ -20,5 +20,11 @@ namespace PDAAplication.MVVM.Model
             Y = pY;
         }
 
+        public GPS()
+        {
+            X = 0;
+            Y = 0;
+        }
+
     }
 }
