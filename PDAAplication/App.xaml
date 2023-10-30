@@ -5,11 +5,10 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          <ResourceDictionary>
-             <ResourceDictionary.MergedDictionaries>
-                 <ResourceDictionary Source="Theme/ParcelaTheme.xaml"/>
-                 <ResourceDictionary Source="Theme/NehnutelnostTheme.xaml"/>
-                 <ResourceDictionary Source="Theme/ParcelaTheme.xaml"/>
-             </ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Theme/ObjectTheme.xaml"/>
+                <ResourceDictionary Source="Theme/ObjectTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
          </ResourceDictionary>
     </Application.Resources>
 </Application>

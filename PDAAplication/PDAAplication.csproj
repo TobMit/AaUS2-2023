@@ -8,6 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Core\FileManager\**" />
+    <EmbeddedResource Remove="Core\FileManager\**" />
+    <None Remove="Core\FileManager\**" />
+    <Page Remove="Core\FileManager\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Quadtree\Quadtree.csproj" />
   </ItemGroup>
 
