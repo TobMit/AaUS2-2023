@@ -1,4 +1,5 @@
 using System.Drawing;
+using Quadtree.StructureClasses.HelperClass;
 using Quadtree.StructureClasses.Node;
 
 namespace QuadTreeTests.Node;
@@ -89,28 +90,28 @@ public class NodeTest
         Assert.False(testNodeLeaf2.LeafsInicialised);
         var Leafs = testNodeLeaf2.TestInitLeafs();
         Assert.True(testNodeLeaf2.LeafsInicialised);
-        Assert.That(Leafs[0].PointDownLeft, Is.EqualTo(new Point(0, 0)));
-        Assert.That(Leafs[0].PointUpRight, Is.EqualTo(new Point(10, 10)));
-        Assert.That(Leafs[1].PointDownLeft, Is.EqualTo(new Point(0, 10)));
-        Assert.That(Leafs[1].PointUpRight, Is.EqualTo(new Point(10, 20)));
-        Assert.That(Leafs[2].PointDownLeft, Is.EqualTo(new Point(10, 10)));
-        Assert.That(Leafs[2].PointUpRight, Is.EqualTo(new Point(20, 20)));
-        Assert.That(Leafs[3].PointDownLeft, Is.EqualTo(new Point(10, 0)));
-        Assert.That(Leafs[3].PointUpRight, Is.EqualTo(new Point(20, 10)));
+        Assert.That(Leafs[0].PointDownLeft, Is.EqualTo(new PointD(0, 0)));
+        Assert.That(Leafs[0].PointUpRight, Is.EqualTo(new PointD(10, 10)));
+        Assert.That(Leafs[1].PointDownLeft, Is.EqualTo(new PointD(0, 10)));
+        Assert.That(Leafs[1].PointUpRight, Is.EqualTo(new PointD(10, 20)));
+        Assert.That(Leafs[2].PointDownLeft, Is.EqualTo(new PointD(10, 10)));
+        Assert.That(Leafs[2].PointUpRight, Is.EqualTo(new PointD(20, 20)));
+        Assert.That(Leafs[3].PointDownLeft, Is.EqualTo(new PointD(10, 0)));
+        Assert.That(Leafs[3].PointUpRight, Is.EqualTo(new PointD(20, 10)));
         
         QuadTreeNodeLeaf<string> testNodeLeaf3 = new(new(-50, -50), new(50, 50), _testNodeLeafData);
         Assert.False(testNodeLeaf3.LeafsInicialised);
         Assert.False(testNodeLeaf3.LeafsInicialised);
         Leafs = testNodeLeaf3.TestInitLeafs();
         Assert.True(testNodeLeaf3.LeafsInicialised);
-        Assert.That(Leafs[0].PointDownLeft, Is.EqualTo(new Point(-50, -50)));
-        Assert.That(Leafs[0].PointUpRight, Is.EqualTo(new Point(0, 0)));
-        Assert.That(Leafs[1].PointDownLeft, Is.EqualTo(new Point(-50, 0)));
-        Assert.That(Leafs[1].PointUpRight, Is.EqualTo(new Point(0, 50)));
-        Assert.That(Leafs[2].PointDownLeft, Is.EqualTo(new Point(0, 0)));
-        Assert.That(Leafs[2].PointUpRight, Is.EqualTo(new Point(50, 50)));
-        Assert.That(Leafs[3].PointDownLeft, Is.EqualTo(new Point(0, -50)));
-        Assert.That(Leafs[3].PointUpRight, Is.EqualTo(new Point(50, 0)));
+        Assert.That(Leafs[0].PointDownLeft, Is.EqualTo(new PointD(-50, -50)));
+        Assert.That(Leafs[0].PointUpRight, Is.EqualTo(new PointD(0, 0)));
+        Assert.That(Leafs[1].PointDownLeft, Is.EqualTo(new PointD(-50, 0)));
+        Assert.That(Leafs[1].PointUpRight, Is.EqualTo(new PointD(0, 50)));
+        Assert.That(Leafs[2].PointDownLeft, Is.EqualTo(new PointD(0, 0)));
+        Assert.That(Leafs[2].PointUpRight, Is.EqualTo(new PointD(50, 50)));
+        Assert.That(Leafs[3].PointDownLeft, Is.EqualTo(new PointD(0, -50)));
+        Assert.That(Leafs[3].PointUpRight, Is.EqualTo(new PointD(50, 0)));
     }
 
 
@@ -122,14 +123,14 @@ public class NodeTest
         QuadTreeNodeLeaf<int> searchArea = new(new(5, 5), new(15, 15));
         List<QuadTreeNodeLeaf<int>> leafs = testNodeLeaf2.GetOverlapingLefs(searchArea);
         Assert.That(leafs.Count, Is.EqualTo(4));
-        Assert.That(leafs[0].PointDownLeft, Is.EqualTo(new Point(0, 0)));
-        Assert.That(leafs[0].PointUpRight, Is.EqualTo(new Point(10, 10)));
-        Assert.That(leafs[1].PointDownLeft, Is.EqualTo(new Point(0, 10)));
-        Assert.That(leafs[1].PointUpRight, Is.EqualTo(new Point(10, 20)));
-        Assert.That(leafs[2].PointDownLeft, Is.EqualTo(new Point(10, 10)));
-        Assert.That(leafs[2].PointUpRight, Is.EqualTo(new Point(20, 20)));
-        Assert.That(leafs[3].PointDownLeft, Is.EqualTo(new Point(10, 0)));
-        Assert.That(leafs[3].PointUpRight, Is.EqualTo(new Point(20, 10)));
+        Assert.That(leafs[0].PointDownLeft, Is.EqualTo(new PointD(0, 0)));
+        Assert.That(leafs[0].PointUpRight, Is.EqualTo(new PointD(10, 10)));
+        Assert.That(leafs[1].PointDownLeft, Is.EqualTo(new PointD(0, 10)));
+        Assert.That(leafs[1].PointUpRight, Is.EqualTo(new PointD(10, 20)));
+        Assert.That(leafs[2].PointDownLeft, Is.EqualTo(new PointD(10, 10)));
+        Assert.That(leafs[2].PointUpRight, Is.EqualTo(new PointD(20, 20)));
+        Assert.That(leafs[3].PointDownLeft, Is.EqualTo(new PointD(10, 0)));
+        Assert.That(leafs[3].PointUpRight, Is.EqualTo(new PointD(20, 10)));
         
         QuadTreeNodeLeaf<int> searchArea2 = new(new(50, 50), new(150, 150));
         leafs = testNodeLeaf2.GetOverlapingLefs(searchArea2);
@@ -142,8 +143,8 @@ public class NodeTest
         QuadTreeNodeLeaf<int> searchArea4 = new(new(-50, -50), new(1, 1));
         leafs = testNodeLeaf2.GetOverlapingLefs(searchArea4);
         Assert.That(leafs.Count, Is.EqualTo(1));
-        Assert.That(leafs[0].PointDownLeft, Is.EqualTo(new Point(0, 0)));
-        Assert.That(leafs[0].PointUpRight, Is.EqualTo(new Point(10, 10)));
+        Assert.That(leafs[0].PointDownLeft, Is.EqualTo(new PointD(0, 0)));
+        Assert.That(leafs[0].PointUpRight, Is.EqualTo(new PointD(10, 10)));
     }
 
     [Test]
@@ -181,7 +182,7 @@ public class NodeTest
         QuadTreeNodeLeaf<int> searchArea = new(new(15, 15), new(20, 20));
         var tmp = testNodeLeaf2.GetLeafThatCanContainDataNode(searchArea);
         Assert.NotNull(tmp);
-        Assert.That(tmp.PointDownLeft, Is.EqualTo(new Point(10, 10)));
+        Assert.That(tmp.PointDownLeft, Is.EqualTo(new PointD(10, 10)));
         QuadTreeNodeLeaf<int> searchArea2 = new(new(20, 20), new(25, 25));
         tmp = testNodeLeaf2.GetLeafThatCanContainDataNode(searchArea2);
         Assert.Null(tmp);

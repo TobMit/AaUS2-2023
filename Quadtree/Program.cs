@@ -7,7 +7,7 @@ using Quadtree.StructureClasses.Node;
 
 public class Program
 {
-    private static bool parallel = true;
+    private static bool parallel = false;
     
     private static int MAX_UNITS = 1000000;
     private static int MAX_TEST = 100000;
@@ -153,7 +153,7 @@ public class Program
             if (rndValue < PROBABILITY_DEPTH)
             {
                 var newDepth = rnd.Next(10, 22);
-                quadtree.setQuadTreeDepth(newDepth);
+                quadtree.SetQuadTreeDepth(newDepth);
                 if (quadtree.Count != quadtree.Recount())
                 {
                     lastestLovest = i;
@@ -194,8 +194,8 @@ public class Program
                     int index = rnd.Next(0, toInsert.Count);
                     int value = toInsert[index];
                     toInsert.RemoveAt(index);
-                    toDelete.Add(new(new(QuadTree<int>.QuadTreeRound(x), QuadTree<int>.QuadTreeRound(y)), 
-                        new(QuadTree<int>.QuadTreeRound(x2), QuadTree<int>.QuadTreeRound(y2)), value));
+                    toDelete.Add(new(new(x, y), 
+                        new(x2, y2), value));
                     
                     quadtree.Insert(x, y, 
                         x2, y2, value);

@@ -2,7 +2,7 @@ namespace QuadTreeTests.QuadTreeMain;
 using Quadtree.StructureClasses;
 public class Utils
 {
-    [Test]
+    /*[Test]
     public void QuadTreeRound()
     {
         Assert.That(QuadTree<int>.TestQuadTreeRound(1.1234567), Is.EqualTo(11234567));
@@ -20,7 +20,7 @@ public class Utils
         Assert.False(QuadTree<int>.TestCheckCoordinates(-1800000000, -900000001));
         Assert.False(QuadTree<int>.TestCheckCoordinates(1800000001, 900000000));
         Assert.False(QuadTree<int>.TestCheckCoordinates(1800000000, 900000001));
-    }
+    }*/
 
     [Test]
     public void Recount()
@@ -46,7 +46,7 @@ public class Utils
         quadtree.Insert(-45.0, -45.0, -10, -10, 2);
         quadtree.Insert(-20.0, -20.0, -10, -10, 3);
         quadtree.Insert(-10.0, -10.0, -1, -1, 4);
-        quadtree.setQuadTreeDepth(2);
+        quadtree.SetQuadTreeDepth(2);
         Assert.That(quadtree.Count, Is.EqualTo(quadtree.Recount()));
         Assert.That(quadtree.Recount(), Is.EqualTo(6));
         var tmp = quadtree.FindOverlapingData(-20.0, -20.0, -1, -1);

@@ -1,4 +1,5 @@
 using System.Drawing;
+using Quadtree.StructureClasses.HelperClass;
 
 namespace Quadtree.StructureClasses.Node;
 
@@ -8,20 +9,20 @@ namespace Quadtree.StructureClasses.Node;
 /// <typeparam name="T"></typeparam>
 public abstract class QuadTreeNode<T>
 {
-    protected Point _pointDownLeft;
-    public Point PointDownLeft
+    protected PointD _pointDownLeft;
+    public PointD PointDownLeft
     {
         get => _pointDownLeft;
     }
-    protected Point _pointUpRight;
-    public Point PointUpRight
+    protected PointD _pointUpRight;
+    public PointD PointUpRight
     {
         get => _pointUpRight;
     }
     
-    public bool ContainsPoints(Point pPointDownLeft, Point pPointUpRight) {
+    public bool ContainsPoints(PointD pPointDownLeft, PointD pPointUpRight) {
         return PointDownLeft.X <= pPointDownLeft.X && PointDownLeft.Y <= pPointDownLeft.Y &&
-               PointUpRight.X >= pPointUpRight.X && PointUpRight.Y >= pPointUpRight.Y;
+                      PointUpRight.X >= pPointUpRight.X && PointUpRight.Y >= pPointUpRight.Y;
     }
     
     public bool ContainNode(QuadTreeNode<T> nodeLeaf)
@@ -29,7 +30,7 @@ public abstract class QuadTreeNode<T>
         return ContainsPoints(nodeLeaf.PointDownLeft, nodeLeaf.PointUpRight);
     }
     
-    public bool OverpalapPoints(Point pPointDownLeft, Point pPointUpRight) {
+    public bool OverpalapPoints(PointD pPointDownLeft, PointD pPointUpRight) {
         return PointDownLeft.X < pPointUpRight.X && PointDownLeft.Y < pPointUpRight.Y &&
                PointUpRight.X > pPointDownLeft.X && PointUpRight.Y > pPointDownLeft.Y;
     }

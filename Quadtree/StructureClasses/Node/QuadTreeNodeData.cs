@@ -1,4 +1,5 @@
 using System.Drawing;
+using Quadtree.StructureClasses.HelperClass;
 
 namespace Quadtree.StructureClasses.Node;
 
@@ -10,7 +11,7 @@ public class QuadTreeNodeData<T> : QuadTreeNode<T>
 {
     public T Data { get; set; }
     
-public QuadTreeNodeData(Point pPointDownLeft, Point pPointUpRight, T pData)
+public QuadTreeNodeData(PointD pPointDownLeft, PointD pPointUpRight, T pData)
     {
         _pointDownLeft = pPointDownLeft;
         _pointUpRight = pPointUpRight;

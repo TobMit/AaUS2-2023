@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Drawing;
+using Quadtree.StructureClasses.HelperClass;
 
 namespace Quadtree.StructureClasses.Node;
 
@@ -29,7 +30,7 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
     public QuadTreeNodeLeaf<T> Parent { get; set; }
 
 
-    public QuadTreeNodeLeaf(Point pPointDownLeft, Point pPointUpRight)
+    public QuadTreeNodeLeaf(PointD pPointDownLeft, PointD pPointUpRight)
     {
         _pointDownLeft = pPointDownLeft;
         _pointUpRight = pPointUpRight;
@@ -38,7 +39,7 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
         _leafsInicialised = false;
     }
     
-    public QuadTreeNodeLeaf(Point pPointDownLeft, Point pPointUpRight, QuadTreeNodeLeaf<T> parent)
+    public QuadTreeNodeLeaf(PointD pPointDownLeft, PointD pPointUpRight, QuadTreeNodeLeaf<T> parent)
     {
         _pointDownLeft = pPointDownLeft;
         _pointUpRight = pPointUpRight;
@@ -48,7 +49,7 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
         _leafsInicialised = false;
     }
     
-    public QuadTreeNodeLeaf(Point pPointDownLeft, Point pPointUpRight, QuadTreeNodeData<T> pData)
+    public QuadTreeNodeLeaf(PointD pPointDownLeft, PointD pPointUpRight, QuadTreeNodeData<T> pData)
     {
         _pointDownLeft = pPointDownLeft;
         _pointUpRight = pPointUpRight;
@@ -126,12 +127,12 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
     
     private void InitLeafs()
     {
-        int x1 = _pointDownLeft.X;
-        int y1 = _pointDownLeft.Y;
-        int x2 = _pointUpRight.X;
-        int y2 = _pointUpRight.Y;
-        int xS = (x1 + x2) / 2;
-        int yS = (y1 + y2) / 2;
+        double x1 = _pointDownLeft.X;
+        double y1 = _pointDownLeft.Y;
+        double x2 = _pointUpRight.X;
+        double y2 = _pointUpRight.Y;
+        double xS = (x1 + x2) / 2;
+        double yS = (y1 + y2) / 2;
         Leafs[0] = new(new(x1, y1), new(xS, yS), this);
         Leafs[1] = new(new(x1, yS), new(xS, y2), this);
         Leafs[2] = new(new(xS, yS), new(x2, y2), this);
@@ -231,6 +232,7 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
     
     public bool CanBeRemoved()
     {
+        
         if (!_leafsInicialised)
         {
             return true;

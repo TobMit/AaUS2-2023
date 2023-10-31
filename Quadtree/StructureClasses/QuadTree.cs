@@ -1,6 +1,7 @@
 using System.Drawing;
 using System.Runtime.InteropServices.JavaScript;
 using System.Security.Cryptography.X509Certificates;
+using Quadtree.StructureClasses.HelperClass;
 using Quadtree.StructureClasses.Node;
 
 namespace Quadtree.StructureClasses;
@@ -8,21 +9,21 @@ namespace Quadtree.StructureClasses;
 public class QuadTree<T>
 {
     private QuadTreeNodeLeaf<T> _root;
-    private const int HODNOTA = 10000000;
-    private const int MAX_DEPTH = 22; // je to kôli tomu že keď zoberiem max rozmer tak ho viem deliť iba 23 krát kým by som nedostal samé 1 a z bezpečnostných dôvodou iba 23
+    //private const int HODNOTA = 10000000;
+    //private const int MAX_DEPTH = 22; // je to kôli tomu že keď zoberiem max rozmer tak ho viem deliť iba 23 krát kým by som nedostal samé 1 a z bezpečnostných dôvodou iba 23
     private const int OPERATION_TO_OPTIMALIZE = 100;
     private const int MIN_DATA_TO_OPTIMALIZE = 1000;
     private const double OPTIMALIZE_RATIO = 0.6;
     private const double CHANGE_SIZE_RATIO = 0.2;
-    private const int MAX_X = 180;
-    private const int MAX_Y = 90;
+    // private const int MAX_X = 180;
+    // private const int MAX_Y = 90;
     private int _maxDepth;
     private int _operationCount;
     
     private bool _optimalize = true;
     
-    private Point _originalPointDownLeft;
-    private Point _originalPointUpRight;
+    private PointD _originalPointDownLeft;
+    private PointD _originalPointUpRight;
     public int Count { get; set; }
     
     /// <summary>
@@ -40,29 +41,57 @@ public class QuadTree<T>
     /// <param name="pMaxDepth">max deepth of the tree</param>
     public QuadTree(double pX, double pY, double width, double height, int pMaxDepth)
     {
-        if (!CheckCoordinates(QuadTreeRound(pX), QuadTreeRound(pY)) 
-            || !CheckCoordinates(QuadTreeRound(pX + width), QuadTreeRound(pY + height)))
-        {
-            throw new Exception("Wrong world coordination");
-        }
+        // if (!CheckCoordinates(QuadTreeRound(pX), QuadTreeRound(pY)) 
+        //     || !CheckCoordinates(QuadTreeRound(pX + width), QuadTreeRound(pY + height)))
+        // {
+        //     throw new Exception("Wrong world coordination");
+        // }
 
-        if (pMaxDepth > MAX_DEPTH)
-        {
-            throw new Exception("Max depth is 22");
-        }
+        // if (pMaxDepth > MAX_DEPTH)
+        // {
+        //     throw new Exception("Max depth is 22");
+        // }
         
         if (pMaxDepth <= 0)
         {
             throw new Exception("Min depth is 1");
         }
         
-        _originalPointDownLeft = new(QuadTreeRound(pX), QuadTreeRound(pY));
-        _originalPointUpRight = new(QuadTreeRound(pX + width), QuadTreeRound(pY + height));
+        _originalPointDownLeft = new(pX, pY);
+        _originalPointUpRight = new(pX + width, pY + height);
         
-        _root = new(new(QuadTreeRound(pX), QuadTreeRound(pY)),
-            new(QuadTreeRound(pX + width), QuadTreeRound(pY + height)));
+        _root = new(new(pX, pY),
+            new(pX + width, pY + height));
         
         _maxDepth = pMaxDepth;
+        Count = 0;
+        _operationCount = 0;
+    }
+    
+    /// <summary>
+    /// Quad tree structure
+    /// </summary>
+    /// <param name="pX">down left point</param>
+    /// <param name="pY">donw left point</param>
+    /// <param name="width">expand to the right</param>
+    /// <param name="height">expand to the up</param>
+    /// <param name="pMaxDepth">max deepth of the tree</param>
+    public QuadTree(double pX, double pY, double width, double height)
+    {
+        // if (!CheckCoordinates(QuadTreeRound(pX), QuadTreeRound(pY)) 
+        //     || !CheckCoordinates(QuadTreeRound(pX + width), QuadTreeRound(pY + height)))
+        // {
+        //     throw new Exception("Wrong world coordination");
+        // }
+        
+        
+        _originalPointDownLeft = new(pX, pY);
+        _originalPointUpRight = new(pX + width, pY + height);
+        
+        _root = new(new(pX, pY),
+            new(pX + width, pY + height));
+        
+        _maxDepth = int.MaxValue;
         Count = 0;
         _operationCount = 0;
     }
@@ -76,14 +105,14 @@ public class QuadTree<T>
     /// <exception cref="Exception">Ak su zle suradnice</exception>
     public void Insert(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight, T pData)
     {
-        if (!_root.ContainsPoints(new(QuadTreeRound(xDownLeft), QuadTreeRound(yDownLeft)), 
-                new(QuadTreeRound(xUpRight), QuadTreeRound(yUpRight))))
+        if (!_root.ContainsPoints(new(xDownLeft, yDownLeft), 
+                new(xUpRight, yUpRight)))
         {
             throw new Exception("Coordinates exceed parameter size");
         }
         QuadTreeNodeLeaf<T>? current = _root;
-        QuadTreeNodeData<T> currentDataNode = new(new(QuadTreeRound(xDownLeft), QuadTreeRound(yDownLeft)), 
-          new (QuadTreeRound(xUpRight), QuadTreeRound(yUpRight)), pData);
+        QuadTreeNodeData<T> currentDataNode = new(new(xDownLeft, yDownLeft), 
+          new (xUpRight, yUpRight), pData);
         
         int depth = 0;
         while (current is not null)
@@ -196,8 +225,8 @@ public class QuadTree<T>
 
     private List<T> Interval(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight, bool delete)
     {
-        QuadTreeNodeLeaf<T> areaToFind = new(new(QuadTreeRound(xDownLeft), QuadTreeRound(yDownLeft)),
-            new(QuadTreeRound(xUpRight), QuadTreeRound(yUpRight)));
+        QuadTreeNodeLeaf<T> areaToFind = new(new(xDownLeft, yDownLeft),
+            new(xUpRight, yUpRight));
         
         List<T> returnData = new();
         Stack<RangeNodes> stack = new();
@@ -280,13 +309,14 @@ public class QuadTree<T>
         return Point(xDownLeft, yDownLeft, xUpRight, yUpRight, false);
     }
 
+    //todo lepšie nazvať
     private List<T> Point(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight, bool delete)
     {
         // Flag = 0 tak vyhľadávame
         // Flag = 1 tak mazeme
         int flag = 0;
-        QuadTreeNodeLeaf<T> objectToFind = new(new(QuadTreeRound(xDownLeft), QuadTreeRound(yDownLeft)),
-            new(QuadTreeRound(xUpRight), QuadTreeRound(yUpRight)));
+        QuadTreeNodeLeaf<T> objectToFind = new(new(xDownLeft, yDownLeft),
+            new(xUpRight, yUpRight));
         
         QuadTreeNodeLeaf<T>? current;
 
@@ -342,9 +372,12 @@ public class QuadTree<T>
             }
             else
             {
+                //todo pridať ak má iba 1 dáta a mi sme prázdny tak to data vložíme k nám a dieťa zmažeme
                 // ak je flag nastavený na vymazávanie nodu tak sa pozrieme či niektorý s potomkov má dáta
                     // ak nemá dáta tak ich zmažeme a current = predok flaga ostáva označená na mazanie node
                     // ak má dáta tak current = null
+                    // Poznámka: canBeRemoved vráti true aj ked current obsahuje data, keďže sa tento objekt zmaže až
+                    // z predka tak nemusíme riešiť že current má data. Metóda CanBeRemoved nedovolí nás zmazať lebo máme dáta
                 if (current.CanBeRemoved())
                 {
                     current = current.Parent;
@@ -366,8 +399,8 @@ public class QuadTree<T>
 
     public List<T> FindOverlapingData(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight)
     {
-        QuadTreeNodeLeaf<T> objectToFind = new(new(QuadTreeRound(xDownLeft), QuadTreeRound(yDownLeft)),
-            new(QuadTreeRound(xUpRight), QuadTreeRound(yUpRight)));
+        QuadTreeNodeLeaf<T> objectToFind = new(new(xDownLeft, yDownLeft),
+            new(xUpRight, yUpRight));
         
         List<T> returnData = new();
         
@@ -407,10 +440,10 @@ public class QuadTree<T>
         }
         
         // spočítame dáta v 4 quadrantoch rootu
-        double x1 = (double)_root.PointDownLeft.X / HODNOTA;
-        double y1 = (double)_root.PointDownLeft.Y / HODNOTA;
-        double x2 = (double)_root.PointUpRight.X / HODNOTA;
-        double y2 = (double)_root.PointUpRight.Y / HODNOTA;
+        double x1 = (double)_root.PointDownLeft.X;
+        double y1 = (double)_root.PointDownLeft.Y;
+        double x2 = (double)_root.PointUpRight.X;
+        double y2 = (double)_root.PointUpRight.Y;
         double xS = (x1 + x2) / 2;
         double yS = (y1 + y2) / 2;
         //todo da sa to zýsakť aj pri inserte a delete
@@ -470,10 +503,10 @@ public class QuadTree<T>
                 var tmpY1 = y2 - (vyska * (1 - CHANGE_SIZE_RATIO));
                 var tmpY2 = y1 + (vyska * (1 + CHANGE_SIZE_RATIO));
                 // skontrolujem či som náhodov niekedy pred tým neposúval spodnú hranicu dole
-                if (y1 != _originalPointDownLeft.Y / HODNOTA)
+                if (Math.Abs(y1 - _originalPointDownLeft.Y) > Double.Epsilon)
                 {
                     // ak áno posuniem spodnú hranicu hore a ak je validná tak ju priradím ak nie tak pousniem hornú hranicu
-                    if (QuadTreeRound(tmpY1) <= _originalPointDownLeft.Y)
+                    if (tmpY1 <= _originalPointDownLeft.Y)
                     {
                         newY1 = tmpY1;
                     }
@@ -494,10 +527,10 @@ public class QuadTree<T>
                 var tmpY2 = y1 + (vyska * (1 - CHANGE_SIZE_RATIO));
                 var tmpY1 = y2 - (vyska * (1 + CHANGE_SIZE_RATIO));
                 // skontrolujem či som náhodov niekedy pred tým neposúval hornú hranicu hranicu hore
-                if (y2 != _originalPointUpRight.Y / HODNOTA)
+                if (Math.Abs(y2 - _originalPointUpRight.Y) > Double.Epsilon)
                 {
                     // ak áno posuniem spodnú hornú hore a ak je validná tak ju priradím ak nie tak pousniem dolnú hranicu
-                    if (QuadTreeRound(tmpY2) >= _originalPointUpRight.Y)
+                    if (tmpY2 >= _originalPointUpRight.Y)
                     {
                         newY2 = tmpY2;
                     }
@@ -523,10 +556,10 @@ public class QuadTree<T>
                 var tmpX1 = x2 - (sirka * (1 - CHANGE_SIZE_RATIO));
                 var tmpX2 = x1 + (sirka * (1 + CHANGE_SIZE_RATIO));
                 // skontrolujem či som náhodov niekedy pred tým neposúval spodnú hranicu dole
-                if (x1 != _originalPointDownLeft.X / HODNOTA)
+                if (Math.Abs(x1 - _originalPointDownLeft.X) > Double.Epsilon)
                 {
                     // ak áno posuniem spodnú hranicu v úravo a ak je validná tak ju priradím ak nie tak pousniem hornú hranicu
-                    if (QuadTreeRound(tmpX1) <= _originalPointDownLeft.X)
+                    if (tmpX1 <= _originalPointDownLeft.X)
                     {
                         newX1 = tmpX1;
                     }
@@ -547,10 +580,10 @@ public class QuadTree<T>
                 var tmpX2 = x1 + (sirka * (1 - CHANGE_SIZE_RATIO));
                 var tmpX1 = x2 - (sirka * (1 + CHANGE_SIZE_RATIO));
                 // skontrolujem či som náhodov niekedy pred tým neposúval hornú hranicu hranicu v ľavo
-                if (x2 != _originalPointUpRight.X / HODNOTA)
+                if (Math.Abs(x2 - _originalPointUpRight.X) > Double.Epsilon)
                 {
                     // ak áno posuniem spodnú hornú v ľavo a ak je validná tak ju priradím ak nie tak pousniem dolnú hranicu
-                    if (QuadTreeRound(tmpX2) >= _originalPointUpRight.X)
+                    if (tmpX2 >= _originalPointUpRight.X)
                     {
                         newX2 = tmpX2;
                     }
@@ -579,11 +612,11 @@ public class QuadTree<T>
         }
         
         // skontrolujem či súradnice nepresialhly limity ak ano nebudm pokračovať
-        if (!CheckCoordinates(QuadTreeRound(newX1), QuadTreeRound(newY1)) 
-            || !CheckCoordinates(QuadTreeRound(newX2), QuadTreeRound(newY2)))
-        {
-            return;
-        }
+        // if (!CheckCoordinates(QuadTreeRound(newX1), QuadTreeRound(newY1)) 
+        //     || !CheckCoordinates(QuadTreeRound(newX2), QuadTreeRound(newY2)))
+        // {
+        //     return;
+        // }
 
         List<QuadTreeNodeData<T>> tmpData = new();
         Stack<QuadTreeNodeLeaf<T>> stack = new();
@@ -602,13 +635,13 @@ public class QuadTree<T>
             }
         }
         Count = 0;
-        _root = new(new(QuadTreeRound(newX1), QuadTreeRound(newY1)),
-            new(QuadTreeRound(newX2), QuadTreeRound(newY2)));
+        _root = new(new(newX1, newY1),
+            new(newX2, newY2));
         _optimalize = false;
         foreach (var data in tmpData)
         {
-            Insert((double)data.PointDownLeft.X / HODNOTA, (double)data.PointDownLeft.Y / HODNOTA, (double)data.PointUpRight.X / HODNOTA,
-                (double)data.PointUpRight.Y / HODNOTA, data.Data);
+            Insert(data.PointDownLeft.X, data.PointDownLeft.Y, data.PointUpRight.X,
+                data.PointUpRight.Y, data.Data);
         }
 
         _optimalize = true;
@@ -619,12 +652,12 @@ public class QuadTree<T>
     /// </summary>
     /// <param name="newDepth"> novej hlbky stromu</param>
     /// <exception cref="Exception"> ak je hĺbka stromu zadaná nesprávna</exception>
-    public void setQuadTreeDepth(int newDepth)
+    public void SetQuadTreeDepth(int newDepth)
     {
-        if (newDepth > MAX_DEPTH)
-        {
-            throw new Exception("Max depth is 28");
-        }
+        // if (newDepth > MAX_DEPTH)
+        // {
+        //     throw new Exception("Max depth is 28");
+        // }
         if (newDepth <= 0)
         {
             throw new Exception("Min depth is 1");
@@ -659,8 +692,8 @@ public class QuadTree<T>
         _optimalize = false;
         foreach (var data in tmpData)
         {
-            Insert((double)data.PointDownLeft.X / HODNOTA, (double)data.PointDownLeft.Y / HODNOTA, (double)data.PointUpRight.X / HODNOTA,
-                (double)data.PointUpRight.Y / HODNOTA, data.Data);
+            Insert(data.PointDownLeft.X, data.PointDownLeft.Y, data.PointUpRight.X,
+                data.PointUpRight.Y, data.Data);
         }
 
         _optimalize = true;
@@ -699,39 +732,39 @@ public class QuadTree<T>
     /// </summary>
     /// <param name="value">double that will be rounded</param>
     /// <returns>rounded integer</returns>
-    public static int QuadTreeRound(double value)
+    /*public static int QuadTreeRound(double value)
     {
         return (int)double.Round(value * HODNOTA, 5);
-    }
+    }*/
 
     /// <summary>
     /// Check if the world coordinations are valid for this structure
     /// </summary>
     /// <returns>true if are valid, false if not</returns>
-    private static bool CheckCoordinates(int x, int y)
-    {
-        if (x < -MAX_X * HODNOTA || x > MAX_X * HODNOTA || y < -MAX_Y * HODNOTA || y > MAX_Y * HODNOTA)
-        {
-            return false;
-        }
-
-        return true;
-    }
+    // private static bool CheckCoordinates(int x, int y)
+    // {
+    //     if (x < -MAX_X * HODNOTA || x > MAX_X * HODNOTA || y < -MAX_Y * HODNOTA || y > MAX_Y * HODNOTA)
+    //     {
+    //         return false;
+    //     }
+    //
+    //     return true;
+    // }
 
 
     /// <summary>
     /// This is only for testing, after that will be removed
     /// </summary>
-    public static int TestQuadTreeRound(double value)
-    {
-        return QuadTreeRound(value);
-    }
+    // public static int TestQuadTreeRound(double value)
+    // {
+    //     return QuadTreeRound(value);
+    // }
     
     /// <summary>
     /// This is only for testing, after that will be removed
     /// </summary>
-    public static bool TestCheckCoordinates(int x, int y)
-    {
-        return CheckCoordinates(x, y);
-    }
+    // public static bool TestCheckCoordinates(int x, int y)
+    // {
+    //     return CheckCoordinates(x, y);
+    // }
 }
