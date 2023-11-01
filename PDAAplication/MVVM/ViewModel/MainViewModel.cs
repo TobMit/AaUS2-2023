@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using PDAAplication.Core;
 using PDAAplication.MVVM.Model;
 using PDAAplication.MVVM.View;
@@ -25,6 +26,36 @@ namespace PDAAplication.MVVM.ViewModel
         public RelayCommand FindObjectCommand { get; set; }
         public RelayCommand AddBuildingCommand { get; set; }
         public RelayCommand ShowAllComand { get; set; }
+
+        private Visibility splitViewShow;
+
+        public Visibility SplitViewShow
+        {
+            get
+            {
+                return splitViewShow;
+            }
+            set
+            {
+                splitViewShow = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private Visibility singleViewShow;
+
+        public Visibility SingleViewShow
+        {
+            get
+            {
+                return singleViewShow;
+            }
+            set
+            {
+                singleViewShow = value;
+                OnPropertyChanged();
+            }
+        }
 
         private ObservableCollection<ObjectModel> _listNehnutelnost;
 
@@ -57,6 +88,8 @@ namespace PDAAplication.MVVM.ViewModel
             InicializeButtons();
             _allNehnutelnosti = new();
             _allParcelas = new();
+            SplitViewShow = Visibility.Visible;
+            SingleViewShow = Visibility.Hidden;
         }
 
         private void InicializeButtons()
@@ -115,9 +148,9 @@ namespace PDAAplication.MVVM.ViewModel
                 tmpParcely.Add(new(i, "Parcela: " + i, tmpGps1, tmpGps2, Core.ObjectType.Parcela));
             }
 
-            _quadTreeNehnutelnost = new QuadTree<ObjectModel>(juhoZapadneGPS.X, juhoZapadneGPS.Y, sirka, dlzka, 22);
-            _quadTreeParcela = new QuadTree<ObjectModel>(juhoZapadneGPS.X, juhoZapadneGPS.Y, sirka, dlzka, 22);
-            _quadTreeJednotne = new QuadTree<ObjectModel>(juhoZapadneGPS.X, juhoZapadneGPS.Y, sirka, dlzka, 22);
+            _quadTreeNehnutelnost = new QuadTree<ObjectModel>(juhoZapadneGPS.X, juhoZapadneGPS.Y, sirka, dlzka);
+            _quadTreeParcela = new QuadTree<ObjectModel>(juhoZapadneGPS.X, juhoZapadneGPS.Y, sirka, dlzka);
+            _quadTreeJednotne = new QuadTree<ObjectModel>(juhoZapadneGPS.X, juhoZapadneGPS.Y, sirka, dlzka);
             
             //Parcely vložíme do quad tree
             foreach (ObjectModel parcela in tmpParcely)
@@ -175,7 +208,7 @@ namespace PDAAplication.MVVM.ViewModel
             {
                 return;
             }
-            ListNehnutelnost = new ObservableCollection<ObjectModel>(_quadTreeNehnutelnost.FindOverlapingData(juhoZapadneGPS.X, juhoZapadneGPS.Y, severoVýchodneGPS.X, severoVýchodneGPS.Y));
+            ListNehnutelnost = new ObservableCollection<ObjectModel>(_quadTreeNehnutelnost.Find(juhoZapadneGPS.X, juhoZapadneGPS.Y, severoVýchodneGPS.X, severoVýchodneGPS.Y));
             ListParcela = new();
         }
 
@@ -201,8 +234,10 @@ namespace PDAAplication.MVVM.ViewModel
             {
                 return;
             }
-            ListNehnutelnost = new ObservableCollection<ObjectModel>(_quadTreeNehnutelnost.Find(juhoZapadneGPS.X, juhoZapadneGPS.Y, severoVýchodneGPS.X, severoVýchodneGPS.Y));
-            ListParcela = new ObservableCollection<ObjectModel>(_quadTreeParcela.Find(juhoZapadneGPS.X, juhoZapadneGPS.Y, severoVýchodneGPS.X, severoVýchodneGPS.Y));
+
+            ChangeView(false);
+
+            ListParcela = new ObservableCollection<ObjectModel>(_quadTreeJednotne.FindOverlapingData(juhoZapadneGPS.X, juhoZapadneGPS.Y, severoVýchodneGPS.X, severoVýchodneGPS.Y));
         }
 
         private void AddBuilding()
@@ -248,6 +283,7 @@ namespace PDAAplication.MVVM.ViewModel
 
         private void ShowAll()
         {
+            ChangeView(true);
             ListNehnutelnost = new ObservableCollection<ObjectModel>(_allNehnutelnosti);
             ListParcela = new ObservableCollection<ObjectModel>(_allParcelas);
         }
@@ -255,6 +291,20 @@ namespace PDAAplication.MVVM.ViewModel
         private static double NextDouble(double min, double max, Random rnd)
         {
             return rnd.NextDouble() * (max - min) + min;
+        }
+
+        private void ChangeView(bool splitView)
+        {
+            if (splitView)
+            {
+                SplitViewShow = Visibility.Visible;
+                SingleViewShow = Visibility.Hidden;
+            }
+            else
+            {
+                SplitViewShow = Visibility.Hidden;
+                SingleViewShow = Visibility.Visible;
+            }
         }
     }
 }

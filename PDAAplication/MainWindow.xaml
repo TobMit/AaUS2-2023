@@ -50,7 +50,7 @@
 
 
         </Border>
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" Visibility="{Binding SplitViewShow}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
@@ -87,8 +87,21 @@
 
             </Border>
         </Grid>
-        
-            
+
+        <Grid Grid.Row="1" Visibility="{Binding SingleViewShow}">
+            <TreeView>
+                <ListView
+                    ItemsSource="{Binding ListParcela}"
+                    ItemContainerStyle="{StaticResource ObjectTheme}"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    KeyboardNavigation.ControlTabNavigation="none"
+                    FocusVisualStyle="{x:Null}"
+                    BorderThickness="0"/>
+            </TreeView>
+        </Grid>
+
+
 
     </Grid>
 </Window>
