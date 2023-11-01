@@ -5,10 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualBasic.CompilerServices;
+using PDAAplication.Interface;
 
 namespace PDAAplication.MVVM.Model
 {
-    public class ObjectModel
+    public class ObjectModel: ISavable
     {
         public int IdObjektu { get; set; }
         public string Popis { get; set; }
@@ -26,6 +27,11 @@ namespace PDAAplication.MVVM.Model
             JuhoZapadnyBod = pJuhoZapadnyBod;
             SeveroVychodnyBod = pSeveroVychodnyBod;
             ObjectType = type;
+        }
+
+        public string ToSave()
+        {
+            return IdObjektu + ";" + Popis + ";" + JuhoZapadnyBod.X + ";" + JuhoZapadnyBod.Y + ";" + SeveroVychodnyBod.X + ";" + SeveroVychodnyBod.Y + ";" + ObjectType;
         }
     }
 }

@@ -8,5 +8,6 @@ namespace PDAAplication.Interface
 {
     internal interface ISavable
     {
+        abstract string ToSave();
     }
 }
