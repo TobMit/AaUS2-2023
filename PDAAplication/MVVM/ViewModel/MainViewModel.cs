@@ -124,64 +124,30 @@ namespace PDAAplication.MVVM.ViewModel
                 return;
             }
 
-            Random rnd = new Random(0);
-            var tmpNehnutelnosti = new List<ObjectModel>(pocetNehnutelnosti);
-            var tmpParcely = new List<ObjectModel>(pocetParciel);
-            GPS serveroVychodneGPS = new(juhoZapadneGPS.X + sirka, juhoZapadneGPS.Y + dlzka);
-            for (int i = 0; i < pocetNehnutelnosti; i++)
-            {
-                GPS tmpGps1 = new(Math.Round(NextDouble(juhoZapadneGPS.X + 1, serveroVychodneGPS.X - 3, rnd), 6),
-                    Math.Round(NextDouble(juhoZapadneGPS.Y + 1, serveroVychodneGPS.Y - 3, rnd),6));
-                GPS tmpGps2 = new(Math.Round(NextDouble(tmpGps1.X + 1, serveroVychodneGPS.X - 1, rnd),6),
-                    Math.Round(NextDouble(tmpGps1.Y + 1, serveroVychodneGPS.Y - 1, rnd), 6));
-
-                tmpNehnutelnosti.Add(new(i, "Nehnutelnost: " + i, tmpGps1, tmpGps2, ObjectType.Nehnutelnost));
-            }
-
-            for (int i = 0; i < pocetParciel; i++)
-            {
-                GPS tmpGps1 = new(Math.Round(NextDouble(juhoZapadneGPS.X + 1, serveroVychodneGPS.X - 3, rnd), 6),
-                    Math.Round(NextDouble(juhoZapadneGPS.Y + 1, serveroVychodneGPS.Y - 3, rnd), 6));
-                GPS tmpGps2 = new(Math.Round(NextDouble(tmpGps1.X + 1, serveroVychodneGPS.X - 1, rnd), 6),
-                    Math.Round(NextDouble(tmpGps1.Y + 1, serveroVychodneGPS.Y - 1, rnd), 6));
-
-                tmpParcely.Add(new(i, "Parcela: " + i, tmpGps1, tmpGps2, Core.ObjectType.Parcela));
-            }
-
             _quadTreeNehnutelnost = new QuadTree<ObjectModel>(juhoZapadneGPS.X, juhoZapadneGPS.Y, sirka, dlzka);
             _quadTreeParcela = new QuadTree<ObjectModel>(juhoZapadneGPS.X, juhoZapadneGPS.Y, sirka, dlzka);
             _quadTreeJednotne = new QuadTree<ObjectModel>(juhoZapadneGPS.X, juhoZapadneGPS.Y, sirka, dlzka);
-            
-            //Parcely vložíme do quad tree
-            foreach (ObjectModel parcela in tmpParcely)
-            {
-                _quadTreeParcela.Insert(parcela.JuhoZapadnyBod.X, parcela.JuhoZapadnyBod.Y, parcela.SeveroVychodnyBod.X, parcela.SeveroVychodnyBod.Y, parcela);
-                _quadTreeJednotne.Insert(parcela.JuhoZapadnyBod.X, parcela.JuhoZapadnyBod.Y, parcela.SeveroVychodnyBod.X, parcela.SeveroVychodnyBod.Y, parcela);
-            }
-            
-            // Budeme prechádzať všetky nehnutelnosti
-            // pre každú nehnuteľnosť zýskame všetky parcely, ktoré ju obsahujú
-            // potom pridáme túto parcelu do zoznamu pre nehnutelnosť
-            // a zase parcelu pridáme do nehnuteľnosti
-            // na záver vložíme nehnuteľnosť do quad tree
-            foreach (ObjectModel nehnutelnost in tmpNehnutelnosti)
-            {
-                var tmpListParciel = _quadTreeParcela.FindOverlapingData(nehnutelnost.JuhoZapadnyBod.X, nehnutelnost.JuhoZapadnyBod.Y, nehnutelnost.SeveroVychodnyBod.X, nehnutelnost.SeveroVychodnyBod.Y);
-                foreach (ObjectModel parcela in tmpListParciel)
-                {
-                    nehnutelnost.ZoznamObjektov.Add(parcela);
-                    parcela.ZoznamObjektov.Add(nehnutelnost);
-                }
-                _quadTreeNehnutelnost.Insert(nehnutelnost.JuhoZapadnyBod.X, nehnutelnost.JuhoZapadnyBod.Y, nehnutelnost.SeveroVychodnyBod.X, nehnutelnost.SeveroVychodnyBod.Y, nehnutelnost);
-                _quadTreeJednotne.Insert(nehnutelnost.JuhoZapadnyBod.X, nehnutelnost.JuhoZapadnyBod.Y, nehnutelnost.SeveroVychodnyBod.X, nehnutelnost.SeveroVychodnyBod.Y, nehnutelnost);
-            }
-            
-            // Aby sme si zobrazili nehnutelnosti a parcely tak ich pridáme do observable kolekcie
-            ListNehnutelnost = new ObservableCollection<ObjectModel>(tmpNehnutelnosti);
-            ListParcela = new ObservableCollection<ObjectModel>(tmpParcely);
-            
-            _allNehnutelnosti = tmpNehnutelnosti;
-            _allParcelas = tmpParcely;
+
+            ListParcela = new ();
+            ListNehnutelnost = new ();
+            _allNehnutelnosti = new(pocetNehnutelnosti);
+            _allParcelas = new(pocetParciel);
+
+            Core.DataManager.DataGenerator.GenerateData(_quadTreeNehnutelnost,
+                _quadTreeParcela,
+                _quadTreeJednotne,
+                ListNehnutelnost,
+                ListParcela,
+                _allNehnutelnosti,
+                _allParcelas,
+                juhoZapadneGPS,
+                new(juhoZapadneGPS.X + sirka, juhoZapadneGPS.Y + dlzka),
+                pocetNehnutelnosti,
+                pocetParciel);
+
+            //ListNehnutelnost = _listNehnutelnost;
+            //ListParcela = _listParcela;
+
 
 
         }

@@ -8,7 +8,7 @@ using Microsoft.VisualBasic.CompilerServices;
 
 namespace PDAAplication.MVVM.Model
 {
-    class ObjectModel
+    public class ObjectModel
     {
         public int IdObjektu { get; set; }
         public string Popis { get; set; }

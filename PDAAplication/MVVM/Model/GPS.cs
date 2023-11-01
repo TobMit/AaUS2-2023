@@ -7,7 +7,7 @@ using System.Transactions;
 
 namespace PDAAplication.MVVM.Model
 {
-    class GPS
+    public class GPS
     {
         public char Sirka { get; set; }
         public double X { get; set; }

@@ -12,7 +12,7 @@ namespace PDAAplication.Core
         Parcela = 1
     }
 
-    class Constants
+    public static class Constants
     {
     }
 }

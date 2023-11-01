@@ -10,6 +10,8 @@
     <Window.DataContext>
         <viewModel:MainViewModel />
     </Window.DataContext>
+
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="0.1*"/>
