@@ -7,90 +7,64 @@ using Quadtree.StructureClasses.Node;
 
 public class Program
 {
-    private static bool parallel = false;
+    private static bool parallel = true;
+    private static bool testForProfiler = true;
     
     private static int MAX_UNITS = 1000000;
     private static int MAX_TEST = 100000;
     private static double PROBABILITY_FD = 0.6;
     private static double PROBABILITY_FO_FR = 0.1;
     private static double PROBABILITY_DEPTH = 0.01;
-        
+    private static double FILL_PROBABILITY = 0.3;
+    private static double MAX_SIZE_OF_OBJCET_PERCENTAGE = 0.25;
+    private static int STARTUP_FILL_COUNT = 10000;
+    
+    private static int OPERATION_COUNT = 10000;
+    private static bool OPTIMALIZATION_ON = true;
         
     private static int lastestLovest = int.MaxValue;
     private static int seed = 0;
-    private static int maxSeed = 4;
+    private static int maxSeed = 30;
     // private static int maxSeed = int.MaxValue;
     public static void Main()
     {
-        if (parallel)
+        if (!testForProfiler)
         {
-            
-            Parallel.For(seed, maxSeed, (iSeed) =>
+            if (parallel)
             {
-                try
+            
+                Parallel.For(seed, maxSeed, (iSeed) =>
                 {
-                    int result = TestInstance(iSeed);
-                    if (result < 30)
+                    try
                     {
-                        Console.WriteLine("Najdeny SEED: " + iSeed);
+                        int result = TestInstance(iSeed);
+                        if (result < 30)
+                        {
+                            Console.WriteLine("Najdeny SEED: " + iSeed);
+                            return;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("---------------------------Error v seede: " + iSeed + "\n" + e.Message);
                         return;
                     }
-                }
-                catch (Exception e)
+                });
+            }
+            else
+            {
+                while (lastestLovest >= 30)
                 {
-                    Console.WriteLine("---------------------------Error v seede: " + iSeed + "\n" + e.Message);
-                    return;
+                    lastestLovest = TestInstance(seed);
+                    seed++;
                 }
-            });
+                Console.WriteLine("Najdeny SEED: " + --seed);
+            }
         }
         else
         {
-            while (lastestLovest >= 30)
-            {
-                lastestLovest = TestInstance(seed);
-                seed++;
-            }
-            Console.WriteLine("Najdeny SEED: " + --seed);
+            ProfillerTest();
         }
-
-        /*
-        QuadTree<int> quadtree = new QuadTree<int>(-50, -50, 100, 100, 4);
-        quadtree.Insert(-5.0, -5.0, -1, -1, 5);
-        quadtree.Insert(-5.0, -5.0, -1, -1, 6);
-        quadtree.Insert(-45.0, -45.0, 30, 30, 1);
-        quadtree.Insert(-45.0, -45.0, -10, -10, 2);
-        quadtree.Insert(-20.0, -20.0, -10, -10, 3);
-        quadtree.Insert(-10.0, -10.0, -1, -1, 4);
-        Console.WriteLine("Count pred delete: " + quadtree.Count);
-        //var tmp = quadtree.Delete(-20.0, -20.0, -10, -10);
-        var tmp = quadtree.DeleteInterval(-20.0, -20.0, -1, -1);
-        Console.WriteLine("Count po delete: " + quadtree.Count);
-        foreach (var i in tmp)
-        {
-            Console.WriteLine(i);
-        }
-        tmp = quadtree.DeleteInterval(-20.0, -20.0, -1, -1);
-        Console.WriteLine("Count po delete: " + quadtree.Count);
-        foreach (var i in tmp)
-        {
-            Console.WriteLine(i);
-        }
-
-        tmp = quadtree.DeleteInterval(-50, -50, 50, 50);
-        Console.WriteLine("Count po delete: " + quadtree.Count);
-        foreach (var i in tmp)
-        {
-            Console.WriteLine(i);
-        }
-
-        quadtree.Insert(-5.0, -5.0, -1, -1, 5);
-        Console.WriteLine("Count po inserte: " + quadtree.Count);
-        tmp = quadtree.DeleteInterval(-50, -50, 50, 50);
-        Console.WriteLine("Count po delete: " + quadtree.Count);
-        foreach (var i in tmp)
-        {
-            Console.WriteLine(i);
-        }*/
     }
 
     private static int TestInstance(int seed)
@@ -118,13 +92,39 @@ public class Program
         }
 
         QuadTree<int, int> quadtree = new QuadTree<int, int>(MIN_X, MIN_Y, 
-            Math.Abs(MIN_X - MAX_X), Math.Abs(MIN_Y - MAX_Y));
+            Math.Abs(MAX_X - MIN_X), Math.Abs(MAX_Y - MIN_Y));
+        
+        if (rnd.NextDouble() <= FILL_PROBABILITY)
+        {
+            Console.WriteLine("naplnam struktúru predom");
+            for (int i = 0; i < STARTUP_FILL_COUNT; i++)
+            {
+                double x = NextDouble(MIN_X, MAX_X-2, rnd);
+                double y = NextDouble(MIN_Y, MAX_Y-2, rnd);
+                var tmpSirka = NextDouble(0, Math.Min(Math.Abs(MAX_X - MIN_X) * MAX_SIZE_OF_OBJCET_PERCENTAGE, MAX_X - 1 - x), rnd);
+                var tmpViska = NextDouble(0, Math.Min(Math.Abs(MAX_Y - MIN_Y) * MAX_SIZE_OF_OBJCET_PERCENTAGE, MAX_Y - 1 - y), rnd);
+                double x2 = x + tmpSirka;
+                double y2 = y + tmpViska;
+            
+                int index = rnd.Next(0, toInsert.Count);
+                int value = toInsert[index];
+                toInsert.RemoveAt(index);
+                toDelete.Add(new(new(x, y), 
+                    new(x2, y2), value));
+                    
+                quadtree.Insert(x, y, 
+                    x2, y2, value);
+            }
+        }
+        
         for (int i = 0; i < MAX_TEST; i++)
         {
             double x = NextDouble(MIN_X, MAX_X-2, rnd);
             double y = NextDouble(MIN_Y, MAX_Y-2, rnd);
-            double x2 = NextDouble(x+1, MAX_X, rnd);
-            double y2 = NextDouble(y+1, MAX_Y, rnd);
+            var tmpSirka = NextDouble(0, Math.Min(Math.Abs(MAX_X - MIN_X) * MAX_SIZE_OF_OBJCET_PERCENTAGE, MAX_X - 1 - x), rnd);
+            var tmpViska = NextDouble(0, Math.Min(Math.Abs(MAX_Y - MIN_Y) * MAX_SIZE_OF_OBJCET_PERCENTAGE, MAX_Y - 1 - y), rnd);
+            double x2 = x + tmpSirka;
+            double y2 = y + tmpViska;
 
             var rndValue = rnd.NextDouble();
             if (rndValue < PROBABILITY_DEPTH)
@@ -225,8 +225,8 @@ public class Program
                     var value = toDelete[index];
                     toDelete.RemoveAt(index);
                     toInsert.Add(value.Data);
-                    var deltedValue = quadtree.Delete((double)value.PointDownLeft.X, (double)value.PointDownLeft.Y,
-                        (double)value.PointUpRight.X, (double)value.PointUpRight.Y, value.Data);
+                    var deltedValue = quadtree.Delete(value.PointDownLeft.X, value.PointDownLeft.Y,
+                        value.PointUpRight.X, value.PointUpRight.Y, value.Data);
                     if (deltedValue.Count != 1)
                     {
                         seedOk = false;
@@ -292,6 +292,94 @@ public class Program
             Console.ForegroundColor = ConsoleColor.White;
         }
         return int.MaxValue;
+    }
+
+    private static void ProfillerTest()
+    {
+        double MIN_X = 0;
+        double MAX_X = 100;
+        double MIN_Y = 0;
+        double MAX_Y = 100;
+        
+        Random rnd = new Random(0);
+        QuadTree<int, int> quadTree = new(0.0, 0.0, 100.0, 100.0);
+        
+        List<int> toInsert = new(MAX_UNITS);
+        List<QuadTreeNodeData<int, int>> toDelete = new(MAX_UNITS);
+        
+        for (int i = 0; i < MAX_UNITS; i++)
+        {
+            toInsert.Add(i);
+        }
+        
+        quadTree.OptimalizationOn = false;
+        
+        for (int i = 0; i < STARTUP_FILL_COUNT; i++)
+        {
+            double x = NextDouble(MIN_X, MAX_X-2, rnd);
+            double y = NextDouble(MIN_Y, MAX_Y-2, rnd);
+            var tmpSirka = NextDouble(0, Math.Min(Math.Abs(MAX_X - MIN_X) * MAX_SIZE_OF_OBJCET_PERCENTAGE, MAX_X - 1 - x), rnd);
+            var tmpViska = NextDouble(0, Math.Min(Math.Abs(MAX_Y - MIN_Y) * MAX_SIZE_OF_OBJCET_PERCENTAGE, MAX_Y - 1 - y), rnd);
+            double x2 = x + tmpSirka;
+            double y2 = y + tmpViska;
+            
+            int index = rnd.Next(0, toInsert.Count);
+            int value = toInsert[index];
+            toInsert.RemoveAt(index);
+            toDelete.Add(new(new(x, y), 
+                new(x2, y2), value));
+                    
+            quadTree.Insert(x, y, x2, y2, value);
+        }
+
+        if (OPTIMALIZATION_ON)
+        {
+            quadTree.OptimalizationOn = true;
+            quadTree.Optimalise(true);
+        }
+        
+        
+        MakeTest(MIN_X, MAX_X, rnd, MIN_Y, MAX_Y, toInsert, toDelete, quadTree);
+        
+        
+    }
+
+    private static void MakeTest(double MIN_X, double MAX_X, Random rnd, double MIN_Y, double MAX_Y, List<int> toInsert,
+        List<QuadTreeNodeData<int, int>> toDelete, QuadTree<int, int> quadTree)
+    {
+        for (int i = 0; i < OPERATION_COUNT; i++)
+        {
+            double x = NextDouble(MIN_X, MAX_X - 2, rnd);
+            double y = NextDouble(MIN_Y, MAX_Y - 2, rnd);
+            var tmpSirka = NextDouble(0, Math.Min(Math.Abs(MAX_X - MIN_X) * MAX_SIZE_OF_OBJCET_PERCENTAGE, MAX_X - 1 - x),
+                rnd);
+            var tmpViska = NextDouble(0, Math.Min(Math.Abs(MAX_Y - MIN_Y) * MAX_SIZE_OF_OBJCET_PERCENTAGE, MAX_Y - 1 - y),
+                rnd);
+            double x2 = x + tmpSirka;
+            double y2 = y + tmpViska;
+
+            if (rnd.NextDouble() <= 0.5)
+            {
+                // ideme insertovať
+                int index = rnd.Next(0, toInsert.Count);
+                int value = toInsert[index];
+                toInsert.RemoveAt(index);
+                toDelete.Add(new(new(x, y),
+                    new(x2, y2), value));
+
+                quadTree.Insert(x, y,
+                    x2, y2, value);
+            }
+            else
+            {
+                int index = rnd.Next(0, toDelete.Count);
+                var value = toDelete[index];
+                toDelete.RemoveAt(index);
+                toInsert.Add(value.Data);
+                var deltedValue = quadTree.Delete(value.PointDownLeft.X, value.PointDownLeft.Y,
+                    value.PointUpRight.X, value.PointUpRight.Y, value.Data);
+            }
+        }
     }
 
     public static double NextDouble(double min, double max, Random rnd)

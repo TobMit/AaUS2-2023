@@ -727,6 +727,11 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
     /// <exception cref="Exception"> ak je hĺbka stromu zadaná nesprávna</exception>
     public void SetQuadTreeDepth(int newDepth)
     {
+        // môuž nastať 2 situácie
+        // zmenšujem quad tree
+            // budem potrebovať pomocnú triedu do ktorej si ukladám aktuálnu výšku daného nodu
+            // dostanem sa na požadovanú výšku
+        
         if (newDepth <= 0)
         {
             throw new Exception("Min depth is 1");
