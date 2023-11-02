@@ -7,7 +7,7 @@ using Quadtree.StructureClasses.Node;
 
 public class Program
 {
-    private static bool parallel = true;
+    private static bool parallel = false;
     
     private static int MAX_UNITS = 1000000;
     private static int MAX_TEST = 100000;
