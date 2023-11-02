@@ -27,7 +27,7 @@ public class QuadTreeNodeLeaf<TKey, TValue> : QuadTreeNode<TKey, TValue> where T
         get => _leafsInicialised;
     }
 
-    public QuadTreeNodeLeaf<TKey, TValue> Parent { get; set; }
+    public QuadTreeNodeLeaf<TKey, TValue> Parent { get; }
 
 
     public QuadTreeNodeLeaf(PointD pPointDownLeft, PointD pPointUpRight)

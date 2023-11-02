@@ -10,14 +10,10 @@ namespace Quadtree.StructureClasses;
 public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue : IComparable<TKey>
 {
     private QuadTreeNodeLeaf<TKey, TValue> _root;
-    //private const int HODNOTA = 10000000;
-    //private const int MAX_DEPTH = 22; // je to kôli tomu že keď zoberiem max rozmer tak ho viem deliť iba 23 krát kým by som nedostal samé 1 a z bezpečnostných dôvodou iba 23
     private const int OPERATION_TO_OPTIMALIZE = 100;
-    private const int MIN_DATA_TO_OPTIMALIZE = 1000;
-    private const double OPTIMALIZE_RATIO = 0.6;
-    private const double CHANGE_SIZE_RATIO = 0.2;
-    // private const int MAX_X = 180;
-    // private const int MAX_Y = 90;
+    private const int MIN_DATA_TO_OPTIMALIZE = 100;
+    private const double OPTIMALIZE_RATIO = 0.4;
+    private const double CHANGE_SIZE_RATIO = 0.3;
     private int _maxDepth;
     private int _operationCount;
     
@@ -32,6 +28,11 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
     /// </summary>
     public double Health { get; set; }
 
+    public bool OptimalizationOn { get; set; }
+
+
+    private int[] _quadrantCount = new int[4];
+
     /// <summary>
     /// Quad tree structure
     /// </summary>
@@ -42,17 +43,6 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
     /// <param name="pMaxDepth">max deepth of the tree</param>
     public QuadTree(double pX, double pY, double width, double height, int pMaxDepth)
     {
-        // if (!CheckCoordinates(QuadTreeRound(pX), QuadTreeRound(pY)) 
-        //     || !CheckCoordinates(QuadTreeRound(pX + width), QuadTreeRound(pY + height)))
-        // {
-        //     throw new Exception("Wrong world coordination");
-        // }
-
-        // if (pMaxDepth > MAX_DEPTH)
-        // {
-        //     throw new Exception("Max depth is 22");
-        // }
-        
         if (pMaxDepth <= 0)
         {
             throw new Exception("Min depth is 1");
@@ -67,6 +57,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         _maxDepth = pMaxDepth;
         Count = 0;
         _operationCount = 0;
+        OptimalizationOn = true;
     }
     
     /// <summary>
@@ -79,13 +70,6 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
     /// <param name="pMaxDepth">max deepth of the tree</param>
     public QuadTree(double pX, double pY, double width, double height)
     {
-        // if (!CheckCoordinates(QuadTreeRound(pX), QuadTreeRound(pY)) 
-        //     || !CheckCoordinates(QuadTreeRound(pX + width), QuadTreeRound(pY + height)))
-        // {
-        //     throw new Exception("Wrong world coordination");
-        // }
-        
-        
         OriginalPointDownLeft = new(pX, pY);
         OriginalPointUpRight = new(pX + width, pY + height);
         
@@ -95,6 +79,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         _maxDepth = int.MaxValue;
         Count = 0;
         _operationCount = 0;
+        OptimalizationOn = true;
     }
 
     /// <summary>
@@ -114,6 +99,9 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         QuadTreeNodeLeaf<TKey, TValue>? current = _root;
         QuadTreeNodeData<TKey, TValue> currentDataNode = new(new(xDownLeft, yDownLeft), 
           new (xUpRight, yUpRight), pData);
+        
+        // zozbieranie info pre optimalizaciu
+        CalculateOptimalizationQuadrant(currentDataNode, false);
         
         int depth = 0;
         while (current is not null)
@@ -291,6 +279,17 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
                 }
             }
         }
+        
+        // zbieranie info pre optimalizáciu
+        if (delete && returnData.Count != 0)
+        {
+            // prechádza sa to v cykle keďže môže nastať situácia že sa vymaže viac objektov
+            // to je iba v takom prípade ak je kľúč null inak je pole o dlžky 1
+            foreach (var data in returnData)
+            {
+                CalculateOptimalizationQuadrant(areaToFind, true);
+            }
+        }
 
         if (_optimalize && delete)
         {
@@ -405,6 +404,17 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
                 }
             }
         }
+        
+        // zbieranie info pre optimalizáciu
+        if (delete && returnData.Count != 0)
+        {
+            // prechádza sa to v cykle keďže môže nastať situácia že sa vymaže viac objektov
+            // to je iba v takom prípade ak je kľúč null inak je pole o dlžky 1
+            foreach (var data in returnData)
+            {
+                CalculateOptimalizationQuadrant(objectToFind, true);
+            }
+        }
 
         if (_optimalize && delete)
         {
@@ -447,27 +457,37 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         return returnData;
     }
     
-    public void Optimalise()
+    /// <summary>
+    /// Optimalizácia stromu ktorá zväčšuje alebo zmenšuje strom na tú stranu na ktorej sa nachádza viac dát. Tým sa zaručí že najväčší zhluk dát bude v strede alebo blýzko jeho okolia
+    /// </summary>
+    /// <param name="force">Ak je nastavené na true tak sa obýdu všetky zábrany spúšťania optimalizácia po každej vykonanej operácií, defaultne je nastavené na false</param>
+    public void Optimalise(bool force = false)
     {
         _operationCount++;
         // Optimalizáciu spúšťam až keď tam je apoň 1000 dát
-        if (Count < MIN_DATA_TO_OPTIMALIZE)
+        if (!force)
         {
-            return;
+            if (Count < MIN_DATA_TO_OPTIMALIZE)
+            {
+                return;
+            }
         }
         
         // spočítame dáta v 4 quadrantoch rootu
-        double x1 = (double)_root.PointDownLeft.X;
-        double y1 = (double)_root.PointDownLeft.Y;
-        double x2 = (double)_root.PointUpRight.X;
-        double y2 = (double)_root.PointUpRight.Y;
-        double xS = (x1 + x2) / 2;
-        double yS = (y1 + y2) / 2;
-        //todo da sa to zýsakť aj pri inserte a delete
-        int first = FindInterval(x1, y1, xS, yS).Count;
-        int second = FindInterval(x1, yS, xS, y2).Count;
-        int third = FindInterval(xS, yS, x2, y2).Count;
-        int forth = FindInterval(xS, y1, x2, yS).Count;
+        double x1 = _root.PointDownLeft.X;
+        double y1 = _root.PointDownLeft.Y;
+        double x2 = _root.PointUpRight.X;
+        double y2 = _root.PointUpRight.Y;
+        //double xS = (x1 + x2) / 2;
+        //double yS = (y1 + y2) / 2;
+        // int first = FindInterval(x1, y1, xS, yS).Count;
+        // int second = FindInterval(x1, yS, xS, y2).Count;
+        // int third = FindInterval(xS, yS, x2, y2).Count;
+        // int forth = FindInterval(xS, y1, x2, yS).Count;
+        int first = _quadrantCount[0];
+        int second = _quadrantCount[1];
+        int third = _quadrantCount[2];
+        int forth = _quadrantCount[3];
         
         // spočítame koľko dát sa nachádza v Severnej časti a južnej časti, tak isto koľko sa nachádza vo východnej a západnej časti
 
@@ -496,10 +516,12 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         double newX2 = x2;
         double newY2 = y2;
         
-        // volanie počítanie zdravia
-        if (_operationCount < OPERATION_TO_OPTIMALIZE)
+        if (!force)
         {
-            return;
+            if (_operationCount < OPERATION_TO_OPTIMALIZE)
+            {
+                return;
+            }
         }
         
         
@@ -616,24 +638,30 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
                 }
             }
         }
-        
-        if (_operationCount < OPERATION_TO_OPTIMALIZE)
+
+        if (!force)
         {
-            return;
+            if (_operationCount < OPERATION_TO_OPTIMALIZE)
+            {
+                return;
+            }
         }
         _operationCount = 0;
 
+        // ak sa root nezmenil nemá zmysl pokračovať
         if (!newRoot)
         {
             return;
         }
         
-        // skontrolujem či súradnice nepresialhly limity ak ano nebudm pokračovať
-        // if (!CheckCoordinates(QuadTreeRound(newX1), QuadTreeRound(newY1)) 
-        //     || !CheckCoordinates(QuadTreeRound(newX2), QuadTreeRound(newY2)))
-        // {
-        //     return;
-        // }
+        // ak nie je optimalizacia zapnutá tak nepokračujem
+        if (!force)
+        {
+            if (!OptimalizationOn)
+            {
+                return;
+            }
+        }
 
         List<QuadTreeNodeData<TKey, TValue>> tmpData = new();
         Stack<QuadTreeNodeLeaf<TKey, TValue>> stack = new();
@@ -655,13 +683,41 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         _root = new(new(newX1, newY1),
             new(newX2, newY2));
         _optimalize = false;
+        
+        _quadrantCount = new int[4];
+        
         foreach (var data in tmpData)
         {
+            // znovu zobieram data pre budúcu optimalizaciu
+            CalculateOptimalizationQuadrant(data, false);
+            
             Insert(data.PointDownLeft.X, data.PointDownLeft.Y, data.PointUpRight.X,
                 data.PointUpRight.Y, data.Data);
         }
 
         _optimalize = true;
+        
+        // Znovu spočítame zdravie 
+        // nasjkôr sa zakutalizujú premenné
+        first = _quadrantCount[0];
+        second = _quadrantCount[1];
+        third = _quadrantCount[2];
+        forth = _quadrantCount[3];
+        sever = second + third;
+        juh = first + forth;
+        vychod = third + forth;
+        zapad = first + second;
+        
+        percentoSever = sever/ (sever + juh);
+        percentoJuh = 1 - percentoSever;
+        percentoVychod = vychod / (vychod + zapad);
+        percentoZapad = 1 - percentoVychod;
+
+        rozdielSJ = percentoSever - percentoJuh;
+        rozdielVZ = percentoVychod - percentoZapad;
+        
+        // vypočítame zdravie
+        Health = 1 - (Math.Abs(rozdielSJ) + Math.Abs(rozdielVZ)) / 2;
     }
 
     /// <summary>
@@ -671,10 +727,6 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
     /// <exception cref="Exception"> ak je hĺbka stromu zadaná nesprávna</exception>
     public void SetQuadTreeDepth(int newDepth)
     {
-        // if (newDepth > MAX_DEPTH)
-        // {
-        //     throw new Exception("Max depth is 28");
-        // }
         if (newDepth <= 0)
         {
             throw new Exception("Min depth is 1");
@@ -769,5 +821,42 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         }
 
         return newList;
+    }
+
+    /// <summary>
+    /// Vypočítava naplnenie jednotlvých kvadrantov používaných v optimalizácii
+    /// </summary>
+    /// <param name="node"> node kotrý sa bude vkladať strome do niektorého z kvadrantov</param>
+    /// <param name="delete"> ak True tak odpočítavame hodnoty v kvadrantoch inak pripočítavame hodnoty v kvadrantoch</param>
+    private void CalculateOptimalizationQuadrant(QuadTreeNode<TKey, TValue> node, bool delete)
+    {
+        QuadTreeNodeLeaf<TKey, TValue> quadrantTree = new(new(_root.PointDownLeft.X, _root.PointDownLeft.Y),
+            new(_root.PointUpRight.X, _root.PointUpRight.Y));
+        var quadrantLeafs = quadrantTree.TestInitLeafs();
+        for (int i = 0; i < quadrantLeafs.Length; i++)
+        {
+            if (quadrantLeafs[i].ContainNode(node))
+            {
+                if (delete)
+                {
+                    _quadrantCount[i]--;
+                }
+                else
+                {
+                    _quadrantCount[i]++;
+                }
+                return;
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// Metoda vyhradená iba na testovanie!!!!
+    /// </summary>
+    /// <returns>Root</returns>
+    public QuadTreeNodeLeaf<TKey, TValue> TestGetRoot()
+    {
+        return _root;
     }
 }

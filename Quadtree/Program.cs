@@ -294,7 +294,7 @@ public class Program
         return int.MaxValue;
     }
 
-    private static double NextDouble(double min, double max, Random rnd)
+    public static double NextDouble(double min, double max, Random rnd)
     {
         return Math.Round(rnd.NextDouble() * (max - min) + min, 8);
     }

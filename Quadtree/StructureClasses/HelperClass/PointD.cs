@@ -43,4 +43,12 @@ public class PointD : IEquatable<PointD>
     /// <param name="right">Pravý PointD na porovavanie</param>
     /// <returns></returns>
     public static bool operator !=(PointD left, PointD right) => !(left == right);
+    
+    /// <summary>
+    /// Vynázosby PointD o daný počet
+    /// </summary>
+    /// <param name="left">PointD ktorý násobime</param>
+    /// <param name="right">čislo ktorým násobime</param>
+    /// <returns></returns>
+    public static PointD operator *(PointD left, double right) => new(left.X * right, left.Y * right);
 }
