@@ -28,6 +28,7 @@ namespace PDAAplication.MVVM.ViewModel
         public RelayCommand AddBuildingCommand { get; set; }
         public RelayCommand ShowAllComand { get; set; }
         public RelayCommand SaveDataCommand { get; set; }
+        public RelayCommand LoadDataCommand { get; set; }
 
         private Visibility splitViewShow;
 
@@ -102,6 +103,7 @@ namespace PDAAplication.MVVM.ViewModel
             AddBuildingCommand = new RelayCommand(o => { AddBuilding(); });
             ShowAllComand = new RelayCommand(o => { ShowAll(); });
             SaveDataCommand = new RelayCommand(o => { SaveData(); });
+            LoadDataCommand = new RelayCommand(o => { LoadData(); });
         }
 
         private void GenerateData()
@@ -260,9 +262,29 @@ namespace PDAAplication.MVVM.ViewModel
         private void SaveData()
         {
             DataSaver<ObjectModel> saver = new();
-            
+            saver.AddLine(_quadTreeJednotne.OriginalPointDownLeft.X + ";" + _quadTreeJednotne.OriginalPointDownLeft.Y + ";" + _quadTreeJednotne.OriginalPointUpRight.X + ";" + _quadTreeJednotne.OriginalPointUpRight.Y + "\n");
             saver.PrepareForSave(_quadTreeJednotne.ToList());
             saver.SaveData();
+        }
+
+        private void LoadData()
+        {
+            DataLoader loader = new();
+
+            ListParcela = new();
+            ListNehnutelnost = new();
+            _allNehnutelnosti = new();
+            _allParcelas = new();
+
+            
+            loader.LoadData(_quadTreeNehnutelnost,
+                _quadTreeParcela,
+                _quadTreeJednotne,
+                ListNehnutelnost,
+                ListParcela,
+                _allNehnutelnosti,
+                _allParcelas);
+
         }
 
         private static double NextDouble(double min, double max, Random rnd)

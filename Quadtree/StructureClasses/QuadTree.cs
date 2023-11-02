@@ -22,8 +22,8 @@ public class QuadTree<T>
     
     private bool _optimalize = true;
     
-    private PointD _originalPointDownLeft;
-    private PointD _originalPointUpRight;
+    public PointD OriginalPointDownLeft { get; set; }
+    public PointD OriginalPointUpRight { get; set; }
     public int Count { get; set; }
     
     /// <summary>
@@ -57,8 +57,8 @@ public class QuadTree<T>
             throw new Exception("Min depth is 1");
         }
         
-        _originalPointDownLeft = new(pX, pY);
-        _originalPointUpRight = new(pX + width, pY + height);
+        OriginalPointDownLeft = new(pX, pY);
+        OriginalPointUpRight = new(pX + width, pY + height);
         
         _root = new(new(pX, pY),
             new(pX + width, pY + height));
@@ -85,8 +85,8 @@ public class QuadTree<T>
         // }
         
         
-        _originalPointDownLeft = new(pX, pY);
-        _originalPointUpRight = new(pX + width, pY + height);
+        OriginalPointDownLeft = new(pX, pY);
+        OriginalPointUpRight = new(pX + width, pY + height);
         
         _root = new(new(pX, pY),
             new(pX + width, pY + height));
@@ -454,8 +454,8 @@ public class QuadTree<T>
         
         // spočítame koľko dát sa nachádza v Severnej časti a južnej časti, tak isto koľko sa nachádza vo východnej a západnej časti
 
-        double sirka = Math.Abs(x1 - x2);
-        double vyska = Math.Abs(y1 - y2);
+        double sirka = Math.Abs(x2 - x1);
+        double vyska = Math.Abs(y2 - y1);
         
         double sever = second + third;
         double juh = first + forth;
@@ -503,10 +503,10 @@ public class QuadTree<T>
                 var tmpY1 = y2 - (vyska * (1 - CHANGE_SIZE_RATIO));
                 var tmpY2 = y1 + (vyska * (1 + CHANGE_SIZE_RATIO));
                 // skontrolujem či som náhodov niekedy pred tým neposúval spodnú hranicu dole
-                if (Math.Abs(y1 - _originalPointDownLeft.Y) > Double.Epsilon)
+                if (Math.Abs(y1 - OriginalPointDownLeft.Y) > Double.Epsilon)
                 {
                     // ak áno posuniem spodnú hranicu hore a ak je validná tak ju priradím ak nie tak pousniem hornú hranicu
-                    if (tmpY1 <= _originalPointDownLeft.Y)
+                    if (tmpY1 <= OriginalPointDownLeft.Y)
                     {
                         newY1 = tmpY1;
                     }
@@ -527,10 +527,10 @@ public class QuadTree<T>
                 var tmpY2 = y1 + (vyska * (1 - CHANGE_SIZE_RATIO));
                 var tmpY1 = y2 - (vyska * (1 + CHANGE_SIZE_RATIO));
                 // skontrolujem či som náhodov niekedy pred tým neposúval hornú hranicu hranicu hore
-                if (Math.Abs(y2 - _originalPointUpRight.Y) > Double.Epsilon)
+                if (Math.Abs(y2 - OriginalPointUpRight.Y) > Double.Epsilon)
                 {
                     // ak áno posuniem spodnú hornú hore a ak je validná tak ju priradím ak nie tak pousniem dolnú hranicu
-                    if (tmpY2 >= _originalPointUpRight.Y)
+                    if (tmpY2 >= OriginalPointUpRight.Y)
                     {
                         newY2 = tmpY2;
                     }
@@ -556,10 +556,10 @@ public class QuadTree<T>
                 var tmpX1 = x2 - (sirka * (1 - CHANGE_SIZE_RATIO));
                 var tmpX2 = x1 + (sirka * (1 + CHANGE_SIZE_RATIO));
                 // skontrolujem či som náhodov niekedy pred tým neposúval spodnú hranicu dole
-                if (Math.Abs(x1 - _originalPointDownLeft.X) > Double.Epsilon)
+                if (Math.Abs(x1 - OriginalPointDownLeft.X) > Double.Epsilon)
                 {
                     // ak áno posuniem spodnú hranicu v úravo a ak je validná tak ju priradím ak nie tak pousniem hornú hranicu
-                    if (tmpX1 <= _originalPointDownLeft.X)
+                    if (tmpX1 <= OriginalPointDownLeft.X)
                     {
                         newX1 = tmpX1;
                     }
@@ -580,10 +580,10 @@ public class QuadTree<T>
                 var tmpX2 = x1 + (sirka * (1 - CHANGE_SIZE_RATIO));
                 var tmpX1 = x2 - (sirka * (1 + CHANGE_SIZE_RATIO));
                 // skontrolujem či som náhodov niekedy pred tým neposúval hornú hranicu hranicu v ľavo
-                if (Math.Abs(x2 - _originalPointUpRight.X) > Double.Epsilon)
+                if (Math.Abs(x2 - OriginalPointUpRight.X) > Double.Epsilon)
                 {
                     // ak áno posuniem spodnú hornú v ľavo a ak je validná tak ju priradím ak nie tak pousniem dolnú hranicu
-                    if (tmpX2 >= _originalPointUpRight.X)
+                    if (tmpX2 >= OriginalPointUpRight.X)
                     {
                         newX2 = tmpX2;
                     }

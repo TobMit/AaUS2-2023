@@ -18,6 +18,15 @@ namespace PDAAplication.Core.DataManager.FileManager
         }
 
         /// <summary>
+        /// Umožnuje pridať 1 riadok záhznamu ktorý sa uloží do súboru
+        /// </summary>
+        /// <param name="line"></param>
+        public void AddLine(string line)
+        {
+            builder.Append(line);
+        }
+
+        /// <summary>
         /// Pripravý data na uloženie do súboru
         /// </summary>
         /// <param name="dataToSave"> Dáta ktoré chceme uložiť do súboru</param>

@@ -37,6 +37,9 @@
                 <MenuItem 
                     Header="Save as"
                     Command="{Binding SaveDataCommand}"/>
+                <MenuItem
+                    Header="Load data"
+                    Command="{Binding LoadDataCommand}"/>
             </MenuItem>
             <MenuItem
                 Header="Zobraziť všetko"
