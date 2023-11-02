@@ -17,11 +17,6 @@ namespace PDAAplication.Core.DataManager.FileManager
             
         }
 
-        public void LoadFirstLine()
-        {
-
-        }
-
         public async void LoadData(QuadTree<ObjectModel> nehnutelnostiQuadTree,
             QuadTree<ObjectModel> parcelyQuadTree,
             QuadTree<ObjectModel> jednotneQuadTree,
@@ -74,17 +69,25 @@ namespace PDAAplication.Core.DataManager.FileManager
                             nehnutelnostiQuadTree.Insert(gps1.X, gps1.Y, gps2.X, gps2.Y, objectModel);
                             jednotneQuadTree.Insert(gps1.X, gps1.Y, gps2.X, gps2.Y, objectModel);
                             nehnutelnostiList.Add(objectModel);
-                            observableCollectionNehnutelnosti.Add(objectModel);
+                            if (observableCollectionNehnutelnosti.Count <= Constants.MAX_SIZE_TO_SHOW)
+                            {
+                                observableCollectionNehnutelnosti.Add(objectModel);
+                            }
                         }
                         else
                         {
                             parcelyQuadTree.Insert(gps1.X, gps1.Y, gps2.X, gps2.Y, objectModel);
                             jednotneQuadTree.Insert(gps1.X, gps1.Y, gps2.X, gps2.Y, objectModel);
                             parcelyList.Add(objectModel);
-                            observableCollectionParcely.Add(objectModel);
+                            if (observableCollectionParcely.Count <= Constants.MAX_SIZE_TO_SHOW)
+                            {   
+                                observableCollectionParcely.Add(objectModel);
+                            }
                         }
                     }
                 }
+                // data linkujem preto, lebo môže sa stať že nehnuteľnosti sú pomiešané s parcelami, takto by som nebol schopný získať všetky parcely pre nehnuteľnosť
+                // preto sa musia najskôr načítať a potom linkovať
                 LinkData(nehnutelnostiList, parcelyQuadTree);
             }
         }

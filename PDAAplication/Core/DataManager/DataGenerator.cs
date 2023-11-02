@@ -11,8 +11,6 @@ namespace PDAAplication.Core.DataManager
 {
     public static class DataGenerator
     {
-        private static double MAX_SIZE_OF_OBJCET_PERCENTAGE = 0.15;
-        private static int MAX_SIZE_TO_SHOW = 500;
         public static void GenerateData(QuadTree<ObjectModel> nehnutelnostiQuadTree,
             QuadTree<ObjectModel> parcelyQuadTree,
             QuadTree<ObjectModel> jednotneQuadTree,
@@ -38,8 +36,8 @@ namespace PDAAplication.Core.DataManager
                 // Druhú poziciu gps vypočítame tak že k prvej pozicií pripočítame náhodnú širku a výšku
                 // šírku a výšku vypočítame ako nahodne číslo medzi 1 pozíciou a minimom medzi (celková šírka /2, a šíkra k druhému bodu)
                 // toto nam zaruší generovanie objektov menších ako 50% celkovej plochy a tým pádom aj lepšie rozloženie v strome
-                var tmpSirka = NextDouble(0, Math.Min(sirka * MAX_SIZE_OF_OBJCET_PERCENTAGE, severovychodneGps.X - 1 - tmpGps1.X), rnd);
-                var tmpViska = NextDouble(0, Math.Min(vyska * MAX_SIZE_OF_OBJCET_PERCENTAGE, severovychodneGps.Y - 1 - tmpGps1.Y), rnd);
+                var tmpSirka = NextDouble(0, Math.Min(sirka * Constants.MAX_SIZE_OF_OBJCET_PERCENTAGE, severovychodneGps.X - 1 - tmpGps1.X), rnd);
+                var tmpViska = NextDouble(0, Math.Min(vyska * Constants.MAX_SIZE_OF_OBJCET_PERCENTAGE, severovychodneGps.Y - 1 - tmpGps1.Y), rnd);
 
                 GPS tmpGps2 = new(tmpGps1.X + tmpSirka, tmpGps1.Y + tmpViska);
 
@@ -49,7 +47,7 @@ namespace PDAAplication.Core.DataManager
                 jednotneQuadTree.Insert(tmpGps1.X, tmpGps1.Y, tmpGps2.X, tmpGps2.Y, tmpParcela);
 
                 parcelyList.Add(tmpParcela);
-                if (i <= MAX_SIZE_TO_SHOW)
+                if (i <= Constants.MAX_SIZE_TO_SHOW)
                 {
                     observableCollectionParcely.Add(tmpParcela);
                 }
@@ -68,8 +66,8 @@ namespace PDAAplication.Core.DataManager
                 // Druhú poziciu gps vypočítame tak že k prvej pozicií pripočítame náhodnú širku a výšku
                 // šírku a výšku vypočítame ako nahodne číslo medzi 1 pozíciou a minimom medzi (celková šírka /2, a šíkra k druhému bodu)
                 // toto nam zaruší generovanie objektov menších ako 50% celkovej plochy a tým pádom aj lepšie rozloženie v strome
-                var tmpSirka = NextDouble(0, Math.Min(sirka * MAX_SIZE_OF_OBJCET_PERCENTAGE, severovychodneGps.X - 1 - tmpGps1.X), rnd);
-                var tmpViska = NextDouble(0, Math.Min(vyska * MAX_SIZE_OF_OBJCET_PERCENTAGE, severovychodneGps.Y - 1 - tmpGps1.Y), rnd);
+                var tmpSirka = NextDouble(0, Math.Min(sirka * Constants.MAX_SIZE_OF_OBJCET_PERCENTAGE, severovychodneGps.X - 1 - tmpGps1.X), rnd);
+                var tmpViska = NextDouble(0, Math.Min(vyska * Constants.MAX_SIZE_OF_OBJCET_PERCENTAGE, severovychodneGps.Y - 1 - tmpGps1.Y), rnd);
 
                 GPS tmpGps2 = new(tmpGps1.X + tmpSirka, tmpGps1.Y + tmpViska);
 
@@ -86,7 +84,7 @@ namespace PDAAplication.Core.DataManager
                 jednotneQuadTree.Insert(tmpGps1.X, tmpGps1.Y, tmpGps2.X, tmpGps2.Y, tmpNehnutelnost);
 
                 nehnutelnostiList.Add(tmpNehnutelnost);
-                if (i <= MAX_SIZE_TO_SHOW)
+                if (i <= Constants.MAX_SIZE_TO_SHOW)
                 {
                     observableCollectionNehnutelnosti.Add(tmpNehnutelnost);
                 }
