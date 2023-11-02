@@ -7,7 +7,7 @@ using Quadtree.StructureClasses.Node;
 
 public class Program
 {
-    private static bool parallel = false;
+    private static bool parallel = true;
     
     private static int MAX_UNITS = 1000000;
     private static int MAX_TEST = 100000;
@@ -18,7 +18,8 @@ public class Program
         
     private static int lastestLovest = int.MaxValue;
     private static int seed = 0;
-    private static int maxSeed = int.MaxValue;
+    private static int maxSeed = 4;
+    // private static int maxSeed = int.MaxValue;
     public static void Main()
     {
         if (parallel)
@@ -109,14 +110,14 @@ public class Program
         
         
         List<int> toInsert = new(MAX_UNITS);
-        List<QuadTreeNodeData<int>> toDelete = new(MAX_UNITS);
+        List<QuadTreeNodeData<int, int>> toDelete = new(MAX_UNITS);
         
         for (int i = 0; i < MAX_UNITS; i++)
         {
             toInsert.Add(i);
         }
 
-        QuadTree<int> quadtree = new QuadTree<int>(MIN_X, MIN_Y, 
+        QuadTree<int, int> quadtree = new QuadTree<int, int>(MIN_X, MIN_Y, 
             Math.Abs(MIN_X - MAX_X), Math.Abs(MIN_Y - MAX_Y));
         for (int i = 0; i < MAX_TEST; i++)
         {

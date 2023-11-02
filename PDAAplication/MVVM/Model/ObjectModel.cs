@@ -9,7 +9,7 @@ using PDAAplication.Interface;
 
 namespace PDAAplication.MVVM.Model
 {
-    public class ObjectModel: ISavable
+    public class ObjectModel: ISavable, IComparable<ObjectModel>
     {
         public int IdObjektu { get; set; }
         public string Popis { get; set; }
@@ -32,6 +32,12 @@ namespace PDAAplication.MVVM.Model
         public string ToSave()
         {
             return IdObjektu + ";" + Popis + ";" + JuhoZapadnyBod.X + ";" + JuhoZapadnyBod.Y + ";" + SeveroVychodnyBod.X + ";" + SeveroVychodnyBod.Y + ";" + ObjectType + "\n";
+        }
+
+        public int CompareTo(ObjectModel? other)
+        {
+            if (other == null) return 1;
+            return IdObjektu.CompareTo(other.IdObjektu);
         }
     }
 }

@@ -7,7 +7,7 @@ public class FindAndDeleteRange
     [Test]
     public void BasicDeleteInterval()
     {
-        QuadTree<int> quadtree = new QuadTree<int>(-50, -50, 100, 100, 4);
+        QuadTree<int, int> quadtree = new QuadTree<int, int>(-50, -50, 100, 100, 4);
         quadtree.Insert(-5.0, -5.0, -1, -1, 5);
         quadtree.Insert(-5.0, -5.0, -1, -1, 6);
         quadtree.Insert(-45.0, -45.0, 30, 30, 1);
@@ -44,7 +44,7 @@ public class FindAndDeleteRange
     [Test]
     public void BasicFindRange()
     {
-        QuadTree<int> quadtree = new QuadTree<int>(-50, -50, 100, 100, 4);
+        QuadTree<int, int> quadtree = new QuadTree<int, int>(-50, -50, 100, 100, 4);
         quadtree.Insert(-5.0, -5.0, -1, -1, 5);
         quadtree.Insert(-5.0, -5.0, -1, -1, 6);
         quadtree.Insert(-45.0, -45.0, 30, 30, 1);
@@ -80,7 +80,7 @@ public class FindAndDeleteRange
     [Test]
     public void OverlapingFind()
     {
-        QuadTree<int> quadtree = new QuadTree<int>(-50, -50, 100, 100, 4);
+        QuadTree<int, int> quadtree = new QuadTree<int, int>(-50, -50, 100, 100, 4);
         quadtree.Insert(-5.0, -5.0, -1, -1, 5);
         quadtree.Insert(-5.0, -5.0, -1, -1, 6);
         quadtree.Insert(-45.0, -45.0, 30, 30, 1);

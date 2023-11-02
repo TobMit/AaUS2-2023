@@ -15,9 +15,9 @@ namespace PDAAplication.MVVM.ViewModel
 {
     class MainViewModel : ObservableObjects
     {
-        private QuadTree<ObjectModel> _quadTreeNehnutelnost;
-        private QuadTree<ObjectModel> _quadTreeParcela;
-        private QuadTree<ObjectModel> _quadTreeJednotne;
+        private QuadTree<int,ObjectModel> _quadTreeNehnutelnost;
+        private QuadTree<int,ObjectModel> _quadTreeParcela;
+        private QuadTree<int,ObjectModel> _quadTreeJednotne;
 
         private List<ObjectModel> _allNehnutelnosti;
         private List<ObjectModel> _allParcelas;
@@ -129,9 +129,9 @@ namespace PDAAplication.MVVM.ViewModel
                 return;
             }
 
-            _quadTreeNehnutelnost = new QuadTree<ObjectModel>(juhoZapadneGPS.X, juhoZapadneGPS.Y, sirka, dlzka);
-            _quadTreeParcela = new QuadTree<ObjectModel>(juhoZapadneGPS.X, juhoZapadneGPS.Y, sirka, dlzka);
-            _quadTreeJednotne = new QuadTree<ObjectModel>(juhoZapadneGPS.X, juhoZapadneGPS.Y, sirka, dlzka);
+            _quadTreeNehnutelnost = new QuadTree<int, ObjectModel>(juhoZapadneGPS.X, juhoZapadneGPS.Y, sirka, dlzka);
+            _quadTreeParcela = new QuadTree<int, ObjectModel>(juhoZapadneGPS.X, juhoZapadneGPS.Y, sirka, dlzka);
+            _quadTreeJednotne = new QuadTree<int, ObjectModel>(juhoZapadneGPS.X, juhoZapadneGPS.Y, sirka, dlzka);
 
             ListParcela = new ();
             ListNehnutelnost = new ();

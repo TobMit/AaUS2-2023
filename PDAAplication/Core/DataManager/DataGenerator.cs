@@ -11,9 +11,9 @@ namespace PDAAplication.Core.DataManager
 {
     public static class DataGenerator
     {
-        public static void GenerateData(QuadTree<ObjectModel> nehnutelnostiQuadTree,
-            QuadTree<ObjectModel> parcelyQuadTree,
-            QuadTree<ObjectModel> jednotneQuadTree,
+        public static void GenerateData(QuadTree<int, ObjectModel> nehnutelnostiQuadTree,
+            QuadTree<int, ObjectModel> parcelyQuadTree,
+            QuadTree<int, ObjectModel> jednotneQuadTree,
             ObservableCollection<ObjectModel> observableCollectionNehnutelnosti,
             ObservableCollection<ObjectModel> observableCollectionParcely,
             List<ObjectModel> nehnutelnostiList,

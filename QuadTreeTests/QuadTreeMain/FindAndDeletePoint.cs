@@ -5,7 +5,7 @@ namespace QuadTreeTests.QuadTreeMain;
 public class FindAndDeletePoint
 {
 
-    private QuadTree<int> _quadTree;
+    private QuadTree<int, int> _quadTree;
     [SetUp]
     public void SetUp()
     {

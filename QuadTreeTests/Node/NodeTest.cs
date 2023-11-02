@@ -6,8 +6,8 @@ namespace QuadTreeTests.Node;
 
 public class NodeTest
 {
-    private QuadTreeNodeLeaf<string> _testNodeLeaf;
-    private QuadTreeNodeData<string> _testNodeLeafData;
+    private QuadTreeNodeLeaf<string, string> _testNodeLeaf;
+    private QuadTreeNodeData<string, string> _testNodeLeafData;
     [SetUp]
     public void Setup()
     {
@@ -38,15 +38,15 @@ public class NodeTest
         Assert.Throws<ArgumentOutOfRangeException>(()=>_testNodeLeaf.GetData(1));
         Assert.NotNull(_testNodeLeaf.GetArrayListData());
         Assert.That(_testNodeLeaf.DataCount(), Is.EqualTo(1));
-        QuadTreeNodeData<string> data = new(new(12, 10), new(20, 20),"data2");
-        QuadTreeNodeData<string> dataErr = new(new(12, 10), new(21, 21),"data2");
+        QuadTreeNodeData<string, string> data = new(new(12, 10), new(20, 20),"data2");
+        QuadTreeNodeData<string, string> dataErr = new(new(12, 10), new(21, 21),"data2");
         _testNodeLeaf.AddData(data);
         Assert.Throws<Exception>(()=>_testNodeLeaf.AddData(dataErr));
         Assert.That(_testNodeLeaf.GetData(1).Data, Is.EqualTo("data2"));
         Assert.That(_testNodeLeaf.DataCount(), Is.EqualTo(2));
         _testNodeLeaf.RemoveData(data);
         Assert.That(_testNodeLeaf.DataCount(), Is.EqualTo(1));
-        List<QuadTreeNodeData<string>> tmp = new();
+        List<QuadTreeNodeData<string, string>> tmp = new();
         tmp.Add(data);
         tmp.Add(new(new(12, 10), new(21, 21), "data3"));
         _testNodeLeaf.AddData(tmp);
@@ -60,15 +60,15 @@ public class NodeTest
     [Test]
     public void OverlapTest()
     {
-        QuadTreeNodeLeaf<string> testNodeLeaf2 = new(new(0, 0), new(20, 20), _testNodeLeafData);
+        QuadTreeNodeLeaf<string, string> testNodeLeaf2 = new(new(0, 0), new(20, 20), _testNodeLeafData);
         
-        QuadTreeNodeLeaf<string> testNodeLeaf3 = new(new(10, 10), new(30, 30), _testNodeLeafData);
-        QuadTreeNodeLeaf<string> testNodeLeaf4 = new(new(10, 10), new(15, 15), _testNodeLeafData);
-        QuadTreeNodeLeaf<string> testNodeLeaf5 = new(new(-10, -10), new(15, 15), _testNodeLeafData);
-        QuadTreeNodeLeaf<string> testNodeLeaf6 = new(new(-20, -20), new(0, 0), _testNodeLeafData);
-        QuadTreeNodeLeaf<string> testNodeLeaf7 = new(new(-20, -20), new(-1, -1), _testNodeLeafData);
-        QuadTreeNodeLeaf<string> testNodeLeaf8 = new(new(-45, -45), new (-10, -10), _testNodeLeafData);
-        QuadTreeNodeLeaf<string> testNodeLeaf9 = new(new(-80, -80), new (80, 80), _testNodeLeafData);
+        QuadTreeNodeLeaf<string, string> testNodeLeaf3 = new(new(10, 10), new(30, 30), _testNodeLeafData);
+        QuadTreeNodeLeaf<string, string> testNodeLeaf4 = new(new(10, 10), new(15, 15), _testNodeLeafData);
+        QuadTreeNodeLeaf<string, string> testNodeLeaf5 = new(new(-10, -10), new(15, 15), _testNodeLeafData);
+        QuadTreeNodeLeaf<string, string> testNodeLeaf6 = new(new(-20, -20), new(0, 0), _testNodeLeafData);
+        QuadTreeNodeLeaf<string, string> testNodeLeaf7 = new(new(-20, -20), new(-1, -1), _testNodeLeafData);
+        QuadTreeNodeLeaf<string, string> testNodeLeaf8 = new(new(-45, -45), new (-10, -10), _testNodeLeafData);
+        QuadTreeNodeLeaf<string, string> testNodeLeaf9 = new(new(-80, -80), new (80, 80), _testNodeLeafData);
         Assert.True(testNodeLeaf2.OverlapNode(testNodeLeaf3));
         Assert.True(testNodeLeaf3.OverlapNode(testNodeLeaf2));
         Assert.True(testNodeLeaf2.OverlapNode(testNodeLeaf4));
@@ -85,7 +85,7 @@ public class NodeTest
     [Test]
     public void TestInitLeafs()
     {
-        QuadTreeNodeLeaf<string> testNodeLeaf2 = new(new(0, 0), new(20, 20), _testNodeLeafData);
+        QuadTreeNodeLeaf<string, string> testNodeLeaf2 = new(new(0, 0), new(20, 20), _testNodeLeafData);
         Assert.False(testNodeLeaf2.LeafsInicialised);
         Assert.False(testNodeLeaf2.LeafsInicialised);
         var Leafs = testNodeLeaf2.TestInitLeafs();
@@ -99,7 +99,7 @@ public class NodeTest
         Assert.That(Leafs[3].PointDownLeft, Is.EqualTo(new PointD(10, 0)));
         Assert.That(Leafs[3].PointUpRight, Is.EqualTo(new PointD(20, 10)));
         
-        QuadTreeNodeLeaf<string> testNodeLeaf3 = new(new(-50, -50), new(50, 50), _testNodeLeafData);
+        QuadTreeNodeLeaf<string, string> testNodeLeaf3 = new(new(-50, -50), new(50, 50), _testNodeLeafData);
         Assert.False(testNodeLeaf3.LeafsInicialised);
         Assert.False(testNodeLeaf3.LeafsInicialised);
         Leafs = testNodeLeaf3.TestInitLeafs();
@@ -118,10 +118,10 @@ public class NodeTest
     [Test]
     public void GetOverlapingLeafs()
     {
-        QuadTreeNodeLeaf<int> testNodeLeaf2 = new(new(0, 0), new(20, 20));
+        QuadTreeNodeLeaf<int, int> testNodeLeaf2 = new(new(0, 0), new(20, 20));
         testNodeLeaf2.TestInitLeafs();
-        QuadTreeNodeLeaf<int> searchArea = new(new(5, 5), new(15, 15));
-        List<QuadTreeNodeLeaf<int>> leafs = testNodeLeaf2.GetOverlapingLefs(searchArea);
+        QuadTreeNodeLeaf<int, int> searchArea = new(new(5, 5), new(15, 15));
+        List<QuadTreeNodeLeaf<int, int>> leafs = testNodeLeaf2.GetOverlapingLefs(searchArea);
         Assert.That(leafs.Count, Is.EqualTo(4));
         Assert.That(leafs[0].PointDownLeft, Is.EqualTo(new PointD(0, 0)));
         Assert.That(leafs[0].PointUpRight, Is.EqualTo(new PointD(10, 10)));
@@ -132,15 +132,15 @@ public class NodeTest
         Assert.That(leafs[3].PointDownLeft, Is.EqualTo(new PointD(10, 0)));
         Assert.That(leafs[3].PointUpRight, Is.EqualTo(new PointD(20, 10)));
         
-        QuadTreeNodeLeaf<int> searchArea2 = new(new(50, 50), new(150, 150));
+        QuadTreeNodeLeaf<int, int> searchArea2 = new(new(50, 50), new(150, 150));
         leafs = testNodeLeaf2.GetOverlapingLefs(searchArea2);
         Assert.That(leafs.Count, Is.EqualTo(0));
         
-        QuadTreeNodeLeaf<int> searchArea3 = new(new(30, 30), new(50, 50));
+        QuadTreeNodeLeaf<int, int> searchArea3 = new(new(30, 30), new(50, 50));
         leafs = testNodeLeaf2.GetOverlapingLefs(searchArea3);
         Assert.That(leafs.Count, Is.EqualTo(0));
         
-        QuadTreeNodeLeaf<int> searchArea4 = new(new(-50, -50), new(1, 1));
+        QuadTreeNodeLeaf<int, int> searchArea4 = new(new(-50, -50), new(1, 1));
         leafs = testNodeLeaf2.GetOverlapingLefs(searchArea4);
         Assert.That(leafs.Count, Is.EqualTo(1));
         Assert.That(leafs[0].PointDownLeft, Is.EqualTo(new PointD(0, 0)));
@@ -150,40 +150,40 @@ public class NodeTest
     [Test]
     public void AnyInitSubNodeContainDataNode()
     {
-        QuadTreeNodeLeaf<int> testNodeLeaf2 = new(new(0, 0), new(20, 20));
-        QuadTreeNodeLeaf<int> searchArea = new(new(15, 15), new(20, 20));
+        QuadTreeNodeLeaf<int, int> testNodeLeaf2 = new(new(0, 0), new(20, 20));
+        QuadTreeNodeLeaf<int, int> searchArea = new(new(15, 15), new(20, 20));
         
         Assert.False(testNodeLeaf2.AnyInitSubNodeContainDataNode(searchArea));
         testNodeLeaf2.TestInitLeafs();
         Assert.True(testNodeLeaf2.AnyInitSubNodeContainDataNode(searchArea));
         
-        QuadTreeNodeLeaf<int> searchArea2 = new(new(5, 5), new(20, 20));
+        QuadTreeNodeLeaf<int, int> searchArea2 = new(new(5, 5), new(20, 20));
         Assert.False(testNodeLeaf2.AnyInitSubNodeContainDataNode(searchArea2));
     }
     
     [Test]
     public void AnySubNodeContainDataNode()
     {
-        QuadTreeNodeLeaf<int> testNodeLeaf2 = new(new(0, 0), new(20, 20));
-        QuadTreeNodeLeaf<int> searchArea = new(new(15, 15), new(20, 20));
+        QuadTreeNodeLeaf<int, int> testNodeLeaf2 = new(new(0, 0), new(20, 20));
+        QuadTreeNodeLeaf<int, int> searchArea = new(new(15, 15), new(20, 20));
         
         Assert.True(testNodeLeaf2.AnySubNodeContainDataNode(searchArea));
         
         testNodeLeaf2 = new(new(0, 0), new(20, 20));
-        QuadTreeNodeLeaf<int> searchArea2 = new(new(5, 5), new(20, 20));
+        QuadTreeNodeLeaf<int, int> searchArea2 = new(new(5, 5), new(20, 20));
         Assert.False(testNodeLeaf2.AnySubNodeContainDataNode(searchArea2));
     }
 
     [Test]
     public void GetLeafThatCanContainDataNode()
     {
-        QuadTreeNodeLeaf<int> testNodeLeaf2 = new(new(0, 0), new(20, 20));
+        QuadTreeNodeLeaf<int, int> testNodeLeaf2 = new(new(0, 0), new(20, 20));
         testNodeLeaf2.TestInitLeafs();
-        QuadTreeNodeLeaf<int> searchArea = new(new(15, 15), new(20, 20));
+        QuadTreeNodeLeaf<int, int> searchArea = new(new(15, 15), new(20, 20));
         var tmp = testNodeLeaf2.GetLeafThatCanContainDataNode(searchArea);
         Assert.NotNull(tmp);
         Assert.That(tmp.PointDownLeft, Is.EqualTo(new PointD(10, 10)));
-        QuadTreeNodeLeaf<int> searchArea2 = new(new(20, 20), new(25, 25));
+        QuadTreeNodeLeaf<int, int> searchArea2 = new(new(20, 20), new(25, 25));
         tmp = testNodeLeaf2.GetLeafThatCanContainDataNode(searchArea2);
         Assert.Null(tmp);
 
@@ -192,13 +192,13 @@ public class NodeTest
     [Test]
     public void RemoveDataInRange()
     {
-        QuadTreeNodeLeaf<int> testNodeLeaf2 = new(new(0, 0), new(20, 20));
+        QuadTreeNodeLeaf<int, int> testNodeLeaf2 = new(new(0, 0), new(20, 20));
         testNodeLeaf2.TestInitLeafs();
-        QuadTreeNodeData<int> data = new(new(15, 15), new(20, 20), 1);
-        QuadTreeNodeData<int> data2 = new(new(10, 10), new(20, 20), 2);
+        QuadTreeNodeData<int, int> data = new(new(15, 15), new(20, 20), 1);
+        QuadTreeNodeData<int, int> data2 = new(new(10, 10), new(20, 20), 2);
         testNodeLeaf2.AddData(data);
         testNodeLeaf2.AddData(data2);
-        QuadTreeNodeLeaf<int> searchArea = new(new(15, 15), new(20, 20));
+        QuadTreeNodeLeaf<int, int> searchArea = new(new(15, 15), new(20, 20));
         Assert.That(testNodeLeaf2.DataCount(), Is.EqualTo(2));
         var tmp = testNodeLeaf2.RemoveDataInRange(searchArea);
         Assert.That(tmp.Count, Is.EqualTo(1));
@@ -209,13 +209,13 @@ public class NodeTest
     [Test]
     public void GetDataInRange()
     {
-        QuadTreeNodeLeaf<int> testNodeLeaf2 = new(new(0, 0), new(20, 20));
+        QuadTreeNodeLeaf<int, int> testNodeLeaf2 = new(new(0, 0), new(20, 20));
         testNodeLeaf2.TestInitLeafs();
-        QuadTreeNodeData<int> data = new(new(15, 15), new(20, 20), 1);
-        QuadTreeNodeData<int> data2 = new(new(10, 10), new(20, 20), 2);
+        QuadTreeNodeData<int, int> data = new(new(15, 15), new(20, 20), 1);
+        QuadTreeNodeData<int, int> data2 = new(new(10, 10), new(20, 20), 2);
         testNodeLeaf2.AddData(data);
         testNodeLeaf2.AddData(data2);
-        QuadTreeNodeLeaf<int> searchArea = new(new(15, 15), new(20, 20));
+        QuadTreeNodeLeaf<int, int> searchArea = new(new(15, 15), new(20, 20));
         Assert.That(testNodeLeaf2.DataCount(), Is.EqualTo(2));
         var tmp = testNodeLeaf2.GetDataInRange(searchArea);
         Assert.That(tmp.Count, Is.EqualTo(1));
@@ -225,8 +225,8 @@ public class NodeTest
     [Test]
     public void SamePoints()
     {
-        QuadTreeNodeData<string> testNodeData = new(new(10, 10), new(20, 20), "data");
-        QuadTreeNodeData<string> testNodeData2 = new(new(11, 10), new(20, 20), "data");
+        QuadTreeNodeData<string, string> testNodeData = new(new(10, 10), new(20, 20), "data");
+        QuadTreeNodeData<string, string> testNodeData2 = new(new(11, 10), new(20, 20), "data");
         Assert.True(_testNodeLeaf.HaveSamePoints(testNodeData));
         Assert.False(_testNodeLeaf.HaveSamePoints(testNodeData2));
     }
@@ -234,13 +234,13 @@ public class NodeTest
     [Test]
     public void DataWithSamePoints()
     {
-        QuadTreeNodeLeaf<int> testNodeLeaf2 = new(new(10, 10), new(20, 20));
-        QuadTreeNodeData<int> testNodeData = new(new(10, 10), new(20, 20), 1);
-        QuadTreeNodeData<int> testNodeData2 = new(new(10, 10), new(20, 20), 2);
-        QuadTreeNodeData<int> testNodeData3 = new(new(11, 10), new(20, 20), 3);
+        QuadTreeNodeLeaf<int, int> testNodeLeaf2 = new(new(10, 10), new(20, 20));
+        QuadTreeNodeData<int, int> testNodeData = new(new(10, 10), new(20, 20), 1);
+        QuadTreeNodeData<int, int> testNodeData2 = new(new(10, 10), new(20, 20), 2);
+        QuadTreeNodeData<int, int> testNodeData3 = new(new(11, 10), new(20, 20), 3);
 
-        QuadTreeNodeLeaf<int> searchData = new(new(10, 10), new(20, 20));
-        QuadTreeNodeLeaf<int> searchData2 = new(new(11, 10), new(20, 20));
+        QuadTreeNodeLeaf<int, int> searchData = new(new(10, 10), new(20, 20));
+        QuadTreeNodeLeaf<int, int> searchData2 = new(new(11, 10), new(20, 20));
         
         testNodeLeaf2.AddData(testNodeData);
         testNodeLeaf2.AddData(testNodeData2);
@@ -271,7 +271,7 @@ public class NodeTest
     [Test]
     public void CanBeRemoved()
     {
-        QuadTreeNodeLeaf<int> testNodeLeaf2 = new(new(10, 10), new(20, 20));
+        QuadTreeNodeLeaf<int, int> testNodeLeaf2 = new(new(10, 10), new(20, 20));
         Assert.True(testNodeLeaf2.CanLeafsBeRemoved());
         Assert.False(testNodeLeaf2.LeafsInicialised);
         testNodeLeaf2.TestInitLeafs();
@@ -280,7 +280,7 @@ public class NodeTest
         Assert.False(testNodeLeaf2.LeafsInicialised);
         
         var tmpLeafs = testNodeLeaf2.TestInitLeafs();
-        tmpLeafs[0].AddData(new QuadTreeNodeData<int>(new(10, 10), new(15, 15), 1));
+        tmpLeafs[0].AddData(new QuadTreeNodeData<int, int>(new(10, 10), new(15, 15), 1));
         Assert.True(testNodeLeaf2.CanLeafsBeRemoved());
         Assert.That(testNodeLeaf2.DataCount(), Is.EqualTo(1));
         Assert.False(testNodeLeaf2.LeafsInicialised);
@@ -288,9 +288,9 @@ public class NodeTest
         // skontroluje keď je medzi dvoma vrstvami vrstva tkorá nemá data ale jej potomok má, tak nemôže byť zmazaná
         tmpLeafs = testNodeLeaf2.TestInitLeafs();
         var innerLeafs = tmpLeafs[0].TestInitLeafs();
-        var ex = Assert.Throws<Exception>(() => innerLeafs[0].AddData(new QuadTreeNodeData<int>(new(10, 10), new(15, 15), 1)));
+        var ex = Assert.Throws<Exception>(() => innerLeafs[0].AddData(new QuadTreeNodeData<int, int>(new(10, 10), new(15, 15), 1)));
         Assert.That(ex.Message, Is.EqualTo("Data is not in this node. This shouldn't happened"));
-        innerLeafs[0].AddData(new QuadTreeNodeData<int>(new(10, 10), new(12.5, 12.5), 1));
+        innerLeafs[0].AddData(new QuadTreeNodeData<int, int>(new(10, 10), new(12.5, 12.5), 1));
         Assert.False(testNodeLeaf2.CanLeafsBeRemoved());
         Assert.That(tmpLeafs[0].DataCount(), Is.EqualTo(0));
         Assert.True(testNodeLeaf2.LeafsInicialised);
@@ -305,35 +305,35 @@ public class NodeTest
     [Test]
     public void GetOverlapingData()
     {
-        QuadTreeNodeLeaf<int> testNodeLeaf2 = new(new(0, 0), new(20, 20));
-        testNodeLeaf2.AddData(new QuadTreeNodeData<int>(new(0,0), new (10,10), 1));
-        testNodeLeaf2.AddData(new QuadTreeNodeData<int>(new(5,5), new (15,15), 2));
-        testNodeLeaf2.AddData(new QuadTreeNodeData<int>(new(10,10), new (20,20), 3));
+        QuadTreeNodeLeaf<int, int> testNodeLeaf2 = new(new(0, 0), new(20, 20));
+        testNodeLeaf2.AddData(new QuadTreeNodeData<int, int>(new(0,0), new (10,10), 1));
+        testNodeLeaf2.AddData(new QuadTreeNodeData<int, int>(new(5,5), new (15,15), 2));
+        testNodeLeaf2.AddData(new QuadTreeNodeData<int, int>(new(10,10), new (20,20), 3));
         
-        var tmpData = testNodeLeaf2.GetOverlapingData(new QuadTreeNodeLeaf<int>(new(0,0), new (10,10)));
+        var tmpData = testNodeLeaf2.GetOverlapingData(new QuadTreeNodeLeaf<int, int>(new(0,0), new (10,10)));
         Assert.That(tmpData.Count, Is.EqualTo(2));
         Assert.That(tmpData[0], Is.EqualTo(1));
         Assert.That(tmpData[1], Is.EqualTo(2));
         
-        tmpData = testNodeLeaf2.GetOverlapingData(new QuadTreeNodeLeaf<int>(new(5,5), new (15,15)));
+        tmpData = testNodeLeaf2.GetOverlapingData(new QuadTreeNodeLeaf<int, int>(new(5,5), new (15,15)));
         Assert.That(tmpData.Count, Is.EqualTo(3));
         Assert.That(tmpData[0], Is.EqualTo(1));
         Assert.That(tmpData[1], Is.EqualTo(2));
         Assert.That(tmpData[2], Is.EqualTo(3));
         
-        tmpData = testNodeLeaf2.GetOverlapingData(new QuadTreeNodeLeaf<int>(new(12,12), new (30,30)));
+        tmpData = testNodeLeaf2.GetOverlapingData(new QuadTreeNodeLeaf<int, int>(new(12,12), new (30,30)));
         Assert.That(tmpData.Count, Is.EqualTo(2));
         Assert.That(tmpData[0], Is.EqualTo(2));
         Assert.That(tmpData[1], Is.EqualTo(3));
         
-        tmpData = testNodeLeaf2.GetOverlapingData(new QuadTreeNodeLeaf<int>(new(15,15), new (30,30)));
+        tmpData = testNodeLeaf2.GetOverlapingData(new QuadTreeNodeLeaf<int, int>(new(15,15), new (30,30)));
         Assert.That(tmpData.Count, Is.EqualTo(1));
         Assert.That(tmpData[0], Is.EqualTo(3));
         
-        tmpData = testNodeLeaf2.GetOverlapingData(new QuadTreeNodeLeaf<int>(new(20,20), new (30,30)));
+        tmpData = testNodeLeaf2.GetOverlapingData(new QuadTreeNodeLeaf<int, int>(new(20,20), new (30,30)));
         Assert.That(tmpData.Count, Is.EqualTo(0));
         
-        tmpData = testNodeLeaf2.GetOverlapingData(new QuadTreeNodeLeaf<int>(new(-20,-20), new (0,0)));
+        tmpData = testNodeLeaf2.GetOverlapingData(new QuadTreeNodeLeaf<int, int>(new(-20,-20), new (0,0)));
         Assert.That(tmpData.Count, Is.EqualTo(0));
     }
 
@@ -344,8 +344,8 @@ public class NodeTest
     public void CoordinationTest()
     {
         //todo toto je ešte na prehodnotenie, lebo to nefunguje správne
-        QuadTreeNodeLeaf<string> testNodeLeaf2 = new(new(11,  11), new(19, 19));
-        QuadTreeNodeLeaf<string> testNodeLeaf3 = new(new(11,  19), new(19, 11));
+        QuadTreeNodeLeaf<string, string> testNodeLeaf2 = new(new(11,  11), new(19, 19));
+        QuadTreeNodeLeaf<string, string> testNodeLeaf3 = new(new(11,  19), new(19, 11));
         Assert.True(_testNodeLeaf.ContainNode(testNodeLeaf2));
         Assert.True(_testNodeLeaf.ContainNode(testNodeLeaf3));
         

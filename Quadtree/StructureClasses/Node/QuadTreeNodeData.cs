@@ -7,11 +7,11 @@ namespace Quadtree.StructureClasses.Node;
 /// Trieda slúži na ukladanie dát do uzlov
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class QuadTreeNodeData<T> : QuadTreeNode<T>
+public class QuadTreeNodeData<TKey, TValue> : QuadTreeNode<TKey, TValue> where TKey : IComparable<TKey> where TValue : IComparable<TValue>
 {
-    public T Data { get; set; }
+    public TValue Data { get; set; }
     
-public QuadTreeNodeData(PointD pPointDownLeft, PointD pPointUpRight, T pData)
+public QuadTreeNodeData(PointD pPointDownLeft, PointD pPointUpRight, TValue pData)
     {
         _pointDownLeft = pPointDownLeft;
         _pointUpRight = pPointUpRight;

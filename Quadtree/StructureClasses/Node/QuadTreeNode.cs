@@ -7,7 +7,7 @@ namespace Quadtree.StructureClasses.Node;
 /// Abstraktna trieda pre uzly
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public abstract class QuadTreeNode<T>
+public abstract class QuadTreeNode<TKey, TValue> where TKey : IComparable<TKey> where TValue : IComparable<TValue>
 {
     protected PointD _pointDownLeft;
     public PointD PointDownLeft
@@ -25,7 +25,7 @@ public abstract class QuadTreeNode<T>
                       PointUpRight.X >= pPointUpRight.X && PointUpRight.Y >= pPointUpRight.Y;
     }
     
-    public bool ContainNode(QuadTreeNode<T> nodeLeaf)
+    public bool ContainNode(QuadTreeNode<TKey, TValue> nodeLeaf)
     {
         return ContainsPoints(nodeLeaf.PointDownLeft, nodeLeaf.PointUpRight);
     }
@@ -35,12 +35,12 @@ public abstract class QuadTreeNode<T>
                PointUpRight.X > pPointDownLeft.X && PointUpRight.Y > pPointDownLeft.Y;
     }
     
-    public bool OverlapNode(QuadTreeNode<T> nodeLeaf)
+    public bool OverlapNode(QuadTreeNode<TKey, TValue> nodeLeaf)
     {
         return OverpalapPoints(nodeLeaf.PointDownLeft, nodeLeaf.PointUpRight);
     }
 
-    public bool HaveSamePoints(QuadTreeNode<T> node)
+    public bool HaveSamePoints(QuadTreeNode<TKey, TValue> node)
     {
         return node.PointDownLeft == PointDownLeft && node.PointUpRight == PointUpRight;
     }

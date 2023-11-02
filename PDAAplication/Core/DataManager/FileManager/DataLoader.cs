@@ -17,9 +17,9 @@ namespace PDAAplication.Core.DataManager.FileManager
             
         }
 
-        public async void LoadData(QuadTree<ObjectModel> nehnutelnostiQuadTree,
-            QuadTree<ObjectModel> parcelyQuadTree,
-            QuadTree<ObjectModel> jednotneQuadTree,
+        public async void LoadData(QuadTree<int, ObjectModel> nehnutelnostiQuadTree,
+            QuadTree<int, ObjectModel> parcelyQuadTree,
+            QuadTree<int, ObjectModel> jednotneQuadTree,
             ObservableCollection<ObjectModel> observableCollectionNehnutelnosti,
             ObservableCollection<ObjectModel> observableCollectionParcely,
             List<ObjectModel> nehnutelnostiList,
@@ -49,9 +49,9 @@ namespace PDAAplication.Core.DataManager.FileManager
                         var sirka = Math.Abs(gps2.X - gps1.X);
                         var dlzka = Math.Abs(gps2.Y - gps1.Y);
 
-                        nehnutelnostiQuadTree = new QuadTree<ObjectModel>(gps1.X, gps1.Y, sirka, dlzka);
-                        parcelyQuadTree = new QuadTree<ObjectModel>(gps1.X, gps1.Y, sirka, dlzka);
-                        jednotneQuadTree = new QuadTree<ObjectModel>(gps1.X, gps1.Y, sirka, dlzka);
+                        nehnutelnostiQuadTree = new QuadTree<int, ObjectModel>(gps1.X, gps1.Y, sirka, dlzka);
+                        parcelyQuadTree = new QuadTree<int, ObjectModel>(gps1.X, gps1.Y, sirka, dlzka);
+                        jednotneQuadTree = new QuadTree<int, ObjectModel>(gps1.X, gps1.Y, sirka, dlzka);
                     } 
                     else
                     {
@@ -92,7 +92,7 @@ namespace PDAAplication.Core.DataManager.FileManager
             }
         }
 
-        private void LinkData(List<ObjectModel> nehnutelnostiList, QuadTree<ObjectModel> parcelyQuadTree)
+        private void LinkData(List<ObjectModel> nehnutelnostiList, QuadTree<int, ObjectModel> parcelyQuadTree)
         {
             foreach (var objectModel in nehnutelnostiList)
             {

@@ -6,9 +6,9 @@ using Quadtree.StructureClasses.Node;
 
 namespace Quadtree.StructureClasses;
 
-public class QuadTree<T>
+public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue : IComparable<TValue>
 {
-    private QuadTreeNodeLeaf<T> _root;
+    private QuadTreeNodeLeaf<TKey, TValue> _root;
     //private const int HODNOTA = 10000000;
     //private const int MAX_DEPTH = 22; // je to kôli tomu že keď zoberiem max rozmer tak ho viem deliť iba 23 krát kým by som nedostal samé 1 a z bezpečnostných dôvodou iba 23
     private const int OPERATION_TO_OPTIMALIZE = 100;
@@ -103,15 +103,15 @@ public class QuadTree<T>
     /// <param name="pY"></param>
     /// <param name="pData"></param>
     /// <exception cref="Exception">Ak su zle suradnice</exception>
-    public void Insert(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight, T pData)
+    public void Insert(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight, TValue pData)
     {
         if (!_root.ContainsPoints(new(xDownLeft, yDownLeft), 
                 new(xUpRight, yUpRight)))
         {
             throw new Exception("Coordinates exceed parameter size");
         }
-        QuadTreeNodeLeaf<T>? current = _root;
-        QuadTreeNodeData<T> currentDataNode = new(new(xDownLeft, yDownLeft), 
+        QuadTreeNodeLeaf<TKey, TValue>? current = _root;
+        QuadTreeNodeData<TKey, TValue> currentDataNode = new(new(xDownLeft, yDownLeft), 
           new (xUpRight, yUpRight), pData);
         
         int depth = 0;
@@ -188,19 +188,19 @@ public class QuadTree<T>
         
     }
 
-    public List<T> DeleteInterval(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight)
+    public List<TValue> DeleteInterval(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight)
     {
         return Interval(xDownLeft, yDownLeft, xUpRight, yUpRight, true);
     }
     
-    public List<T> FindInterval(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight)
+    public List<TValue> FindInterval(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight)
     {
         return Interval(xDownLeft, yDownLeft, xUpRight, yUpRight, false);
     }
     
     private class RangeNodes
     {
-        public QuadTreeNodeLeaf<T> Node { get; }
+        public QuadTreeNodeLeaf<TKey, TValue> Node { get; }
         /// <summary>
         /// <p> 0 - mod vyhľadavanie </p>
         /// <p> 1 - mod mazania </p>
@@ -208,14 +208,14 @@ public class QuadTree<T>
         public int Mode { get; }
         
         public bool LeafsAlreadyInStack { get; }
-        public RangeNodes(QuadTreeNodeLeaf<T> pNode, int pMode)
+        public RangeNodes(QuadTreeNodeLeaf<TKey, TValue> pNode, int pMode)
         {
             Node = pNode;
             Mode = pMode;
             LeafsAlreadyInStack = false;
         }
         
-        public RangeNodes(QuadTreeNodeLeaf<T> pNode, int pMode, bool pLeafsAlreadyInStack)
+        public RangeNodes(QuadTreeNodeLeaf<TKey, TValue> pNode, int pMode, bool pLeafsAlreadyInStack)
         {
             Node = pNode;
             Mode = pMode;
@@ -223,12 +223,12 @@ public class QuadTree<T>
         }
     }
 
-    private List<T> Interval(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight, bool delete)
+    private List<TValue> Interval(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight, bool delete)
     {
-        QuadTreeNodeLeaf<T> areaToFind = new(new(xDownLeft, yDownLeft),
+        QuadTreeNodeLeaf<TKey, TValue> areaToFind = new(new(xDownLeft, yDownLeft),
             new(xUpRight, yUpRight));
         
-        List<T> returnData = new();
+        List<TValue> returnData = new();
         Stack<RangeNodes> stack = new();
         stack.Push(new(_root, 0));
         while (stack.Count != 0)
@@ -266,7 +266,7 @@ public class QuadTree<T>
                 // režim 2
                 // 1. Skontrolujeme či sa nachádzajú nejaké dáta v danom uzle, ak áno tak ich spracujeme a pridáme do returnData
                     // nájdeme ich tak že skontrolujeme či sú v hľadanej arey
-                List<T> tmpList = new();
+                List<TValue> tmpList = new();
                 if (delete)
                 {
                     tmpList = current.Node.RemoveDataInRange(areaToFind);
@@ -299,28 +299,28 @@ public class QuadTree<T>
         return returnData;
     }
     
-    public List<T> Delete(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight)
+    public List<TValue> Delete(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight)
     {
         return FindAndDelete(xDownLeft, yDownLeft, xUpRight, yUpRight, true);
     }
     
-    public List<T> Find(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight)
+    public List<TValue> Find(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight)
     {
         return FindAndDelete(xDownLeft, yDownLeft, xUpRight, yUpRight, false);
     }
 
     //todo lepšie nazvať
-    private List<T> FindAndDelete(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight, bool delete)
+    private List<TValue> FindAndDelete(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight, bool delete)
     {
         // Flag = 0 tak vyhľadávame
         // Flag = 1 tak mazeme
         int flag = 0;
-        QuadTreeNodeLeaf<T> objectToFind = new(new(xDownLeft, yDownLeft),
+        QuadTreeNodeLeaf<TKey, TValue> objectToFind = new(new(xDownLeft, yDownLeft),
             new(xUpRight, yUpRight));
         
-        QuadTreeNodeLeaf<T>? current;
+        QuadTreeNodeLeaf<TKey, TValue>? current;
 
-        List<T> returnData = new();
+        List<TValue> returnData = new();
 
         current = _root;
         while (current is not null)
@@ -394,14 +394,14 @@ public class QuadTree<T>
         return returnData;
     }
 
-    public List<T> FindOverlapingData(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight)
+    public List<TValue> FindOverlapingData(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight)
     {
-        QuadTreeNodeLeaf<T> objectToFind = new(new(xDownLeft, yDownLeft),
+        QuadTreeNodeLeaf<TKey, TValue> objectToFind = new(new(xDownLeft, yDownLeft),
             new(xUpRight, yUpRight));
         
-        List<T> returnData = new();
+        List<TValue> returnData = new();
         
-        Stack<QuadTreeNodeLeaf<T>> stack = new();
+        Stack<QuadTreeNodeLeaf<TKey, TValue>> stack = new();
         // prdidáme do stakú root
         stack.Push(_root);
         
@@ -427,7 +427,7 @@ public class QuadTree<T>
         return returnData;
     }
     
-    private void Optimalise()
+    public void Optimalise()
     {
         _operationCount++;
         // Optimalizáciu spúšťam až keď tam je apoň 1000 dát
@@ -615,8 +615,8 @@ public class QuadTree<T>
         //     return;
         // }
 
-        List<QuadTreeNodeData<T>> tmpData = new();
-        Stack<QuadTreeNodeLeaf<T>> stack = new();
+        List<QuadTreeNodeData<TKey, TValue>> tmpData = new();
+        Stack<QuadTreeNodeLeaf<TKey, TValue>> stack = new();
         stack.Push(_root);
         while (stack.Count != 0)
         {
@@ -666,8 +666,8 @@ public class QuadTree<T>
             return;
         }
 
-        List<QuadTreeNodeData<T>> tmpData = new();
-        Stack<QuadTreeNodeLeaf<T>> stack = new();
+        List<QuadTreeNodeData<TKey, TValue>> tmpData = new();
+        Stack<QuadTreeNodeLeaf<TKey, TValue>> stack = new();
         // prdidáme do stakú root
         stack.Push(_root);
         while (stack.Count != 0)
@@ -704,7 +704,7 @@ public class QuadTree<T>
     public int Recount()
     {
         int newCount = 0;
-        Stack<QuadTreeNodeLeaf<T>> stack = new();
+        Stack<QuadTreeNodeLeaf<TKey, TValue>> stack = new();
         // prdidáme do stakú root
         stack.Push(_root);
         while (stack.Count != 0)
@@ -728,10 +728,10 @@ public class QuadTree<T>
     /// Transformuje QuadTree na List dát
     /// </summary>
     /// <returns>List dát ktoré sa nachádzajú v strome</returns>
-    public List<T> ToList()
+    public List<TValue> ToList()
     {
-        List<T> newList = new(Count);
-        Stack<QuadTreeNodeLeaf<T>> stack = new();
+        List<TValue> newList = new(Count);
+        Stack<QuadTreeNodeLeaf<TKey, TValue>> stack = new();
         // prdidáme do stakú root
         stack.Push(_root);
         while (stack.Count != 0)
@@ -750,45 +750,4 @@ public class QuadTree<T>
 
         return newList;
     }
-
-    /// <summary>
-    /// Round data and decimal numbers for this structure
-    /// </summary>
-    /// <param name="value">double that will be rounded</param>
-    /// <returns>rounded integer</returns>
-    /*public static int QuadTreeRound(double value)
-    {
-        return (int)double.Round(value * HODNOTA, 5);
-    }*/
-
-    /// <summary>
-    /// Check if the world coordinations are valid for this structure
-    /// </summary>
-    /// <returns>true if are valid, false if not</returns>
-    // private static bool CheckCoordinates(int x, int y)
-    // {
-    //     if (x < -MAX_X * HODNOTA || x > MAX_X * HODNOTA || y < -MAX_Y * HODNOTA || y > MAX_Y * HODNOTA)
-    //     {
-    //         return false;
-    //     }
-    //
-    //     return true;
-    // }
-
-
-    /// <summary>
-    /// This is only for testing, after that will be removed
-    /// </summary>
-    // public static int TestQuadTreeRound(double value)
-    // {
-    //     return QuadTreeRound(value);
-    // }
-
-    /// <summary>
-    /// This is only for testing, after that will be removed
-    /// </summary>
-    // public static bool TestCheckCoordinates(int x, int y)
-    // {
-    //     return CheckCoordinates(x, y);
-    // }
 }
