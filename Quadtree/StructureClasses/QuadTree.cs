@@ -301,16 +301,16 @@ public class QuadTree<T>
     
     public List<T> Delete(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight)
     {
-        return Point(xDownLeft, yDownLeft, xUpRight, yUpRight, true);
+        return FindAndDelete(xDownLeft, yDownLeft, xUpRight, yUpRight, true);
     }
     
     public List<T> Find(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight)
     {
-        return Point(xDownLeft, yDownLeft, xUpRight, yUpRight, false);
+        return FindAndDelete(xDownLeft, yDownLeft, xUpRight, yUpRight, false);
     }
 
     //todo lepšie nazvať
-    private List<T> Point(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight, bool delete)
+    private List<T> FindAndDelete(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight, bool delete)
     {
         // Flag = 0 tak vyhľadávame
         // Flag = 1 tak mazeme
@@ -352,8 +352,6 @@ public class QuadTree<T>
                         current = current.GetLeafThatCanContainDataNode(objectToFind);
                     }
                     // ak sa stane že nemáme už žiadné dáta a ani potomka tak vrátime do current = predka a flag označíme na vymazávanie nodu
-                    //todo tu to môže spôsobovať bug ak sa objavý
-                    //else if (current.DataIsEmpty() && !current.LeafsInicialised)
                     else if (current.DataIsEmpty())
                     {
                         //current = current.Parent;
@@ -372,13 +370,12 @@ public class QuadTree<T>
             }
             else
             {
-                //todo pridať ak má iba 1 dáta a mi sme prázdny tak to data vložíme k nám a dieťa zmažeme
                 // ak je flag nastavený na vymazávanie nodu tak sa pozrieme či niektorý s potomkov má dáta
                     // ak nemá dáta tak ich zmažeme a current = predok flaga ostáva označená na mazanie node
                     // ak má dáta tak current = null
                     // Poznámka: canBeRemoved vráti true aj ked current obsahuje data, keďže sa tento objekt zmaže až
                     // z predka tak nemusíme riešiť že current má data. Metóda CanBeRemoved nedovolí nás zmazať lebo máme dáta
-                if (current.CanBeRemoved())
+                if (current.CanLeafsBeRemoved())
                 {
                     current = current.Parent;
                 }

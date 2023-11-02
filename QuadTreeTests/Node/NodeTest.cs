@@ -272,21 +272,32 @@ public class NodeTest
     public void CanBeRemoved()
     {
         QuadTreeNodeLeaf<int> testNodeLeaf2 = new(new(10, 10), new(20, 20));
-        Assert.True(testNodeLeaf2.CanBeRemoved());
+        Assert.True(testNodeLeaf2.CanLeafsBeRemoved());
         Assert.False(testNodeLeaf2.LeafsInicialised);
         testNodeLeaf2.TestInitLeafs();
         Assert.True(testNodeLeaf2.LeafsInicialised);
-        Assert.True(testNodeLeaf2.CanBeRemoved());
+        Assert.True(testNodeLeaf2.CanLeafsBeRemoved());
         Assert.False(testNodeLeaf2.LeafsInicialised);
         
         var tmpLeafs = testNodeLeaf2.TestInitLeafs();
         tmpLeafs[0].AddData(new QuadTreeNodeData<int>(new(10, 10), new(15, 15), 1));
-        Assert.False(testNodeLeaf2.CanBeRemoved());
+        Assert.True(testNodeLeaf2.CanLeafsBeRemoved());
+        Assert.That(testNodeLeaf2.DataCount(), Is.EqualTo(1));
+        Assert.False(testNodeLeaf2.LeafsInicialised);
+        
+        // skontroluje keď je medzi dvoma vrstvami vrstva tkorá nemá data ale jej potomok má, tak nemôže byť zmazaná
+        tmpLeafs = testNodeLeaf2.TestInitLeafs();
+        var innerLeafs = tmpLeafs[0].TestInitLeafs();
+        var ex = Assert.Throws<Exception>(() => innerLeafs[0].AddData(new QuadTreeNodeData<int>(new(10, 10), new(15, 15), 1)));
+        Assert.That(ex.Message, Is.EqualTo("Data is not in this node. This shouldn't happened"));
+        innerLeafs[0].AddData(new QuadTreeNodeData<int>(new(10, 10), new(12.5, 12.5), 1));
+        Assert.False(testNodeLeaf2.CanLeafsBeRemoved());
+        Assert.That(tmpLeafs[0].DataCount(), Is.EqualTo(0));
         Assert.True(testNodeLeaf2.LeafsInicialised);
         
         tmpLeafs = testNodeLeaf2.TestInitLeafs();
         tmpLeafs[0].TestInitLeafs();
-        Assert.False(testNodeLeaf2.CanBeRemoved());
+        Assert.False(testNodeLeaf2.CanLeafsBeRemoved());
         Assert.True(testNodeLeaf2.LeafsInicialised);
         Assert.True(tmpLeafs[0].LeafsInicialised);
     }

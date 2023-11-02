@@ -230,14 +230,48 @@ public class QuadTreeNodeLeaf<T> : QuadTreeNode<T>
         return returnData;
     }
     
-    public bool CanBeRemoved()
+    /// <summary>
+    /// Ak môžu byť listy vymazané tak ich vymaže
+    /// </summary>
+    /// <returns>Vráti true ak listy môžu byť vymazané</returns>
+    public bool CanLeafsBeRemoved()
     {
-        
+        // ak nie sú listy inicializované tak ich môžeme vymazať
         if (!_leafsInicialised)
         {
             return true;
         }
         
+        // skontrolujeme či sa v listoch nachádzajú nejaké dáta a my nemáme žiadne dáta a ak sa nachádza práve 1 tak ich môžeme prehodiť k sebe
+        if (DataIsEmpty() && _leafsInicialised)
+        {
+            int indexLeaf = 0;
+            int dataCount = 0;
+            
+            bool hasLeafs = false;
+            for (int i = 0; i < Leafs.Length; i++)
+            {
+                if (!Leafs[i].DataIsEmpty())
+                {
+                    indexLeaf = i;
+                    dataCount += Leafs[i].DataCount();
+                }
+                
+                // ak má inicializované listy tak nemôžeme mazať lebo by sme stratili dáta
+                if (Leafs[i].LeafsInicialised)
+                {
+                    hasLeafs = true;
+                }
+            }
+
+            if (dataCount == 1 && !hasLeafs)
+            {
+                data.Add(Leafs[indexLeaf].GetData(0));
+                Leafs[indexLeaf].ClearData();
+            }
+        }
+        
+        // na záver skontrolujem či môžu byť listy vymazané, kontrola 2
         bool canBeRemoved = true;
         foreach (var leaf in Leafs)
         {
