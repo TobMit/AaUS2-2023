@@ -149,7 +149,7 @@ namespace PDAAplication.MVVM.ViewModel
                 new(juhoZapadneGPS.X + sirka, juhoZapadneGPS.Y + dlzka),
                 pocetNehnutelnosti,
                 pocetParciel);
-
+            Console.WriteLine("Dogenerovane");
             //ListNehnutelnost = _listNehnutelnost;
             //ListParcela = _listParcela;
 

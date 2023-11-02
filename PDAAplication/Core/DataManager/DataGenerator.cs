@@ -11,6 +11,8 @@ namespace PDAAplication.Core.DataManager
 {
     public static class DataGenerator
     {
+        private static double MAX_SIZE_OF_OBJCET_PERCENTAGE = 0.15;
+        private static int MAX_SIZE_TO_SHOW = 500;
         public static void GenerateData(QuadTree<ObjectModel> nehnutelnostiQuadTree,
             QuadTree<ObjectModel> parcelyQuadTree,
             QuadTree<ObjectModel> jednotneQuadTree,
@@ -25,15 +27,21 @@ namespace PDAAplication.Core.DataManager
         {
             Random rnd = new Random(0);
 
-            //nehnutelnostiList = new List<ObjectModel>(pocetNehnutelnosti);
-            //parcelyList = new List<ObjectModel>(pocetParciel);
-
+            var sirka = Math.Abs(severovychodneGps.X - juhozapadneGps.X);
+            var vyska = Math.Abs(severovychodneGps.Y - juhozapadneGps.Y);
+                
             for (int i = 0; i < pocetParciel; i++)
             {
                 GPS tmpGps1 = new(NextDouble(juhozapadneGps.X + 1, severovychodneGps.X - 3, rnd),
                     NextDouble(juhozapadneGps.Y + 1, severovychodneGps.Y - 3, rnd));
-                GPS tmpGps2 = new(NextDouble(tmpGps1.X + 1, severovychodneGps.X - 1, rnd),
-                    NextDouble(tmpGps1.Y + 1, severovychodneGps.Y - 1, rnd));
+
+                // Druhú poziciu gps vypočítame tak že k prvej pozicií pripočítame náhodnú širku a výšku
+                // šírku a výšku vypočítame ako nahodne číslo medzi 1 pozíciou a minimom medzi (celková šírka /2, a šíkra k druhému bodu)
+                // toto nam zaruší generovanie objektov menších ako 50% celkovej plochy a tým pádom aj lepšie rozloženie v strome
+                var tmpSirka = NextDouble(0, Math.Min(sirka * MAX_SIZE_OF_OBJCET_PERCENTAGE, severovychodneGps.X - 1 - tmpGps1.X), rnd);
+                var tmpViska = NextDouble(0, Math.Min(vyska * MAX_SIZE_OF_OBJCET_PERCENTAGE, severovychodneGps.Y - 1 - tmpGps1.Y), rnd);
+
+                GPS tmpGps2 = new(tmpGps1.X + tmpSirka, tmpGps1.Y + tmpViska);
 
                 ObjectModel tmpParcela = new(i, "Parcela: " + i, tmpGps1, tmpGps2, Core.ObjectType.Parcela);
 
@@ -41,7 +49,10 @@ namespace PDAAplication.Core.DataManager
                 jednotneQuadTree.Insert(tmpGps1.X, tmpGps1.Y, tmpGps2.X, tmpGps2.Y, tmpParcela);
 
                 parcelyList.Add(tmpParcela);
-                observableCollectionParcely.Add(tmpParcela);
+                if (i <= MAX_SIZE_TO_SHOW)
+                {
+                    observableCollectionParcely.Add(tmpParcela);
+                }
             }
             // Budeme postupne generovať nehnuteľnosti
             // pre každú nehnuteľnosť zýskame všetky parcely, ktoré ju obsahujú
@@ -53,8 +64,14 @@ namespace PDAAplication.Core.DataManager
             {
                 GPS tmpGps1 = new(NextDouble(juhozapadneGps.X + 1, severovychodneGps.X - 3, rnd),
                     NextDouble(juhozapadneGps.Y + 1, severovychodneGps.Y - 3, rnd));
-                GPS tmpGps2 = new(NextDouble(tmpGps1.X + 1, severovychodneGps.X - 1, rnd),
-                    NextDouble(tmpGps1.Y + 1, severovychodneGps.Y - 1, rnd));
+
+                // Druhú poziciu gps vypočítame tak že k prvej pozicií pripočítame náhodnú širku a výšku
+                // šírku a výšku vypočítame ako nahodne číslo medzi 1 pozíciou a minimom medzi (celková šírka /2, a šíkra k druhému bodu)
+                // toto nam zaruší generovanie objektov menších ako 50% celkovej plochy a tým pádom aj lepšie rozloženie v strome
+                var tmpSirka = NextDouble(0, Math.Min(sirka * MAX_SIZE_OF_OBJCET_PERCENTAGE, severovychodneGps.X - 1 - tmpGps1.X), rnd);
+                var tmpViska = NextDouble(0, Math.Min(vyska * MAX_SIZE_OF_OBJCET_PERCENTAGE, severovychodneGps.Y - 1 - tmpGps1.Y), rnd);
+
+                GPS tmpGps2 = new(tmpGps1.X + tmpSirka, tmpGps1.Y + tmpViska);
 
                 ObjectModel tmpNehnutelnost = new(i, "Nehnuteľnosť: " + i, tmpGps1, tmpGps2, Core.ObjectType.Nehnutelnost);
                 var tmpListParciel = parcelyQuadTree.FindOverlapingData(tmpNehnutelnost.JuhoZapadnyBod.X, tmpNehnutelnost.JuhoZapadnyBod.Y,
@@ -69,7 +86,10 @@ namespace PDAAplication.Core.DataManager
                 jednotneQuadTree.Insert(tmpGps1.X, tmpGps1.Y, tmpGps2.X, tmpGps2.Y, tmpNehnutelnost);
 
                 nehnutelnostiList.Add(tmpNehnutelnost);
-                observableCollectionNehnutelnosti.Add(tmpNehnutelnost);
+                if (i <= MAX_SIZE_TO_SHOW)
+                {
+                    observableCollectionNehnutelnosti.Add(tmpNehnutelnost);
+                }
             }
 
             //observableCollectionNehnutelnosti = new ObservableCollection<ObjectModel>(nehnutelnostiList);

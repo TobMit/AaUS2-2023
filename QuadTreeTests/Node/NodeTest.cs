@@ -325,5 +325,21 @@ public class NodeTest
         tmpData = testNodeLeaf2.GetOverlapingData(new QuadTreeNodeLeaf<int>(new(-20,-20), new (0,0)));
         Assert.That(tmpData.Count, Is.EqualTo(0));
     }
+
+    /// <summary>
+    /// Test skontroluje či sa dajú zadávať súradnice aj v drumo variante. Základny varian je lavý dolný roh a pravý horný roh, ruhý variant je lavý horný roh a pravý dolný roh.
+    /// </summary>
+    [Test]
+    public void CoordinationTest()
+    {
+        //todo toto je ešte na prehodnotenie, lebo to nefunguje správne
+        QuadTreeNodeLeaf<string> testNodeLeaf2 = new(new(11,  11), new(19, 19));
+        QuadTreeNodeLeaf<string> testNodeLeaf3 = new(new(11,  19), new(19, 11));
+        Assert.True(_testNodeLeaf.ContainNode(testNodeLeaf2));
+        Assert.True(_testNodeLeaf.ContainNode(testNodeLeaf3));
+        
+        Assert.True(_testNodeLeaf.OverlapNode(testNodeLeaf2));
+        Assert.True(_testNodeLeaf.OverlapNode(testNodeLeaf3));
+    }
     
 }
