@@ -7,7 +7,7 @@ namespace Quadtree.StructureClasses.Node;
 /// Abstraktna trieda pre uzly
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public abstract class QuadTreeNode<TKey, TValue> where TKey : IComparable<TKey> where TValue : IComparable<TValue>
+public abstract class QuadTreeNode<TKey, TValue> where TKey : IComparable<TKey> where TValue : IComparable<TKey>
 {
     protected PointD _pointDownLeft;
     public PointD PointDownLeft

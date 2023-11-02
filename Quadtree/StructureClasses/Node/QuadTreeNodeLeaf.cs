@@ -8,7 +8,7 @@ namespace Quadtree.StructureClasses.Node;
 /// Trieda slúži na vytvorenie uzlov
 /// </summary>
 /// <typeparam name="TValue">Hodnota uložená v kluči</typeparam>
-public class QuadTreeNodeLeaf<TKey, TValue> : QuadTreeNode<TKey, TValue> where TKey : IComparable<TKey> where TValue : IComparable<TValue>
+public class QuadTreeNodeLeaf<TKey, TValue> : QuadTreeNode<TKey, TValue> where TKey : IComparable<TKey> where TValue : IComparable<TKey>
 {
     private List<QuadTreeNodeData<TKey, TValue>> data;
 
@@ -200,6 +200,27 @@ public class QuadTreeNodeLeaf<TKey, TValue> : QuadTreeNode<TKey, TValue> where T
         return returnData;
     }
 
+    /// <summary>
+    /// Zmaže konkrétny záznam ktorý má rovnaké súradnice ako daný uzol a kľúč, ak sa nachádza viacero záznamov tak vymaže iba prvý
+    /// </summary>
+    /// <param name="node">Node s ktorým porovnávam súradnice</param>
+    /// <param name="key">Kúč ktorý rozhodne či bude dáta vymazané, ak má rovnaký kľúč a aj súradnice tak sa vymaže</param>
+    /// <returns>Vymazané data</returns>
+    public List<TValue> RemoveDataWithSamePointsAndKey(QuadTreeNode<TKey, TValue> node, TKey key)
+    {
+        List<TValue> returnData = new();
+        for (int i = 0; i < data.Count; i++)
+        {
+            if (node.HaveSamePoints(data[i]) && data[i].Data.CompareTo(key) == 0)
+            {
+                returnData.Add(data[i].Data);
+                data.RemoveAt(i);
+                return returnData;
+            }
+        }
+
+        return returnData;
+    }
     
     public List<TValue> RemoveDataWithSamePoints(QuadTreeNode<TKey, TValue> node)
     {

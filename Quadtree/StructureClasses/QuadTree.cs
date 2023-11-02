@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.Reflection;
 using System.Runtime.InteropServices.JavaScript;
 using System.Security.Cryptography.X509Certificates;
 using Quadtree.StructureClasses.HelperClass;
@@ -6,7 +7,7 @@ using Quadtree.StructureClasses.Node;
 
 namespace Quadtree.StructureClasses;
 
-public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue : IComparable<TValue>
+public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue : IComparable<TKey>
 {
     private QuadTreeNodeLeaf<TKey, TValue> _root;
     //private const int HODNOTA = 10000000;
@@ -299,9 +300,9 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         return returnData;
     }
     
-    public List<TValue> Delete(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight)
+    public List<TValue> Delete(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight, TKey key)
     {
-        return FindAndDelete(xDownLeft, yDownLeft, xUpRight, yUpRight, true);
+        return FindAndDelete(xDownLeft, yDownLeft, xUpRight, yUpRight, true, key);
     }
     
     public List<TValue> Find(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight)
@@ -309,8 +310,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         return FindAndDelete(xDownLeft, yDownLeft, xUpRight, yUpRight, false);
     }
 
-    //todo lepšie nazvať
-    private List<TValue> FindAndDelete(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight, bool delete)
+    private List<TValue> FindAndDelete(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight, bool delete, TKey? key = default )
     {
         // Flag = 0 tak vyhľadávame
         // Flag = 1 tak mazeme
@@ -336,30 +336,50 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
                     // ak áno tak ich pridám k vráteným objektom
                     if (delete)
                     {
-                        var tmpData = current.RemoveDataWithSamePoints(objectToFind);
-                        Count -= tmpData.Count;
-                        returnData.AddRange(tmpData);
+                        if (key is not null)
+                        {
+                            var tmpData = current.RemoveDataWithSamePointsAndKey(objectToFind, key);
+                            Count -= tmpData.Count;
+                            returnData.AddRange(tmpData);
+                            // ak sa nič nenašlo tak pokračujeme v prehľadávani daľej, ak sa našlo tak current = null
+                            if (tmpData.Count != 0)
+                            {
+                                current = null;   
+                            }
+                        }
+                        // ak by bol kluč null tak sa maže iba podľa súradnic, toto je optional funkcionalita
+                        else
+                        {
+                            var tmpData = current.RemoveDataWithSamePoints(objectToFind);
+                            Count -= tmpData.Count;
+                            returnData.AddRange(tmpData);
+                            current = null;
+                        }
                     }
                     else
                     {
                         returnData.AddRange(current.GetDataWithSamePoints(objectToFind));
                     }
-                    
-                    // skontrolujem či sa hladaný objekt nevie zmestiť do niektorého poduzla
-                    if (current.AnyInitSubNodeContainDataNode(objectToFind))
+
+                    // skontrolujem či current už medzi časom nie je null
+                    if (current is not null)
                     {
-                        // ak áno ta current = poduzol
-                        current = current.GetLeafThatCanContainDataNode(objectToFind);
-                    }
-                    // ak sa stane že nemáme už žiadné dáta a ani potomka tak vrátime do current = predka a flag označíme na vymazávanie nodu
-                    else if (current.DataIsEmpty())
-                    {
-                        //current = current.Parent;
-                        flag = 1;
-                    }
-                    else
-                    {
-                        current = null;
+                        // skontrolujem či sa hladaný objekt nevie zmestiť do niektorého poduzla
+                        if (current.AnyInitSubNodeContainDataNode(objectToFind))
+                        {
+                            // ak áno ta current = poduzol
+                            current = current.GetLeafThatCanContainDataNode(objectToFind);
+                        }
+                        // ak sa stane že nemáme už žiadné dáta a ani potomka tak vrátime do current = predka a flag označíme na vymazávanie nodu
+                        else if (current.DataIsEmpty())
+                        {
+                            //current = current.Parent;
+                            flag = 1;
+                        }
+                        else
+                        {
+                            current = null;
+                        }
                     }
                 }
                 else

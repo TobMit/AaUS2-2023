@@ -226,8 +226,8 @@ public class Program
                     toDelete.RemoveAt(index);
                     toInsert.Add(value.Data);
                     var deltedValue = quadtree.Delete((double)value.PointDownLeft.X, (double)value.PointDownLeft.Y,
-                        (double)value.PointUpRight.X, (double)value.PointUpRight.Y);
-                    if (deltedValue.Count == 0)
+                        (double)value.PointUpRight.X, (double)value.PointUpRight.Y, value.Data);
+                    if (deltedValue.Count != 1)
                     {
                         seedOk = false;
                         lastestLovest = i;
@@ -248,21 +248,21 @@ public class Program
                         return lastestLovest;
                     }
 
-                    foreach (var returnedValue in deltedValue)
-                    {
-                        if (returnedValue != value.Data)
-                        {
-                            for (int j = 0; j < toDelete.Count; j++)
-                            {
-                                if (toDelete[j].Data == returnedValue)
-                                {
-                                    toDelete.RemoveAt(j);
-                                    toInsert.Add(returnedValue);
-                                    break;
-                                }
-                            }
-                        }
-                    }
+                    // foreach (var returnedValue in deltedValue)
+                    // {
+                    //     if (returnedValue != value.Data)
+                    //     {
+                    //         for (int j = 0; j < toDelete.Count; j++)
+                    //         {
+                    //             if (toDelete[j].Data == returnedValue)
+                    //             {
+                    //                 toDelete.RemoveAt(j);
+                    //                 toInsert.Add(returnedValue);
+                    //                 break;
+                    //             }
+                    //         }
+                    //     }
+                    // }
                     
                     var realCount = quadtree.Recount();
                     if (realCount != toDelete.Count)
