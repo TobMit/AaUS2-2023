@@ -728,6 +728,33 @@ public class QuadTree<T>
     }
 
     /// <summary>
+    /// Transformuje QuadTree na List dát
+    /// </summary>
+    /// <returns>List dát ktoré sa nachádzajú v strome</returns>
+    public List<T> ToList()
+    {
+        List<T> newList = new(Count);
+        Stack<QuadTreeNodeLeaf<T>> stack = new();
+        // prdidáme do stakú root
+        stack.Push(_root);
+        while (stack.Count != 0)
+        {
+            var current = stack.Pop();
+            newList.AddRange(current.GetArrayListData().Select(data => data.Data));
+            if (current.LeafsInicialised)
+            {
+                var tmpLeafs = current.TestGetLeafs();
+                foreach (var leaf in tmpLeafs)
+                {
+                    stack.Push(leaf);
+                }
+            }
+        }
+
+        return newList;
+    }
+
+    /// <summary>
     /// Round data and decimal numbers for this structure
     /// </summary>
     /// <param name="value">double that will be rounded</param>
@@ -759,7 +786,7 @@ public class QuadTree<T>
     // {
     //     return QuadTreeRound(value);
     // }
-    
+
     /// <summary>
     /// This is only for testing, after that will be removed
     /// </summary>

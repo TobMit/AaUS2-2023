@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using PDAAplication.Core;
+using PDAAplication.Core.DataManager.FileManager;
 using PDAAplication.MVVM.Model;
 using PDAAplication.MVVM.View;
 using Quadtree.StructureClasses;
@@ -26,6 +27,7 @@ namespace PDAAplication.MVVM.ViewModel
         public RelayCommand FindObjectCommand { get; set; }
         public RelayCommand AddBuildingCommand { get; set; }
         public RelayCommand ShowAllComand { get; set; }
+        public RelayCommand SaveDataCommand { get; set; }
 
         private Visibility splitViewShow;
 
@@ -99,6 +101,7 @@ namespace PDAAplication.MVVM.ViewModel
             FindObjectCommand = new RelayCommand(o => { FindObject(); });
             AddBuildingCommand = new RelayCommand(o => { AddBuilding(); });
             ShowAllComand = new RelayCommand(o => { ShowAll(); });
+            SaveDataCommand = new RelayCommand(o => { SaveData(); });
         }
 
         private void GenerateData()
@@ -252,6 +255,14 @@ namespace PDAAplication.MVVM.ViewModel
             ChangeView(true);
             ListNehnutelnost = new ObservableCollection<ObjectModel>(_allNehnutelnosti);
             ListParcela = new ObservableCollection<ObjectModel>(_allParcelas);
+        }
+
+        private void SaveData()
+        {
+            DataSaver<ObjectModel> saver = new();
+            
+            saver.PrepareForSave(_quadTreeJednotne.ToList());
+            saver.SaveData();
         }
 
         private static double NextDouble(double min, double max, Random rnd)

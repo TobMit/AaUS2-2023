@@ -11,47 +11,38 @@
         <viewModel:MainViewModel />
     </Window.DataContext>
 
-
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="0.1*"/>
+            <RowDefinition Height="0.04*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Border
-            Grid.Row="0"
-            BorderThickness="0,0,0,1"
-            BorderBrush="Black">
-            <StackPanel 
-                Orientation="Horizontal">
-                <Button
-                    Margin="4"
-                    Padding="4"
-                    Command="{Binding GenerateDataCommand}"
-                    > Vygenerovať dáta</Button>
-                <Button
-                    Margin="4"
-                    Padding="4"
-                    Command="{Binding FindBuildingsCommand}"
-                >Vyhľadanie nehnuteľnosti</Button>
-                <Button
-                    Margin="4"
-                    Padding="4"
-                    Command="{Binding FindObjectCommand}"
-                >Vyhľadanie objektov</Button>
-                <Button
-                    Margin="4"
-                    Padding="4"
-                    Command="{Binding AddBuildingCommand}"
-                >Pridanie nehnuteľnosti</Button>
-                <Button
-                    Margin="4"
-                    Padding="4"
-                    Command="{Binding ShowAllComand}"
-                >Zobraziť všetko</Button>
-            </StackPanel>
-
-
-        </Border>
+        <Menu Grid.Row="0">
+            <MenuItem 
+                Header="Vygenerovať dáta"
+                Command="{Binding GenerateDataCommand}"/>
+            <MenuItem Header="Najsť">
+                <MenuItem 
+                    Header="Vyhľadanie nehnuteľnosti"
+                    Command="{Binding FindBuildingsCommand}"/>
+                <MenuItem
+                    Header="Vyhľadanie objektov"
+                    Command="{Binding FindObjectCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Pridavanie objektov">
+                <MenuItem 
+                    Header="Pridanie nehnutelnosti"
+                    Command="{Binding AddBuildingCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Save">
+                <MenuItem 
+                    Header="Save as"
+                    Command="{Binding SaveDataCommand}"/>
+            </MenuItem>
+            <MenuItem
+                Header="Zobraziť všetko"
+                Command="{Binding ShowAllComand}"/>
+        </Menu>
+        
         <Grid Grid.Row="1" Visibility="{Binding SplitViewShow}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>

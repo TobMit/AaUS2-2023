@@ -31,7 +31,7 @@ namespace PDAAplication.MVVM.Model
 
         public string ToSave()
         {
-            return IdObjektu + ";" + Popis + ";" + JuhoZapadnyBod.X + ";" + JuhoZapadnyBod.Y + ";" + SeveroVychodnyBod.X + ";" + SeveroVychodnyBod.Y + ";" + ObjectType;
+            return IdObjektu + ";" + Popis + ";" + JuhoZapadnyBod.X + ";" + JuhoZapadnyBod.Y + ";" + SeveroVychodnyBod.X + ";" + SeveroVychodnyBod.Y + ";" + ObjectType + "\n";
         }
     }
 }
