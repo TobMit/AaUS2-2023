@@ -338,7 +338,7 @@ public class QuadTreeNodeLeaf<TKey, TValue> : QuadTreeNode<TKey, TValue> where T
 
     public List<QuadTreeNodeData<TKey, TValue>> GetArrayListData()
     {
-        return data;
+        return new(data);
     }
     
     public QuadTreeNodeData<TKey, TValue> GetData(int index)
@@ -366,7 +366,11 @@ public class QuadTreeNodeLeaf<TKey, TValue> : QuadTreeNode<TKey, TValue> where T
         return Leafs;
     }
 
-    public QuadTreeNodeLeaf<TKey, TValue>[] TestGetLeafs()
+    /// <summary>
+    /// Zýkame listy ktoré ktoré sú potrebné pri prechádzani v stromu
+    /// </summary>
+    /// <returns>Pole listov, je nutene pred tým skontrolovať či sú inicializované</returns>
+    public QuadTreeNodeLeaf<TKey, TValue>[] GetLeafs()
     {
         return Leafs;
     }

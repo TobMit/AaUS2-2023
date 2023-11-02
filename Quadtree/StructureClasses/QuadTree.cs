@@ -98,12 +98,19 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         }
         QuadTreeNodeLeaf<TKey, TValue>? current = _root;
         QuadTreeNodeData<TKey, TValue> currentDataNode = new(new(xDownLeft, yDownLeft), 
-          new (xUpRight, yUpRight), pData);
+            new (xUpRight, yUpRight), pData);
         
         // zozbieranie info pre optimalizaciu
         CalculateOptimalizationQuadrant(currentDataNode, false);
         
-        int depth = 0;
+        Insert(current, currentDataNode, 0);
+    }
+    private void Insert(QuadTreeNodeLeaf<TKey, TValue> root, QuadTreeNodeData<TKey, TValue> data, int pDepth)
+    {
+        QuadTreeNodeLeaf<TKey, TValue>? current = root;
+        QuadTreeNodeData<TKey, TValue> currentDataNode = data;
+        
+        int depth = pDepth;
         while (current is not null)
         {
             // pozrieme sa či sa nejaký polygón nachádza v danom uzle a nie sú listy tak to môžeme vložiť
@@ -187,27 +194,28 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         return Interval(xDownLeft, yDownLeft, xUpRight, yUpRight, false);
     }
     
-    private class RangeNodes
+    private class WrapClass
     {
-        public QuadTreeNodeLeaf<TKey, TValue> Node { get; }
+        public QuadTreeNodeLeaf<TKey, TValue>? Node { get; }
         /// <summary>
         /// <p> 0 - mod vyhľadavanie </p>
         /// <p> 1 - mod mazania </p>
+        /// <p> Taktiež sa používa pri zmene výšky stromu na ručenie hlbky</p>
         /// </summary>
-        public int Mode { get; }
+        public int ModeOrDepth { get; }
         
         public bool LeafsAlreadyInStack { get; }
-        public RangeNodes(QuadTreeNodeLeaf<TKey, TValue> pNode, int pMode)
+        public WrapClass(QuadTreeNodeLeaf<TKey, TValue> pNode, int modeOrDepth)
         {
             Node = pNode;
-            Mode = pMode;
+            ModeOrDepth = modeOrDepth;
             LeafsAlreadyInStack = false;
         }
         
-        public RangeNodes(QuadTreeNodeLeaf<TKey, TValue> pNode, int pMode, bool pLeafsAlreadyInStack)
+        public WrapClass(QuadTreeNodeLeaf<TKey, TValue> pNode, int modeOrDepth, bool pLeafsAlreadyInStack)
         {
             Node = pNode;
-            Mode = pMode;
+            ModeOrDepth = modeOrDepth;
             LeafsAlreadyInStack = pLeafsAlreadyInStack;
         }
     }
@@ -218,13 +226,13 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
             new(xUpRight, yUpRight));
         
         List<TValue> returnData = new();
-        Stack<RangeNodes> stack = new();
+        Stack<WrapClass> stack = new();
         stack.Push(new(_root, 0));
         while (stack.Count != 0)
         {
             // Prebieha v 2 režimoch
             var current = stack.Pop();
-            if (current.Mode == 0)
+            if (current.ModeOrDepth == 0)
             { 
                 // 1. hľadanie poduzla do ktorého sa zmesti hladaná area
                 if (current.Node.ContainNode(areaToFind))
@@ -672,7 +680,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
             tmpData.AddRange(current.GetArrayListData());
             if (current.LeafsInicialised)
             {
-                var tmpLeafs = current.TestGetLeafs();
+                var tmpLeafs = current.GetLeafs();
                 foreach (var leaf in tmpLeafs)
                 {
                     stack.Push(leaf);
@@ -727,10 +735,6 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
     /// <exception cref="Exception"> ak je hĺbka stromu zadaná nesprávna</exception>
     public void SetQuadTreeDepth(int newDepth)
     {
-        // môuž nastať 2 situácie
-        // zmenšujem quad tree
-            // budem potrebovať pomocnú triedu do ktorej si ukladám aktuálnu výšku daného nodu
-            // dostanem sa na požadovanú výšku
         
         if (newDepth <= 0)
         {
@@ -743,6 +747,106 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
             return;
         }
 
+        _maxDepth = newDepth;
+        
+        Stack<WrapClass> stack = new();
+        stack.Push(new(_root, 0));
+
+        while (stack.Count != 0) 
+        {
+            // vytiahneme zo staku node ktorý je obalený v pomocnej triede
+            var current = stack.Pop();
+            
+            // skontrolujem či nie je null
+            if (current.Node is not null)
+            {
+                // pozrieme sa či má inicializované listy
+                if (current.Node.LeafsInicialised)
+                {
+                    // skontrolujem hlbku
+                    if (current.ModeOrDepth < _maxDepth)
+                    {
+                        // ak je hlbka menšia nahram listy do staku a pokračujem v cykle
+                        var tmpLeafs = current.Node.GetLeafs();
+                        foreach (var leaf in tmpLeafs)
+                        {
+                            stack.Push(new(leaf, current.ModeOrDepth + 1));
+                        }
+                    }
+                    else
+                    {
+                        // ak je hlbka rovnaká alebo väčšia ako požadovaná tak skontrolujem či môžem zmazať leafs
+                        if (!current.Node.CanLeafsBeRemoved())
+                        {
+                            // ak nemôžem tak ich pridáme do staku a pri ich vkladaní zvýšime im ich hĺbku
+                            // keď som pridal tak môžem začať cyklus od znova
+                            var tmpLeafs = current.Node.GetLeafs();
+                            foreach (var leaf in tmpLeafs)
+                            {
+                                stack.Push(new(leaf, current.ModeOrDepth + 1));
+                            }
+                        }
+                        else
+                        {
+                            // ak môžem tak ich vymažem a pridám parenta do staku
+                            stack.Push(new(current.Node.Parent, current.ModeOrDepth - 1));
+                            // Ak je hlbka väčšia ako pžadovaná tak dáta vložím do parenta
+                            if (!current.Node.DataIsEmpty() && current.ModeOrDepth > _maxDepth)
+                            {
+                                current.Node.Parent.AddData(current.Node.GetArrayListData());
+                                current.Node.ClearData();
+                            }
+                        } 
+                        
+                    }
+                }
+                else
+                {
+                    // ak nemá inicializované listy tak skonrolujem hlbku
+                    if (current.ModeOrDepth > _maxDepth)
+                    {
+                        // ak je hlbka väčšia
+                        if (!current.Node.DataIsEmpty())
+                        {
+                            // ak mám dáta, vložím ich k parentovi a u seba zmažem
+                            current.Node.Parent.AddData(current.Node.GetArrayListData());
+                            current.Node.ClearData();  
+                        }
+                        
+                        // pozriem sa či parent môže zmazať listy
+                        var parent = current.Node.Parent;
+                        if (parent.CanLeafsBeRemoved())
+                        {
+                            stack.Push(new (parent, current.ModeOrDepth-1));
+                        }
+                        // ak nie tak pokračujem v cykle
+                    }
+                    else if (current.ModeOrDepth < _maxDepth)
+                    {
+                        // ak je menšia a ja mám dáta
+                        // v cykle budem ich prechádzať a vkladať do listov pomocou praveného importu
+                        var tmpData = current.Node.GetArrayListData();
+                        current.Node.ClearData();
+                        foreach (var quadTreeNodeData in tmpData)
+                        {
+                            Count--; // toto je tu preto, lebo v inserte sa zvýši tak aby sme mali reálne počty dát
+                            Insert(current.Node, quadTreeNodeData, current.ModeOrDepth);
+                        }
+                        
+                        //môžem pokračovať daľším prvkom z poľa
+                    }
+                    // ak je menšia a ja mám dáta
+                }
+                
+            }
+            // ak je null tak pokračujem v cykle
+        }
+        
+            // ak je menšia a ja mám dáta
+                
+        
+                
+        /*
         List<QuadTreeNodeData<TKey, TValue>> tmpData = new();
         Stack<QuadTreeNodeLeaf<TKey, TValue>> stack = new();
         // prdidáme do stakú root
@@ -770,7 +874,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
                 data.PointUpRight.Y, data.Data);
         }
 
-        _optimalize = true;
+        _optimalize = true;*/
 
     }
     
@@ -790,7 +894,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
             newCount += current.DataCount();
             if (current.LeafsInicialised)
             {
-                var tmpLeafs = current.TestGetLeafs();
+                var tmpLeafs = current.GetLeafs();
                 foreach (var leaf in tmpLeafs)
                 {
                     stack.Push(leaf);
@@ -817,7 +921,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
             newList.AddRange(current.GetArrayListData().Select(data => data.Data));
             if (current.LeafsInicialised)
             {
-                var tmpLeafs = current.TestGetLeafs();
+                var tmpLeafs = current.GetLeafs();
                 foreach (var leaf in tmpLeafs)
                 {
                     stack.Push(leaf);
