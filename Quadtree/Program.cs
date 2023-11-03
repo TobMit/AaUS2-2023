@@ -7,17 +7,17 @@ using Quadtree.StructureClasses.Node;
 
 public class Program
 {
-    private static bool parallel = false;
+    private static bool parallel = true; // pri paralelnom testovaní treba dať max seed na nejaké rozumné čislo (napr. 30)aby program skončil v nejakom rozumnom čase, keby bolo nejaké veľké čislo, tak sa NET snaží najskôr naplánovať všetky tasky a potom ich spúšťa, a to pri veľom množstve už trvá dlho.
     private static bool testForProfiler = false;
     
     private static int MAX_UNITS = 1000000;
     private static int MAX_TEST = 100000;
     private static double PROBABILITY_FD = 0.6;
     private static double PROBABILITY_FO_FR = 0.1;
-    private static double PROBABILITY_DEPTH = 0.01;
+    private static double PROBABILITY_DEPTH = 0.0001;
     private static double FILL_PROBABILITY = 0.3;
     private static double MAX_SIZE_OF_OBJCET_PERCENTAGE = 0.25;
-    private static int STARTUP_FILL_COUNT = 10000;
+    private static int STARTUP_FILL_COUNT = 11000;
     
     private static int OPERATION_COUNT = 10000;
     private static bool OPTIMALIZATION_ON = true;
@@ -96,7 +96,6 @@ public class Program
         
         if (rnd.NextDouble() <= FILL_PROBABILITY)
         {
-            Console.WriteLine("naplnam struktúru predom");
             for (int i = 0; i < STARTUP_FILL_COUNT; i++)
             {
                 double x = NextDouble(MIN_X, MAX_X-2, rnd);
@@ -129,7 +128,8 @@ public class Program
             var rndValue = rnd.NextDouble();
             if (rndValue < PROBABILITY_DEPTH)
             {
-                var newDepth = rnd.Next(30, 200);
+                var newDepth = rnd.Next(2, 20);
+                //Console.WriteLine("Set depth: " + newDepth + " in seed: " + seed + " operation count: " + i);
                 quadtree.SetQuadTreeDepth(newDepth);
                 if (quadtree.Count != quadtree.Recount())
                 {
