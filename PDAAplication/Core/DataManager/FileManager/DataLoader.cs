@@ -17,7 +17,8 @@ namespace PDAAplication.Core.DataManager.FileManager
             
         }
 
-        public async void LoadData(QuadTree<int, ObjectModel> nehnutelnostiQuadTree,
+
+        public QuadTree<int, ObjectModel>[] LoadData(QuadTree<int, ObjectModel> nehnutelnostiQuadTree,
             QuadTree<int, ObjectModel> parcelyQuadTree,
             QuadTree<int, ObjectModel> jednotneQuadTree,
             ObservableCollection<ObjectModel> observableCollectionNehnutelnosti,
@@ -33,7 +34,7 @@ namespace PDAAplication.Core.DataManager.FileManager
             if (opneFileDialog.ShowDialog() == true)
             {
                 var file = opneFileDialog.FileName;
-                var lines = await System.IO.File.ReadAllLinesAsync(file);
+                var lines =  System.IO.File.ReadAllLines(file);
 
                 bool firstLine = true;
 
@@ -58,16 +59,20 @@ namespace PDAAplication.Core.DataManager.FileManager
                         var values = line.Split(';');
                         var id = int.Parse(values[0]);
                         var name = values[1];
-                        var gps1 = new GPS(double.Parse(values[2]), double.Parse(values[3]));
-                        var gps2 = new GPS(double.Parse(values[4]), double.Parse(values[5]));
-                        var type = (ObjectType)Enum.Parse(typeof(ObjectType), values[6]);
+                        var gps1 = new GPS(double.Parse(values[2]), char.Parse(values[3]), double.Parse(values[4]), char.Parse(values[5]));
+                        var gps2 = new GPS(double.Parse(values[6]), char.Parse(values[7]), double.Parse(values[8]), char.Parse(values[9]));
+                        var type = (ObjectType)Enum.Parse(typeof(ObjectType), values[10]);
+
+                        GPS checkedGps1 = new();
+                        GPS checkedGps2 = new();
+                        Utils.CheckAndRecalculateGps(gps1, gps2, checkedGps1, checkedGps2);
 
                         var objectModel = new ObjectModel(id, name, gps1, gps2, type);
 
                         if (type == ObjectType.Nehnutelnost)
                         {
-                            nehnutelnostiQuadTree.Insert(gps1.X, gps1.Y, gps2.X, gps2.Y, objectModel);
-                            jednotneQuadTree.Insert(gps1.X, gps1.Y, gps2.X, gps2.Y, objectModel);
+                            nehnutelnostiQuadTree.Insert(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, objectModel);
+                            jednotneQuadTree.Insert(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, objectModel);
                             nehnutelnostiList.Add(objectModel);
                             if (observableCollectionNehnutelnosti.Count <= Constants.MAX_SIZE_TO_SHOW)
                             {
@@ -76,8 +81,8 @@ namespace PDAAplication.Core.DataManager.FileManager
                         }
                         else
                         {
-                            parcelyQuadTree.Insert(gps1.X, gps1.Y, gps2.X, gps2.Y, objectModel);
-                            jednotneQuadTree.Insert(gps1.X, gps1.Y, gps2.X, gps2.Y, objectModel);
+                            parcelyQuadTree.Insert(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, objectModel);
+                            jednotneQuadTree.Insert(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, objectModel);
                             parcelyList.Add(objectModel);
                             if (observableCollectionParcely.Count <= Constants.MAX_SIZE_TO_SHOW)
                             {   
@@ -90,14 +95,19 @@ namespace PDAAplication.Core.DataManager.FileManager
                 // preto sa musia najskôr načítať a potom linkovať
                 LinkData(nehnutelnostiList, parcelyQuadTree);
             }
+            QuadTree<int, ObjectModel>[] tree = new QuadTree<int, ObjectModel>[3];
+            tree[0] = nehnutelnostiQuadTree;
+            tree[1] = parcelyQuadTree;
+            tree[2] = jednotneQuadTree;
+            return tree;
         }
 
         private void LinkData(List<ObjectModel> nehnutelnostiList, QuadTree<int, ObjectModel> parcelyQuadTree)
         {
             foreach (var objectModel in nehnutelnostiList)
             {
-                var tmpListParciel = parcelyQuadTree.FindOverlapingData(objectModel.JuhoZapadnyBod.X, objectModel.JuhoZapadnyBod.Y,
-                    objectModel.SeveroVychodnyBod.X, objectModel.SeveroVychodnyBod.Y);
+                var tmpListParciel = parcelyQuadTree.FindOverlapingData(objectModel.GpsBod1.X, objectModel.GpsBod1.Y,
+                    objectModel.GpsBod2.X, objectModel.GpsBod2.Y);
                 foreach (ObjectModel parcela in tmpListParciel)
                 {
                     objectModel.ZoznamObjektov.Add(parcela);

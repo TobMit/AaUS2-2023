@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
+using PDAAplication.Interface;
 
 namespace PDAAplication.MVVM.Model
 {
-    public class GPS
+    public class GPS: ISavable
     {
         public char SirkaX { get; set; }
         public double X { get; set; }
@@ -50,5 +51,9 @@ namespace PDAAplication.MVVM.Model
             Y = 0;
         }
 
+        public string ToSave()
+        {
+            return X + ";" + SirkaX + ";" + Y + ";" + DlzkaY; // tu nie je \n, lebo to je len jeden riadok (pokazilo by mi to ukladanie v ObjectModel)
+        }
     }
 }

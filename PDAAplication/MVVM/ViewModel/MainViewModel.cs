@@ -302,14 +302,17 @@ namespace PDAAplication.MVVM.ViewModel
             _allNehnutelnosti = new();
             _allParcelas = new();
 
-            
-            loader.LoadData(_quadTreeNehnutelnost,
+
+            var tmp = loader.LoadData(_quadTreeNehnutelnost,
                 _quadTreeParcela,
                 _quadTreeJednotne,
                 ListNehnutelnost,
                 ListParcela,
                 _allNehnutelnosti,
                 _allParcelas);
+            _quadTreeNehnutelnost = tmp[0];
+            _quadTreeParcela = tmp[1];
+            _quadTreeJednotne = tmp[2];
 
         }
 

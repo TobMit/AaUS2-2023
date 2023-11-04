@@ -12,12 +12,12 @@
                             <TreeViewItem Header="{Binding Popis}"/>
                         </TreeViewItem>
                         <TreeViewItem Header="GPS 1.">
-                            <TreeViewItem Header="{Binding JuhoZapadnyBod.XVypis }"/>
-                            <TreeViewItem Header="{Binding JuhoZapadnyBod.YVypis }"/>
+                            <TreeViewItem Header="{Binding GpsBod1.XVypis }"/>
+                            <TreeViewItem Header="{Binding GpsBod1.YVypis }"/>
                         </TreeViewItem>
                         <TreeViewItem Header="GPS 2.">
-                            <TreeViewItem Header="{Binding SeveroVychodnyBod.XVypis }"/>
-                            <TreeViewItem Header="{Binding SeveroVychodnyBod.YVypis }"/>
+                            <TreeViewItem Header="{Binding GpsBod2.XVypis }"/>
+                            <TreeViewItem Header="{Binding GpsBod2.YVypis }"/>
                         </TreeViewItem>
                         <TreeViewItem Header="Parcely na ktorych sa nachadza">
                             <ListView
@@ -44,12 +44,12 @@
                                     <TreeViewItem Header="{Binding Popis}"/>
                                 </TreeViewItem>
                                 <TreeViewItem Header="GPS 1.">
-                                    <TreeViewItem Header="{Binding JuhoZapadnyBod.XVypis }"/>
-                                    <TreeViewItem Header="{Binding JuhoZapadnyBod.YVypis }"/>
+                                    <TreeViewItem Header="{Binding GpsBod1.XVypis }"/>
+                                    <TreeViewItem Header="{Binding GpsBod1.YVypis }"/>
                                 </TreeViewItem>
                                 <TreeViewItem Header="GPS 2.">
-                                    <TreeViewItem Header="{Binding SeveroVychodnyBod.XVypis }"/>
-                                    <TreeViewItem Header="{Binding SeveroVychodnyBod.YVypis }"/>
+                                    <TreeViewItem Header="{Binding GpsBod2.XVypis }"/>
+                                    <TreeViewItem Header="{Binding GpsBod2.YVypis }"/>
                                 </TreeViewItem>
                                 <TreeViewItem Header="Nehnutelnosti ktoré sa tam nachádzajú">
                                     <ListView
