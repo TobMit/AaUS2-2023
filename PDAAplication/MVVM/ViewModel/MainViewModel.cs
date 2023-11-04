@@ -24,6 +24,7 @@ namespace PDAAplication.MVVM.ViewModel
 
         public RelayCommand GenerateDataCommand { get; set; }
         public RelayCommand FindBuildingsCommand { get; set; }
+        public RelayCommand FindParcelaCommand { get; set; }
         public RelayCommand FindObjectCommand { get; set; }
         public RelayCommand AddBuildingCommand { get; set; }
         public RelayCommand ShowAllComand { get; set; }
@@ -144,6 +145,7 @@ namespace PDAAplication.MVVM.ViewModel
         {
             GenerateDataCommand = new RelayCommand(o => { GenerateData(); });
             FindBuildingsCommand = new RelayCommand(o => { FindBuildings(); });
+            FindParcelaCommand = new RelayCommand(o => { FindParcela(); });
             FindObjectCommand = new RelayCommand(o => { FindObject(); });
             AddBuildingCommand = new RelayCommand(o => { AddBuilding(); });
             ShowAllComand = new RelayCommand(o => { ShowAll(); });
@@ -210,15 +212,15 @@ namespace PDAAplication.MVVM.ViewModel
             {
                 return;
             }
-            var dlg = new FindBuilding();
+            var dlg = new FindObject("Vyhľadanie budovy");
             dlg.ShowDialog();
-            GPS juhoZapadneGPS = new GPS();
-            GPS severoVýchodneGPS = new GPS();
+            GPS gps1 = new GPS();
+            GPS gps2 = new GPS();
             bool cancel = true;
             if (dlg.DialogResult == true)
             {
-                juhoZapadneGPS = new(dlg.x, dlg.y);
-                severoVýchodneGPS = new(dlg.x, dlg.y);
+                gps1 = new(dlg.x, dlg.y);
+                gps2 = new(dlg.x, dlg.y);
                 cancel = false;
             }
 
@@ -226,8 +228,34 @@ namespace PDAAplication.MVVM.ViewModel
             {
                 return;
             }
-            ListNehnutelnost = new ObservableCollection<ObjectModel>(_quadTreeNehnutelnost.Find(juhoZapadneGPS.X, juhoZapadneGPS.Y, severoVýchodneGPS.X, severoVýchodneGPS.Y));
+            ListNehnutelnost = new ObservableCollection<ObjectModel>(_quadTreeNehnutelnost.FindOverlapingData(gps1.X, gps1.Y, gps2.X, gps2.Y));
             ListParcela = new();
+        }
+
+        private void FindParcela()
+        {
+            if (_quadTreeNehnutelnost is null)
+            {
+                return;
+            }
+            var dlg = new FindObject("Vyhľadanie parcely");
+            dlg.ShowDialog();
+            GPS gps1 = new GPS();
+            GPS gps2 = new GPS();
+            bool cancel = true;
+            if (dlg.DialogResult == true)
+            {
+                gps1 = new(dlg.x, dlg.y);
+                gps2 = new(dlg.x, dlg.y);
+                cancel = false;
+            }
+
+            if (cancel)
+            {
+                return;
+            }
+            ListParcela = new ObservableCollection<ObjectModel>(_quadTreeParcela.FindOverlapingData(gps1.X, gps1.Y, gps2.X, gps2.Y));
+            ListNehnutelnost = new();
         }
 
         private void FindObject()

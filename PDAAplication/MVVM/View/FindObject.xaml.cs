@@ -5,13 +5,14 @@ using System.Windows.Input;
 
 namespace PDAAplication.MVVM.View;
 
-public partial class FindBuilding : Window
+public partial class FindObject : Window
 {
-    public FindBuilding()
+    public FindObject(string pTitle)
     {
         InitializeComponent();
         x = 0;
         y = 0;
+        this.Title = pTitle;
     }
     
     public double x { get; set; }

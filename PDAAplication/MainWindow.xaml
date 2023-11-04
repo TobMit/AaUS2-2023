@@ -24,6 +24,9 @@
                 <MenuItem 
                     Header="Vyhľadanie nehnuteľnosti"
                     Command="{Binding FindBuildingsCommand}"/>
+                <MenuItem 
+                    Header="Vyhľadanie parcely"
+                    Command="{Binding FindParcelaCommand}"/>
                 <MenuItem
                     Header="Vyhľadanie objektov"
                     Command="{Binding FindObjectCommand}"/>
