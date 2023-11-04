@@ -35,6 +35,9 @@
                 <MenuItem 
                     Header="Pridanie nehnutelnosti"
                     Command="{Binding AddBuildingCommand}"/>
+                <MenuItem 
+                    Header="Pridanie parcely"
+                    Command="{Binding AddParcelaCommand}"/>
             </MenuItem>
             <MenuItem Header="Save">
                 <MenuItem 

@@ -2,14 +2,27 @@
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
+using PDAAplication.Core;
 
 namespace PDAAplication.MVVM.View;
 
-public partial class AddNehnutelnost : Window
+public partial class AddObject : Window
 {
-    public AddNehnutelnost()
+    public AddObject(Core.ObjectType type)
     {
         InitializeComponent();
+        if (type == Core.ObjectType.Nehnutelnost)
+        {
+            this.Title = "Pridanie nehnuteľnosti";
+            this.LabelID.Content = "Súpisné číslo";
+            this.Popis.Text = "Nehnuteľnosť";
+        }
+        else
+        {
+            this.Title = "Pridanie parcely";
+            this.LabelID.Content = "Číslo parcely";
+            this.Popis.Text = "Parcela";
+        }
     }
 
     public double x { get; set; }
@@ -21,7 +34,7 @@ public partial class AddNehnutelnost : Window
     public double y2 { get; set; }
     public char y2Oz { get; set; }
     public string popis { get; set; }
-    public int supisneCislo { get; set; }
+    public int IdCislo { get; set; }
     
     private void OkButton_OnClick(object sender, RoutedEventArgs e)
     {
@@ -36,7 +49,7 @@ public partial class AddNehnutelnost : Window
             x2 = double.Parse(x2Point.Text);
             y2 = double.Parse(y2Point.Text);
             popis = Popis.Text;
-            supisneCislo = int.Parse(SupisneCislo.Text);
+            IdCislo = int.Parse(idCislo.Text);
 
             DialogResult = true;
         }
