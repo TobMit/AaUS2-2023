@@ -7,11 +7,9 @@ namespace PDAAplication.MVVM.View;
 
 public partial class FindBuilding : Window
 {
-    private readonly Regex decimalNumber;
     public FindBuilding()
     {
         InitializeComponent();
-        decimalNumber = new Regex(@"^-?\d+\.\d{6}$");
         x = 0;
         y = 0;
     }
@@ -27,14 +25,12 @@ public partial class FindBuilding : Window
     }
     private void XPoint_OnPreviewTextInput(object sender, TextCompositionEventArgs e)
     {
-        //todo add kontrola ci je v rozsahu
-        e.Handled = decimalNumber.IsMatch(e.Text);
+        Core.Utils.DoublePreviewCheck(sender, e);
     }
 
 
     private void YPoint_OnPreviewTextInput(object sender, TextCompositionEventArgs e)
     {
-        //todo add kontrola ci je v rozsahu
-        e.Handled = decimalNumber.IsMatch(e.Text);
+        Core.Utils.DoublePreviewCheck(sender, e);
     }
 }

@@ -237,6 +237,12 @@ namespace PDAAplication.MVVM.ViewModel
             {
                 return;
             }
+            // kontrolujem či vôbec môžem pridať do stromu
+            if (!_quadTreeParcela.QuadTreeCanContain(juhoZapadneGPS.X, juhoZapadneGPS.Y, severoVýchodneGPS.X, severoVýchodneGPS.Y))
+            {
+                MessageBox.Show("Nie je možné pridať parcelu do stromu", "Chyba vstupu", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
             // musím nájsť všetky parcely, ktoré obsahujú túto nehnuteľnosť
             // pridať tam tú nehnuteľnosť
             // pridať nehnuteľnosť do zoznamu všetkých nehnutelností a všetky parcely do nehnuteľnosti

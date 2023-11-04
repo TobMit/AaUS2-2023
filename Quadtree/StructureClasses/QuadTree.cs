@@ -21,6 +21,8 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
     
     public PointD OriginalPointDownLeft { get; set; }
     public PointD OriginalPointUpRight { get; set; }
+
+    private QuadTreeNodeLeaf<int, int> _originalRoot;
     public int Count { get; set; }
     
     /// <summary>
@@ -53,7 +55,9 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         
         _root = new(new(pX, pY),
             new(pX + width, pY + height));
-        
+        _originalRoot = new(new(pX, pY),
+            new(pX + width, pY + height));
+
         _maxDepth = pMaxDepth;
         Count = 0;
         _operationCount = 0;
@@ -75,7 +79,9 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         
         _root = new(new(pX, pY),
             new(pX + width, pY + height));
-        
+        _originalRoot = new(new(pX, pY),
+            new(pX + width, pY + height));
+
         _maxDepth = int.MaxValue;
         Count = 0;
         _operationCount = 0;
@@ -91,8 +97,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
     /// <exception cref="Exception">Ak su zle suradnice</exception>
     public void Insert(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight, TValue pData)
     {
-        if (!_root.ContainsPoints(new(xDownLeft, yDownLeft), 
-                new(xUpRight, yUpRight)))
+        if (!QuadTreeCanContain(xDownLeft, yDownLeft, xUpRight, yUpRight))
         {
             throw new Exception("Coordinates exceed parameter size");
         }
@@ -752,6 +757,8 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         Stack<WrapClass> stack = new();
         stack.Push(new(_root, 0));
 
+        _optimalize = false;
+
         while (stack.Count != 0) 
         {
             // vytiahneme zo staku node ktorý je obalený v pomocnej triede
@@ -842,39 +849,10 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
             // ak je null tak pokračujem v cykle
         }
         
-            // ak je menšia a ja mám dáta
+        _optimalize = true;
                 
         
-                
-        /*
-        List<QuadTreeNodeData<TKey, TValue>> tmpData = new();
-        Stack<QuadTreeNodeLeaf<TKey, TValue>> stack = new();
-        // prdidáme do stakú root
-        stack.Push(_root);
-        while (stack.Count != 0)
-        {
-            var current = stack.Pop();
-            tmpData.AddRange(current.GetArrayListData());
-            if (current.LeafsInicialised)
-            {
-                var tmpLeafs = current.TestGetLeafs();
-                foreach (var leaf in tmpLeafs)
-                {
-                    stack.Push(leaf);
-                }
-            }
-        }
-        _maxDepth = newDepth;
-        Count = 0;
-        _root = new(_root.PointDownLeft, _root.PointUpRight);
-        _optimalize = false;
-        foreach (var data in tmpData)
-        {
-            Insert(data.PointDownLeft.X, data.PointDownLeft.Y, data.PointUpRight.X,
-                data.PointUpRight.Y, data.Data);
-        }
-
-        _optimalize = true;*/
+        
 
     }
     
@@ -959,12 +937,30 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         }
     }
 
+    /// <summary>
+    /// Skontroluje či sa vkladané dáta môžu vložiť do stromu
+    /// </summary>
+    /// <returns>true ak ano a false ak nie</returns>
+    public bool QuadTreeCanContain(QuadTreeNode<TKey, TValue> node)
+    {
+        return QuadTreeCanContain(node.PointDownLeft.X, node.PointDownLeft.Y, node.PointUpRight.X, node.PointUpRight.Y);
+    }
 
     /// <summary>
-    /// Metoda vyhradená iba na testovanie!!!!
+    /// Skontroluje či sa vkladané dáta môžu vložiť do stromu
     /// </summary>
-    /// <returns>Root</returns>
-    public QuadTreeNodeLeaf<TKey, TValue> TestGetRoot()
+    /// <returns>true ak ano a false ak nie</returns>
+    public bool QuadTreeCanContain(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight)
+    {
+        return _originalRoot.ContainsPoints(new(xDownLeft, yDownLeft),
+            new(xUpRight, yUpRight));
+    }
+
+    /// <summary>
+        /// Metoda vyhradená iba na testovanie!!!!
+        /// </summary>
+        /// <returns>Root</returns>
+        public QuadTreeNodeLeaf<TKey, TValue> TestGetRoot()
     {
         return _root;
     }

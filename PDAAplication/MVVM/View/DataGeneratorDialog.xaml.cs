@@ -21,13 +21,9 @@ namespace PDAAplication.MVVM.View
     /// </summary>
     public partial class DataGeneratorDialog : Window
     {
-        private readonly Regex number;
-        private readonly Regex decimalNumber;
         public DataGeneratorDialog()
         {
             InitializeComponent();
-            number = new Regex("[^0-9]+");
-            decimalNumber = new Regex(@"^-?\d+\.\d{6}$");
             PocetNehnutelnosti = 100;
             PocetParciel = 100;
             
@@ -39,34 +35,39 @@ namespace PDAAplication.MVVM.View
         public double y { get; set; }
         public int sirka { get; set; }
         public int dlzka { get; set; }
+        private void OkButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                PocetNehnutelnosti = int.Parse(Nehnutelnosti.Text);
+                PocetParciel = int.Parse(Parcely.Text);
+                x = double.Parse(xPoint.Text);
+                y = double.Parse(yPoint.Text);
+                sirka = int.Parse(Sikra.Text);
+                dlzka = int.Parse(Dlzka.Text);
+                DialogResult = true;
+            }
+            catch (Exception exception)
+            {
+                DialogResult = false;
+                MessageBox.Show("Zle zadaný vstup", "Chyba vstupu", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
 
         private void UIElement_OnPreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            e.Handled = number.IsMatch(e.Text);
-        }
-
-        private void OkButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            PocetNehnutelnosti = int.Parse(Nehnutelnosti.Text);
-            PocetParciel = int.Parse(Parcely.Text);
-            x = double.Parse(xPoint.Text);
-            y = double.Parse(yPoint.Text);
-            sirka = int.Parse(Sikra.Text); // todo add kontrola ci je cislo v rozsahu
-            dlzka = int.Parse(Dlzka.Text); // todo tuto tiez
-            DialogResult = true;
+            Core.Utils.NumaberPreviewCheck(sender, e);
         }
 
         private void XPoint_OnPreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            //todo add kontrola ci je v rozsahu
-            e.Handled = decimalNumber.IsMatch(e.Text);
+            Core.Utils.DoublePreviewCheck(sender, e);
         }
 
 
         private void YPoint_OnPreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            //todo add kontrola ci je v rozsahu
-            e.Handled = decimalNumber.IsMatch(e.Text);
+            Core.Utils.DoublePreviewCheck(sender, e);
         }
     }
 }
