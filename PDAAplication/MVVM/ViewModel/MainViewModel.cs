@@ -84,6 +84,51 @@ namespace PDAAplication.MVVM.ViewModel
             }
         }
 
+        private string _healthNehnutelnosti;
+
+        public string HealthNehnutelnosti
+        {
+            get
+            {
+                return "Zdravie stromu nehnutelnsti: " + _healthNehnutelnosti + "%";
+            }
+            set
+            {
+                _healthNehnutelnosti = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _healthParcela;
+
+        public string HealthParcela
+        {
+            get
+            {
+                return "Zdravie stromu parciel: " + _healthParcela + "%";
+            }
+            set
+            {
+                _healthParcela = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _healthJednotne;
+
+        public string HealthJednotne
+        {
+            get
+            {
+                return "Zdravie stromu zjednotených dát: " + _healthJednotne + "%";
+            }
+            set
+            {
+                _healthJednotne = value;
+                OnPropertyChanged();
+            }
+        }
+
 
 
         public MainViewModel()
@@ -153,7 +198,9 @@ namespace PDAAplication.MVVM.ViewModel
             //ListNehnutelnost = _listNehnutelnost;
             //ListParcela = _listParcela;
 
-
+            HealthJednotne = Math.Round(_quadTreeJednotne.Health * 100).ToString();
+            HealthNehnutelnosti = Math.Round(_quadTreeNehnutelnost.Health*100).ToString();
+            HealthParcela = Math.Round(_quadTreeParcela.Health * 100).ToString();
 
         }
 
@@ -276,6 +323,9 @@ namespace PDAAplication.MVVM.ViewModel
             _quadTreeNehnutelnost.Insert(checketGps1.X, checketGps1.Y, checketGps2.X, checketGps2.Y, tmpNehnutelnost);
             _quadTreeJednotne.Insert(checketGps1.X, checketGps1.Y, checketGps2.X, checketGps2.Y, tmpNehnutelnost);
             _allNehnutelnosti.Add(tmpNehnutelnost);
+
+            HealthNehnutelnosti = Math.Round(_quadTreeNehnutelnost.Health * 100).ToString();
+            HealthJednotne = Math.Round(_quadTreeJednotne.Health * 100).ToString();
         }
 
         private void ShowAll()
@@ -314,6 +364,9 @@ namespace PDAAplication.MVVM.ViewModel
             _quadTreeParcela = tmp[1];
             _quadTreeJednotne = tmp[2];
 
+            HealthJednotne = Math.Round(_quadTreeJednotne.Health * 100).ToString();
+            HealthNehnutelnosti = Math.Round(_quadTreeNehnutelnost.Health * 100).ToString();
+            HealthParcela = Math.Round(_quadTreeParcela.Health * 100).ToString();
         }
 
         private static double NextDouble(double min, double max, Random rnd)

@@ -44,6 +44,11 @@
             <MenuItem
                 Header="Zobraziť všetko"
                 Command="{Binding ShowAllComand}"/>
+            <MenuItem Header="Zdravie">
+                <MenuItem Header="{Binding HealthJednotne}"/>
+                <MenuItem Header="{Binding HealthNehnutelnosti}"/>
+                <MenuItem Header="{Binding HealthParcela}"/>
+            </MenuItem>
         </Menu>
         
         <Grid Grid.Row="1" Visibility="{Binding SplitViewShow}">
