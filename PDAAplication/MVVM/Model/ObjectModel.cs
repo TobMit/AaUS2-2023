@@ -19,6 +19,14 @@ namespace PDAAplication.MVVM.Model
 
         public Core.ObjectType ObjectType { get; set; }
 
+        public string Title
+        {
+            get
+            {
+                return (ObjectType == Core.ObjectType.Nehnutelnost ? "Nehnuteľnosť: " : "Parcela: ") + IdObjektu;
+            }
+        }
+
         public ObjectModel(int idObjektu, string pPopis, GPS pJuhoZapadnyBod, GPS pSeveroVychodnyBod, Core.ObjectType type)
         {
             IdObjektu = idObjektu;

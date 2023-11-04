@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Pridanie nehnuteľnosti"
         Height="350" 
-        Width="250"
+        Width="346"
         ResizeMode="CanResizeWithGrip"
         ShowInTaskbar="False"
         WindowStartupLocation="CenterOwner">
@@ -25,34 +25,75 @@
             Margin="5,0,5,0"
             TextAlignment="Left"
             Name="Popis" />
-        <Label>Juhozápadny Bod X</Label>
-        <TextBox
-            Text="1,0"
-            Margin="5,0,5,0"
-            TextAlignment="Right"
-            Name="xPoint"
-            PreviewTextInput="XPoint_OnPreviewTextInput" />
-        <Label>Juhozapadny Bod Y</Label>
-        <TextBox
-            Text="1,0"
-            Margin="5,0,5,0"
-            TextAlignment="Right"
-            Name="yPoint"
-            PreviewTextInput="YPoint_OnPreviewTextInput" />
-        <Label>Severovýchodny Bod X</Label>
-        <TextBox
-            Text="2,0"
-            Margin="5,0,5,0"
-            TextAlignment="Right"
-            Name="x2Point"
-            PreviewTextInput="XPoint_OnPreviewTextInput" />
-        <Label>Severovýchodny Bod Y</Label>
-        <TextBox
-            Text="2,0"
-            Margin="5,0,5,0"
-            TextAlignment="Right"
-            Name="y2Point"
-            PreviewTextInput="YPoint_OnPreviewTextInput" />
+        <Label>Šírka (X)</Label>
+        <StackPanel Orientation="Horizontal" >
+            <TextBox
+                Text="W"
+                Width="20"
+                Margin="5,0,5,0"
+                TextAlignment="Right"
+                Name="xOznacenie"
+                PreviewTextInput="XOznacenie_OnPreviewTextInput" />
+            <TextBox
+                Text="0,0"
+                Margin="5,0,5,0"
+                Width="290"
+                TextAlignment="Right"
+                Name="xPoint"
+                PreviewTextInput="XPoint_OnPreviewTextInput" />
+        </StackPanel>
+        <Label>Dĺžka (Y)</Label>
+        <StackPanel Orientation="Horizontal" >
+            <TextBox
+                Text="S"
+                Width="20"
+                Margin="5,0,5,0"
+                TextAlignment="Right"
+                Name="yOznacenie"
+                PreviewTextInput="YOznacenie_OnPreviewTextInput" />
+            <TextBox
+                Text="0,0"
+                Margin="5,0,5,0"
+                TextAlignment="Right"
+                Width="290"
+                Name="yPoint"
+                PreviewTextInput="YPoint_OnPreviewTextInput" />
+        </StackPanel>
+
+        <Label>Šírka (X)</Label>
+        <StackPanel Orientation="Horizontal" >
+            <TextBox
+                Text="E"
+                Width="20"
+                Margin="5,0,5,0"
+                TextAlignment="Right"
+                Name="x2Oznacenie"
+                PreviewTextInput="XOznacenie_OnPreviewTextInput" />
+            <TextBox
+                Text="0,0"
+                Margin="5,0,5,0"
+                Width="290"
+                TextAlignment="Right"
+                Name="x2Point"
+                PreviewTextInput="XPoint_OnPreviewTextInput" />
+        </StackPanel>
+        <Label>Dĺžka (Y)</Label>
+        <StackPanel Orientation="Horizontal" >
+            <TextBox
+                Text="N"
+                Width="20"
+                Margin="5,0,5,0"
+                TextAlignment="Right"
+                Name="y2Oznacenie"
+                PreviewTextInput="YOznacenie_OnPreviewTextInput" />
+            <TextBox
+                Text="0,0"
+                Margin="5,0,5,0"
+                TextAlignment="Right"
+                Width="290"
+                Name="y2Point"
+                PreviewTextInput="YPoint_OnPreviewTextInput" />
+        </StackPanel>
         
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5" >

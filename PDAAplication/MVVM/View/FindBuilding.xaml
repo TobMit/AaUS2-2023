@@ -11,14 +11,14 @@
         ShowInTaskbar="False"
         WindowStartupLocation="CenterOwner">
     <StackPanel Orientation="Vertical">
-        <Label>Bod X</Label>
+        <Label>Bod šírky (X)</Label>
         <TextBox
             Text="0,0"
             Margin="5,0,5,0"
             TextAlignment="Right"
             Name="xPoint"
             PreviewTextInput="XPoint_OnPreviewTextInput" />
-        <Label>Bod Y</Label>
+        <Label>Bod dĺžky (Y)</Label>
         <TextBox
             Text="0,0"
             Margin="5,0,5,0"

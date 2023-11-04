@@ -4,17 +4,20 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListViewItem">
-                    <TreeViewItem Header="{Binding Popis}">
+                    <TreeViewItem Header="{Binding Title}">
                         <TreeViewItem Header="Supisne cislo">
                             <TreeViewItem Header="{Binding IdObjektu}"/>
                         </TreeViewItem>
-                        <TreeViewItem Header="GPS - Juhozapadný bod">
-                            <TreeViewItem Header="{Binding JuhoZapadnyBod.X }"/>
-                            <TreeViewItem Header="{Binding JuhoZapadnyBod.Y }"/>
+                        <TreeViewItem Header="Popis nehnutelnosti">
+                            <TreeViewItem Header="{Binding Popis}"/>
                         </TreeViewItem>
-                        <TreeViewItem Header="GPS - Severovýchodný bod">
-                            <TreeViewItem Header="{Binding SeveroVychodnyBod.X }"/>
-                            <TreeViewItem Header="{Binding SeveroVychodnyBod.Y }"/>
+                        <TreeViewItem Header="GPS 1.">
+                            <TreeViewItem Header="{Binding JuhoZapadnyBod.XVypis }"/>
+                            <TreeViewItem Header="{Binding JuhoZapadnyBod.YVypis }"/>
+                        </TreeViewItem>
+                        <TreeViewItem Header="GPS 2.">
+                            <TreeViewItem Header="{Binding SeveroVychodnyBod.XVypis }"/>
+                            <TreeViewItem Header="{Binding SeveroVychodnyBod.YVypis }"/>
                         </TreeViewItem>
                         <TreeViewItem Header="Parcely na ktorych sa nachadza">
                             <ListView
@@ -33,17 +36,20 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="ListViewItem">
-                            <TreeViewItem Header="{Binding Popis}">
+                            <TreeViewItem Header="{Binding Title}">
                                 <TreeViewItem Header="CisloParcely">
                                     <TreeViewItem Header="{Binding IdObjektu}"/>
                                 </TreeViewItem>
-                                <TreeViewItem Header="GPS - Juhozapadný bod">
-                                    <TreeViewItem Header="{Binding JuhoZapadnyBod.X }"/>
-                                    <TreeViewItem Header="{Binding JuhoZapadnyBod.Y }"/>
+                                <TreeViewItem Header="Popis parcely">
+                                    <TreeViewItem Header="{Binding Popis}"/>
                                 </TreeViewItem>
-                                <TreeViewItem Header="GPS - Severovýchodný bod">
-                                    <TreeViewItem Header="{Binding SeveroVychodnyBod.X }"/>
-                                    <TreeViewItem Header="{Binding SeveroVychodnyBod.Y }"/>
+                                <TreeViewItem Header="GPS 1.">
+                                    <TreeViewItem Header="{Binding JuhoZapadnyBod.XVypis }"/>
+                                    <TreeViewItem Header="{Binding JuhoZapadnyBod.YVypis }"/>
+                                </TreeViewItem>
+                                <TreeViewItem Header="GPS 2.">
+                                    <TreeViewItem Header="{Binding SeveroVychodnyBod.XVypis }"/>
+                                    <TreeViewItem Header="{Binding SeveroVychodnyBod.YVypis }"/>
                                 </TreeViewItem>
                                 <TreeViewItem Header="Nehnutelnosti ktoré sa tam nachádzajú">
                                     <ListView

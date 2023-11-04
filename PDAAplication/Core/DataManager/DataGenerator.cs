@@ -30,8 +30,8 @@ namespace PDAAplication.Core.DataManager
                 
             for (int i = 0; i < pocetParciel; i++)
             {
-                GPS tmpGps1 = new(NextDouble(juhozapadneGps.X + 1, severovychodneGps.X - 3, rnd),
-                    NextDouble(juhozapadneGps.Y + 1, severovychodneGps.Y - 3, rnd));
+                GPS tmpGps1 = new(NextDouble(juhozapadneGps.X + 1, severovychodneGps.X - 3, rnd), 'W',
+                    NextDouble(juhozapadneGps.Y + 1, severovychodneGps.Y - 3, rnd), 'S');
 
                 // Druhú poziciu gps vypočítame tak že k prvej pozicií pripočítame náhodnú širku a výšku
                 // šírku a výšku vypočítame ako nahodne číslo medzi 1 pozíciou a minimom medzi (celková šírka /2, a šíkra k druhému bodu)
@@ -39,7 +39,7 @@ namespace PDAAplication.Core.DataManager
                 var tmpSirka = NextDouble(0, Math.Min(sirka * Constants.MAX_SIZE_OF_OBJCET_PERCENTAGE, severovychodneGps.X - 1 - tmpGps1.X), rnd);
                 var tmpViska = NextDouble(0, Math.Min(vyska * Constants.MAX_SIZE_OF_OBJCET_PERCENTAGE, severovychodneGps.Y - 1 - tmpGps1.Y), rnd);
 
-                GPS tmpGps2 = new(tmpGps1.X + tmpSirka, tmpGps1.Y + tmpViska);
+                GPS tmpGps2 = new(tmpGps1.X + tmpSirka,'E', tmpGps1.Y + tmpViska, 'N');
 
                 ObjectModel tmpParcela = new(i, "Parcela: " + i, tmpGps1, tmpGps2, Core.ObjectType.Parcela);
 
@@ -60,8 +60,8 @@ namespace PDAAplication.Core.DataManager
 
             for (int i = 0; i < pocetNehnutelnosti; i++)
             {
-                GPS tmpGps1 = new(NextDouble(juhozapadneGps.X + 1, severovychodneGps.X - 3, rnd),
-                    NextDouble(juhozapadneGps.Y + 1, severovychodneGps.Y - 3, rnd));
+                GPS tmpGps1 = new(NextDouble(juhozapadneGps.X + 1, severovychodneGps.X - 3, rnd), 'W',
+                    NextDouble(juhozapadneGps.Y + 1, severovychodneGps.Y - 3, rnd), 'S');
 
                 // Druhú poziciu gps vypočítame tak že k prvej pozicií pripočítame náhodnú širku a výšku
                 // šírku a výšku vypočítame ako nahodne číslo medzi 1 pozíciou a minimom medzi (celková šírka /2, a šíkra k druhému bodu)
@@ -69,7 +69,7 @@ namespace PDAAplication.Core.DataManager
                 var tmpSirka = NextDouble(0, Math.Min(sirka * Constants.MAX_SIZE_OF_OBJCET_PERCENTAGE, severovychodneGps.X - 1 - tmpGps1.X), rnd);
                 var tmpViska = NextDouble(0, Math.Min(vyska * Constants.MAX_SIZE_OF_OBJCET_PERCENTAGE, severovychodneGps.Y - 1 - tmpGps1.Y), rnd);
 
-                GPS tmpGps2 = new(tmpGps1.X + tmpSirka, tmpGps1.Y + tmpViska);
+                GPS tmpGps2 = new(tmpGps1.X + tmpSirka, 'E', tmpGps1.Y + tmpViska, 'N');
 
                 ObjectModel tmpNehnutelnost = new(i, "Nehnuteľnosť: " + i, tmpGps1, tmpGps2, Core.ObjectType.Nehnutelnost);
                 var tmpListParciel = parcelyQuadTree.FindOverlapingData(tmpNehnutelnost.JuhoZapadnyBod.X, tmpNehnutelnost.JuhoZapadnyBod.Y,
