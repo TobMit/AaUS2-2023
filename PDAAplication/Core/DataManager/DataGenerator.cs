@@ -27,6 +27,8 @@ namespace PDAAplication.Core.DataManager
 
             var sirka = Math.Abs(severovychodneGps.X - juhozapadneGps.X);
             var vyska = Math.Abs(severovychodneGps.Y - juhozapadneGps.Y);
+
+            int count = 0;
                 
             for (int i = 0; i < pocetParciel; i++)
             {
@@ -41,7 +43,7 @@ namespace PDAAplication.Core.DataManager
 
                 GPS tmpGps2 = new(tmpGps1.X + tmpSirka,'E', tmpGps1.Y + tmpViska, 'N');
 
-                ObjectModel tmpParcela = new(i, "Parcela: " + i, tmpGps1, tmpGps2, Core.ObjectType.Parcela);
+                ObjectModel tmpParcela = new(count, "Parcela: " + count, tmpGps1, tmpGps2, Core.ObjectType.Parcela);
 
                 parcelyQuadTree.Insert(tmpGps1.X, tmpGps1.Y, tmpGps2.X, tmpGps2.Y, tmpParcela);
                 jednotneQuadTree.Insert(tmpGps1.X, tmpGps1.Y, tmpGps2.X, tmpGps2.Y, tmpParcela);
@@ -51,6 +53,8 @@ namespace PDAAplication.Core.DataManager
                 {
                     observableCollectionParcely.Add(tmpParcela);
                 }
+
+                count++;
             }
             // Budeme postupne generovať nehnuteľnosti
             // pre každú nehnuteľnosť zýskame všetky parcely, ktoré ju obsahujú
@@ -71,7 +75,7 @@ namespace PDAAplication.Core.DataManager
 
                 GPS tmpGps2 = new(tmpGps1.X + tmpSirka, 'E', tmpGps1.Y + tmpViska, 'N');
 
-                ObjectModel tmpNehnutelnost = new(i, "Nehnuteľnosť: " + i, tmpGps1, tmpGps2, Core.ObjectType.Nehnutelnost);
+                ObjectModel tmpNehnutelnost = new(count, "Nehnuteľnosť: " + count, tmpGps1, tmpGps2, Core.ObjectType.Nehnutelnost);
                 var tmpListParciel = parcelyQuadTree.FindOverlapingData(tmpNehnutelnost.GpsBod1.X, tmpNehnutelnost.GpsBod1.Y,
                     tmpNehnutelnost.GpsBod2.X, tmpNehnutelnost.GpsBod2.Y);
                 foreach (ObjectModel parcela in tmpListParciel)
@@ -88,6 +92,8 @@ namespace PDAAplication.Core.DataManager
                 {
                     observableCollectionNehnutelnosti.Add(tmpNehnutelnost);
                 }
+
+                count++;
             }
 
             //observableCollectionNehnutelnosti = new ObservableCollection<ObjectModel>(nehnutelnostiList);

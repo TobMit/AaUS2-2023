@@ -5,14 +5,38 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualBasic.CompilerServices;
+using PDAAplication.Core;
 using PDAAplication.Interface;
 
 namespace PDAAplication.MVVM.Model
 {
-    public class ObjectModel: ISavable, IComparable<int>
+    public class ObjectModel: ObservableObjects, ISavable, IComparable<int>
     {
-        public int IdObjektu { get; set; }
-        public string Popis { get; set; }
+        private int _idObjektu;
+        private string _popis;
+
+        public int IdObjektu
+        {
+            get => _idObjektu;
+            set
+            {
+                if (value == _idObjektu) return;
+                _idObjektu = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string Popis
+        {
+            get => _popis;
+            set
+            {
+                if (value == _popis) return;
+                _popis = value;
+                OnPropertyChanged();
+            }
+        }
+
         public GPS GpsBod1 { get; set; }
         public GPS GpsBod2 { get; set; }
         public ObservableCollection<ObjectModel> ZoznamObjektov { get; set; }

@@ -28,6 +28,7 @@ namespace PDAAplication.MVVM.ViewModel
         public RelayCommand FindObjectCommand { get; set; }
         public RelayCommand AddBuildingCommand { get; set; }
         public RelayCommand AddParcelaCommand { get; set; }
+        public RelayCommand EditCommand { get; set; }
         public RelayCommand ShowAllComand { get; set; }
         public RelayCommand SaveDataCommand { get; set; }
         public RelayCommand LoadDataCommand { get; set; }
@@ -150,6 +151,11 @@ namespace PDAAplication.MVVM.ViewModel
             FindObjectCommand = new RelayCommand(o => { FindObject(); });
             AddBuildingCommand = new RelayCommand(o => { AddBuilding(); });
             AddParcelaCommand = new RelayCommand(o => { AddParcela(); });
+            EditCommand = new RelayCommand(o =>
+            {
+                var tmp = (ObjectModel)o;
+                EditObject(tmp);
+            });
             ShowAllComand = new RelayCommand(o => { ShowAll(); });
             SaveDataCommand = new RelayCommand(o => { SaveData(); });
             LoadDataCommand = new RelayCommand(o => { LoadData(); });
@@ -312,8 +318,8 @@ namespace PDAAplication.MVVM.ViewModel
             bool cancel = true;
             if (dlg.DialogResult == true)
             {
-                dlgGps1 = new(Math.Round(dlg.x), dlg.xOz, Math.Round(dlg.y), dlg.yOz);
-                dlgGps2 = new(Math.Round(dlg.x2), dlg.x2Oz, Math.Round(dlg.y2), dlg.y2Oz);
+                dlgGps1 = new(dlg.x, dlg.xOz, dlg.y, dlg.yOz);
+                dlgGps2 = new(dlg.x2, dlg.x2Oz, dlg.y2, dlg.y2Oz);
                 popis = dlg.popis;
                 idCislo = dlg.IdCislo;
                 cancel = false;
@@ -373,8 +379,8 @@ namespace PDAAplication.MVVM.ViewModel
             bool cancel = true;
             if (dlg.DialogResult == true)
             {
-                dlgGps1 = new(Math.Round(dlg.x), dlg.xOz, Math.Round(dlg.y), dlg.yOz);
-                dlgGps2 = new(Math.Round(dlg.x2), dlg.x2Oz, Math.Round(dlg.y2), dlg.y2Oz);
+                dlgGps1 = new(dlg.x, dlg.xOz, dlg.y, dlg.yOz);
+                dlgGps2 = new(dlg.x2, dlg.x2Oz, dlg.y2, dlg.y2Oz);
                 popis = dlg.popis;
                 idCislo = dlg.IdCislo;
                 cancel = false;
@@ -411,7 +417,129 @@ namespace PDAAplication.MVVM.ViewModel
             _quadTreeJednotne.Insert(checketGps1.X, checketGps1.Y, checketGps2.X, checketGps2.Y, tmpNehnutelnost);
             _allParcelas.Add(tmpNehnutelnost);
 
-            HealthParcela = Math.Round(_quadTreeNehnutelnost.Health * 100).ToString();
+            HealthParcela = Math.Round(_quadTreeParcela.Health * 100).ToString();
+            HealthJednotne = Math.Round(_quadTreeJednotne.Health * 100).ToString();
+        }
+
+        private void EditObject(ObjectModel objectModel)
+        {
+            var dlg = new EditObject(objectModel);
+            dlg.ShowDialog();
+            GPS dlgGpsOfiginal1 = new GPS(objectModel.GpsBod1);
+            GPS dlgGpsOriginal2 = new GPS(objectModel.GpsBod2);
+            int originalID = objectModel.IdObjektu;
+            GPS dlgGps1 = new GPS();
+            GPS dlgGps2 = new GPS();
+            string popis = "";
+            int idCislo = 0;
+            bool cancel = true;
+            if (dlg.DialogResult == true)
+            {
+                dlgGps1 = new(dlg.x, dlg.xOz, dlg.y, dlg.yOz);
+                dlgGps2 = new(dlg.x2, dlg.x2Oz, dlg.y2, dlg.y2Oz);
+                popis = dlg.popis;
+                idCislo = dlg.IdCislo;
+                cancel = false;
+            }
+
+            if (cancel)
+            {
+                return;
+            }
+            
+            //naplníme dáta do modelu
+            objectModel.IdObjektu = idCislo;
+            objectModel.Popis = popis;
+            
+            // skontrolujeme či sa zmenili gps súradnice
+            if (dlgGpsOfiginal1 == dlgGps1 && dlgGpsOriginal2 == dlgGps2)
+            {
+                return;
+            }
+            // zmenili sa skontrolujeme či sú nové súradnice ok
+
+            GPS checketGps1 = new GPS();
+            GPS checketGps2 = new GPS();
+
+            if (!Core.Utils.CheckAndRecalculateGps(dlgGps1, dlgGps2, checketGps1, checketGps2))
+            {
+                MessageBox.Show("Nie je možné zmeniť súradnice, chybný vstup.", "Chyba vstupu", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            // kontrolujem či sa môžu zmeniť súradnice
+
+            if (!_quadTreeJednotne.QuadTreeCanContain(checketGps1.X, checketGps1.Y, checketGps2.X, checketGps2.Y))
+            {
+                MessageBox.Show("Nie je možné zmeniť súradnice, zlý rozsah.", "Chyba vstupu", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            objectModel.GpsBod1 = checketGps1;
+            objectModel.GpsBod2 = checketGps2;
+
+            // musím zmazať zo všetkých parciel záznam na tento objekt
+            foreach (ObjectModel parcela in objectModel.ZoznamObjektov)
+            {
+                parcela.ZoznamObjektov.Remove(objectModel);
+            }
+
+            // vymažem sa z oboch stromov
+            _quadTreeJednotne.Delete(dlgGpsOfiginal1.X, dlgGpsOfiginal1.Y, dlgGpsOriginal2.X, dlgGpsOriginal2.Y,
+                originalID);
+            if (objectModel.ObjectType == ObjectType.Nehnutelnost)
+            {
+                _quadTreeNehnutelnost.Delete(dlgGpsOfiginal1.X, dlgGpsOfiginal1.Y, dlgGpsOriginal2.X, dlgGpsOriginal2.Y,
+                    originalID);
+            }
+            else
+            {
+                _quadTreeParcela.Delete(dlgGpsOfiginal1.X, dlgGpsOfiginal1.Y, dlgGpsOriginal2.X, dlgGpsOriginal2.Y,
+                    originalID);
+            }
+
+            _quadTreeJednotne.Delete(dlgGpsOfiginal1.X, dlgGpsOfiginal1.Y, dlgGpsOriginal2.X, dlgGpsOriginal2.Y,
+                originalID);
+            objectModel.ZoznamObjektov.Clear();
+
+            // teraz postupujem ako pri vytváraní nového objektu
+            // nájdem overlaping objekty, seba tam pridám a na záver pridám aj seba do oboch stromov
+
+            List<ObjectModel> tmpListOverlapingData;
+
+            if (objectModel.ObjectType == ObjectType.Nehnutelnost)
+            {
+                tmpListOverlapingData = _quadTreeParcela.FindOverlapingData(checketGps1.X, checketGps1.Y, checketGps2.X, checketGps2.Y);
+            }
+            else
+            {
+                tmpListOverlapingData = _quadTreeNehnutelnost.FindOverlapingData(checketGps1.X, checketGps1.Y, checketGps2.X, checketGps2.Y);
+            }
+
+            foreach (ObjectModel model in tmpListOverlapingData)
+            {
+                objectModel.ZoznamObjektov.Add(model);
+                model.ZoznamObjektov.Add(objectModel);
+            }
+
+            if (objectModel.ObjectType == ObjectType.Nehnutelnost)
+            {
+                _quadTreeNehnutelnost.Insert(checketGps1.X, checketGps1.Y, checketGps2.X, checketGps2.Y, objectModel);
+                _listNehnutelnost = new(_quadTreeNehnutelnost.ToList());
+                ListNehnutelnost =
+                    new(_allNehnutelnosti.GetRange(0, _allNehnutelnosti.Count > 500 ? 500 : _allNehnutelnosti.Count));
+            }
+            else
+            {
+                _quadTreeParcela.Insert(checketGps1.X, checketGps1.Y, checketGps2.X, checketGps2.Y, objectModel);
+                _listParcela = new(_quadTreeNehnutelnost.ToList());
+                ListParcela =
+                    new(_allParcelas.GetRange(0, _allParcelas.Count > 500 ? 500 : _allParcelas.Count));
+            }
+            _quadTreeJednotne.Insert(checketGps1.X, checketGps1.Y, checketGps2.X, checketGps2.Y, objectModel);
+
+            HealthParcela = Math.Round(_quadTreeParcela.Health * 100).ToString();
+            HealthNehnutelnosti = Math.Round(_quadTreeNehnutelnost.Health * 100).ToString();
             HealthJednotne = Math.Round(_quadTreeJednotne.Health * 100).ToString();
         }
 

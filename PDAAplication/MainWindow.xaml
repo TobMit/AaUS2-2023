@@ -74,7 +74,8 @@
                         VerticalAlignment="Stretch"
                         KeyboardNavigation.ControlTabNavigation="none"
                         FocusVisualStyle="{x:Null}"
-                        BorderThickness="0"/>
+                        BorderThickness="0"
+                        x:Name="ListViewNehnutelnost"/>
                 </TreeView>
 
             </Border>
@@ -89,7 +90,8 @@
                         VerticalAlignment="Stretch"
                         KeyboardNavigation.ControlTabNavigation="none"
                         FocusVisualStyle="{x:Null}"
-                        BorderThickness="0"/>
+                        BorderThickness="0"
+                        x:Name="ListViewParcela"/>
                 </TreeView>
 
             </Border>
@@ -104,7 +106,8 @@
                     VerticalAlignment="Stretch"
                     KeyboardNavigation.ControlTabNavigation="none"
                     FocusVisualStyle="{x:Null}"
-                    BorderThickness="0"/>
+                    BorderThickness="0"
+                    x:Name="ListViewAll"/>
             </TreeView>
         </Grid>
 
