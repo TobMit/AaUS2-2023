@@ -23,7 +23,7 @@ namespace PDAAplication.Core.DataManager
             int pocetNehnutelnosti,
             int pocetParciel)
         {
-            Random rnd = new Random(0);
+            Random rnd = new Random();
 
             var sirka = Math.Abs(gps2.X - gps1.X);
             var vyska = Math.Abs(gps2.Y - gps1.Y);

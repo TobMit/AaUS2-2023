@@ -235,6 +235,7 @@ namespace PDAAplication.MVVM.ViewModel
             {
                 return;
             }
+            ChangeView(true);
             ListNehnutelnost = new ObservableCollection<ObjectModel>(_quadTreeNehnutelnost.FindIntervalOverlapping(gps1.X, gps1.Y, gps2.X, gps2.Y));
             ListParcela = new();
         }
@@ -261,6 +262,7 @@ namespace PDAAplication.MVVM.ViewModel
             {
                 return;
             }
+            ChangeView(true);
             ListParcela = new ObservableCollection<ObjectModel>(_quadTreeParcela.FindIntervalOverlapping(gps1.X, gps1.Y, gps2.X, gps2.Y));
             ListNehnutelnost = new();
         }
@@ -288,8 +290,6 @@ namespace PDAAplication.MVVM.ViewModel
                 return;
             }
 
-            ChangeView(false);
-
             GPS checkedGps1 = new GPS();
             GPS checkedGps2 = new GPS();
 
@@ -298,6 +298,7 @@ namespace PDAAplication.MVVM.ViewModel
                 MessageBox.Show("Zle zadaný vstup!", "Chyba vstupu", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
+            ChangeView(false);
 
             ListParcela = new ObservableCollection<ObjectModel>(_quadTreeJednotne.FindIntervalOverlapping(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y));
         }
