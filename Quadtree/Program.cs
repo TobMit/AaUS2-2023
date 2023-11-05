@@ -8,7 +8,7 @@ using Quadtree.StructureClasses.Node;
 public class Program
 {
     private static bool parallel = true; // pri paralelnom testovaní treba dať max seed na nejaké rozumné číslo (napr. 30)aby program skončil v nejakom rozumnom čase, keby bolo nejaké veľké číslo, tak sa NET snaží najskôr naplánovať všetky úlohy a potom ich spúšťa, a to pri veľkom množstve už trvá dlho.
-    private static bool testForProfiler = false;
+    private static bool testForProfiler = true;
     
     private static int MAX_UNITS = 1000000;
     private static int MAX_TEST = 100000;
@@ -17,9 +17,9 @@ public class Program
     private static double PROBABILITY_DEPTH = 0.0001;
     private static double FILL_PROBABILITY = 0.3;
     private static double MAX_SIZE_OF_OBJECT_PERCENTAGE = 0.25;
-    private static int STARTUP_FILL_COUNT = 11000;
+    private static int STARTUP_FILL_COUNT = 12000;
     
-    private static int OPERATION_COUNT = 10000;
+    private static int OPERATION_COUNT = 20000;
     private static bool OPTIMALIZATION_ON = true;
         
     private static int latestLowest = int.MaxValue;
@@ -285,7 +285,7 @@ public class Program
         double MIN_Y = 0;
         double MAX_Y = 100;
         
-        Random rnd = new Random(0);
+        Random rnd = new Random();
         QuadTree<int, int> quadTree = new(0.0, 0.0, 100.0, 100.0);
         
         List<int> toInsert = new(MAX_UNITS);
@@ -301,7 +301,7 @@ public class Program
         for (int i = 0; i < STARTUP_FILL_COUNT; i++)
         {
             double x = NextDouble(MIN_X, MAX_X-2, rnd);
-            double y = NextDouble(MIN_Y, MAX_Y-2, rnd);
+            double y = NextDouble(MAX_Y / 2, MAX_Y-2, rnd); // aby som napĺňal iba hornú polovicu
             var tmpSirka = NextDouble(0, Math.Min(Math.Abs(MAX_X - MIN_X) * MAX_SIZE_OF_OBJECT_PERCENTAGE, MAX_X - 1 - x), rnd);
             var tmpViska = NextDouble(0, Math.Min(Math.Abs(MAX_Y - MIN_Y) * MAX_SIZE_OF_OBJECT_PERCENTAGE, MAX_Y - 1 - y), rnd);
             double x2 = x + tmpSirka;
@@ -315,15 +315,19 @@ public class Program
                     
             quadTree.Insert(x, y, x2, y2, value);
         }
-
+        
+        Console.WriteLine("Zdravie na začiatku: " + quadTree.Health);
         if (OPTIMALIZATION_ON)
         {
             quadTree.OptimalizationOn = true;
             quadTree.Optimalise(true);
+            quadTree.OptimalizationOn = false;
+            Console.WriteLine("Zdravie po optimalizácií: " + quadTree.Health);
         }
         
         
         MakeTest(MIN_X, MAX_X, rnd, MIN_Y, MAX_Y, toInsert, toDelete, quadTree);
+        Console.WriteLine("Zdravie po teste: " + quadTree.Health);
         
         
     }
@@ -356,6 +360,7 @@ public class Program
             }
             else
             {
+                // ideme mazať
                 int index = rnd.Next(0, toDelete.Count);
                 var value = toDelete[index];
                 toDelete.RemoveAt(index);

@@ -540,7 +540,6 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
             newRoot = true;
             
             // ak je sever menší ako juh posunieme Pravé horné y dole, môže ale nastať situácia že y by bolo menšie ako pôvodné
-            // ale musíme dbať na to aby sa neprekročili max hranice štruktúry
             // tým pádom nastavíme pôvodné Y a posunieme pravé dolné y smerom dolu
             
             // takže ak je percentuálne obsadenie severu a juhu väčšie ako 40% tak pravé horné y posunieme o 10 % hore
