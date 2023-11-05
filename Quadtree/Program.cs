@@ -24,7 +24,7 @@ public class Program
         
     private static int lastestLovest = int.MaxValue;
     private static int seed = 0;
-    private static int maxSeed = 30;
+    private static int maxSeed = 20;
     // private static int maxSeed = int.MaxValue;
     public static void Main()
     {

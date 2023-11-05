@@ -544,6 +544,7 @@ namespace PDAAplication.MVVM.ViewModel
             HealthParcela = Math.Round(_quadTreeParcela.Health * 100).ToString();
             HealthNehnutelnosti = Math.Round(_quadTreeNehnutelnost.Health * 100).ToString();
             HealthJednotne = Math.Round(_quadTreeJednotne.Health * 100).ToString();
+            ChangeView(true);
         }
 
         private void DeleteObject(ObjectModel objectModel)
@@ -554,18 +555,23 @@ namespace PDAAplication.MVVM.ViewModel
                 parcela.ZoznamObjektov.Remove(objectModel);
             }
 
+            GPS checketGps1 = new GPS();
+            GPS checketGps2 = new GPS();
+
+            Core.Utils.CheckAndRecalculateGps(objectModel.GpsBod1, objectModel.GpsBod2, checketGps1, checketGps2);
+
             // vymažem sa z oboch stromov
             if (objectModel.ObjectType == ObjectType.Nehnutelnost)
             {
-                _quadTreeNehnutelnost.Delete(objectModel.GpsBod1.X, objectModel.GpsBod1.Y, objectModel.GpsBod2.X, objectModel.GpsBod2.Y,
+                _quadTreeNehnutelnost.Delete(checketGps1.X, checketGps1.Y, checketGps2.X, checketGps2.Y,
                     objectModel.IdObjektu);
             }
             else
             {
-                _quadTreeParcela.Delete(objectModel.GpsBod1.X, objectModel.GpsBod1.Y, objectModel.GpsBod2.X, objectModel.GpsBod2.Y, objectModel.IdObjektu);
+                _quadTreeParcela.Delete(checketGps1.X, checketGps1.Y, checketGps2.X, checketGps2.Y, objectModel.IdObjektu);
             }
 
-            _quadTreeJednotne.Delete(objectModel.GpsBod1.X, objectModel.GpsBod1.Y, objectModel.GpsBod2.X, objectModel.GpsBod2.Y, objectModel.IdObjektu);
+            _quadTreeJednotne.Delete(checketGps1.X, checketGps1.Y, checketGps2.X, checketGps2.Y, objectModel.IdObjektu);
             objectModel.ZoznamObjektov.Clear();
 
             if (objectModel.ObjectType == ObjectType.Nehnutelnost)
@@ -580,7 +586,10 @@ namespace PDAAplication.MVVM.ViewModel
                 ListParcela =
                     new(_allParcelas.GetRange(0, _allParcelas.Count > 500 ? 500 : _allParcelas.Count)); // zobrazíme len prvých 500 (aby UI išlo normálne a nesekalo sa)
             }
+
+            ChangeView(true);
         }
+
 
         private void ShowAll()
         {
