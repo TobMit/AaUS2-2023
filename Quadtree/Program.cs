@@ -24,8 +24,8 @@ public class Program
         
     private static int latestLowest = int.MaxValue;
     private static int seed = 0;
-    private static int maxSeed = 30;
-    // private static int maxSeed = int.MaxValue;
+    // private static int maxSeed = 300;
+    private static int maxSeed = int.MaxValue;
     public static void Main()
     {
         if (!testForProfiler)

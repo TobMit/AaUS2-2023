@@ -1,0 +1,171 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="PDAAplication.Core.DataManager.FileManager.DataLoader">
+    <Position X="11.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAA=</HashCode>
+      <FileName>Core\DataManager\FileManager\DataLoader.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PDAAplication.Core.DataManager.FileManager.DataSaver&lt;T&gt;">
+    <Position X="13" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAAAAAAAAAAAAAAAAAQQAAAIAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\DataManager\FileManager\DataSaver.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PDAAplication.Core.DataManager.DataGenerator">
+    <Position X="14.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACIA=</HashCode>
+      <FileName>Core\DataManager\DataGenerator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PDAAplication.Core.Constants">
+    <Position X="13" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\Constants.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PDAAplication.Core.ObservableObjects">
+    <Position X="6" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAIAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\ObservableObjects.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PDAAplication.Core.RelayCommand" BaseTypeListCollapsed="true">
+    <Position X="9.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEACAAQAAECAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\RelayCommand.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="PDAAplication.Core.Utils">
+    <Position X="11.25" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAABQAAAIAAAARAAAAAAAAAAAAAAAAAAEAI=</HashCode>
+      <FileName>Core\Utils.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PDAAplication.MVVM.Model.GPS" BaseTypeListCollapsed="true">
+    <Position X="13" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAgAAAAAQgAAAAAAAAEAAAAAAAAAAAAAAYiA=</HashCode>
+      <FileName>MVVM\Model\GPS.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="PDAAplication.MVVM.Model.ObjectModel">
+    <Position X="5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAAEQQATAAAAQAAAAAAQAAAIAAAAAAAAA=</HashCode>
+      <FileName>MVVM\Model\ObjectModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PDAAplication.MVVM.View.AddObject" BaseTypeListCollapsed="true">
+    <Position X="11.25" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIDQAACAAAAAUCIAAAAAAwAAgAQQAABgAAAAAAA=</HashCode>
+      <FileName>MVVM\View\AddObject.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="PDAAplication.MVVM.View.DataGeneratorDialog" BaseTypeListCollapsed="true">
+    <Position X="9.25" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAQBAAAAAAAACIACAAAAAAAAABQAABgAAAAAAA=</HashCode>
+      <FileName>MVVM\View\DataGeneratorDialog.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="PDAAplication.MVVM.View.EditObject" BaseTypeListCollapsed="true">
+    <Position X="14.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIDQAACAAAAAUCIAAAAAAwAAgAQQAABgAAAAAAA=</HashCode>
+      <FileName>MVVM\View\EditObject.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="PDAAplication.MVVM.View.FindObject" BaseTypeListCollapsed="true">
+    <Position X="9.25" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAAAAAAAAACIAAAAAAAAAAAAAAABgAAAAAAA=</HashCode>
+      <FileName>MVVM\View\FindObject.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="PDAAplication.MVVM.View.FindObjects" BaseTypeListCollapsed="true">
+    <Position X="11.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAADQAACAAAAAQCIAAAAAAwAAgAQAAABgAAAAAAA=</HashCode>
+      <FileName>MVVM\View\FindObjects.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="PDAAplication.MVVM.ViewModel.MainViewModel">
+    <Position X="7" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACGGABACBAgRQkEAgCJAAgA4A4AiEIQBQTIHAIAAEKA=</HashCode>
+      <FileName>MVVM\ViewModel\MainViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PDAAplication.App">
+    <Position X="11.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>App.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PDAAplication.MainWindow" BaseTypeListCollapsed="true">
+    <Position X="14.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MainWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Quadtree.StructureClasses.HelperClass.PointD">
+    <Position X="16.75" Y="0.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Quadtree.StructureClasses.Node.QuadTreeNode&lt;TKey, TValue&gt;">
+    <Position X="21.75" Y="0.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Quadtree.StructureClasses.Node.QuadTreeNodeData&lt;TKey, TValue&gt;">
+    <Position X="22.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Quadtree.StructureClasses.Node.QuadTreeNodeLeaf&lt;TKey, TValue&gt;">
+    <Position X="20.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Quadtree.StructureClasses.QuadTree&lt;TKey, TValue&gt;">
+    <Position X="18.5" Y="3" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Program">
+    <Position X="18.5" Y="0.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Interface Name="PDAAplication.Interface.ISavable">
+    <Position X="9.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Interface\ISavable.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="PDAAplication.Core.ObjectType">
+    <Position X="9.25" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\Constants.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
