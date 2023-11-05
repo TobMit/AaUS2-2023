@@ -47,7 +47,7 @@ public class Optimalisation
         
         Assert.That(quadTree.Count, Is.EqualTo(quadTree.Recount()));
 
-        // budem generovať dáta v dolnej polovičke aby som vynutil optimalizáciou posun dole
+        // budem generovať dáta v dolnej polovičke aby som vynútil optimalizáciou posun dole
         quadTree.OptimalizationOn = false;
         for (int i = 0; i < 10000; i++)
         {
@@ -160,7 +160,7 @@ public class Optimalisation
         
         Assert.That(quadTree.Count, Is.EqualTo(quadTree.Recount()));
 
-        // budem generovať dáta v dolnej polovičke aby som vynutil optimalizáciou posun dole
+        // budem generovať dáta v dolnej polovičke aby som vynútil optimalizáciou posun dole
         quadTree.OptimalizationOn = false;
         for (int i = 0; i < 10000; i++)
         {

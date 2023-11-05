@@ -5,10 +5,10 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ListViewItem">
                     <TreeViewItem Header="{Binding Title}">
-                        <TreeViewItem Header="Supisne cislo">
+                        <TreeViewItem Header="Súpisné číslo">
                             <TreeViewItem Header="{Binding IdObjektu}"/>
                         </TreeViewItem>
-                        <TreeViewItem Header="Popis nehnutelnosti">
+                        <TreeViewItem Header="Popis nehnuteľností">
                             <TreeViewItem Header="{Binding Popis}"/>
                         </TreeViewItem>
                         <TreeViewItem Header="GPS 1.">
@@ -19,7 +19,7 @@
                             <TreeViewItem Header="{Binding GpsBod2.XVypis }"/>
                             <TreeViewItem Header="{Binding GpsBod2.YVypis }"/>
                         </TreeViewItem>
-                        <TreeViewItem Header="Parcely na ktorych sa nachadza">
+                        <TreeViewItem Header="Parcely na ktorých sa nachádza">
                             <ListView
                                 ItemsSource="{Binding ZoznamObjektov}"
                                 ItemContainerStyle="{StaticResource ObjectTheme}"
@@ -50,7 +50,7 @@
                     <Setter.Value>
                         <ControlTemplate TargetType="ListViewItem">
                             <TreeViewItem Header="{Binding Title}">
-                                <TreeViewItem Header="CisloParcely">
+                                <TreeViewItem Header="Číslo Parcely">
                                     <TreeViewItem Header="{Binding IdObjektu}"/>
                                 </TreeViewItem>
                                 <TreeViewItem Header="Popis parcely">
@@ -64,7 +64,7 @@
                                     <TreeViewItem Header="{Binding GpsBod2.XVypis }"/>
                                     <TreeViewItem Header="{Binding GpsBod2.YVypis }"/>
                                 </TreeViewItem>
-                                <TreeViewItem Header="Nehnutelnosti ktoré sa tam nachádzajú">
+                                <TreeViewItem Header="Nehnuteľnosti ktoré sa tam nachádzajú">
                                     <ListView
                                         ItemsSource="{Binding ZoznamObjektov}"
                                         ItemContainerStyle="{StaticResource ObjectTheme}"

@@ -26,28 +26,28 @@
             TextAlignment="Right"
             Name="Nehnutelnosti"
             PreviewTextInput="UIElement_OnPreviewTextInput" />
-        <Label>Juhozápadny Bod X</Label>
+        <Label>Bod X</Label>
         <TextBox
             Text="0,0"
             Margin="5,0,5,0"
             TextAlignment="Right"
             Name="xPoint"
             PreviewTextInput="XPoint_OnPreviewTextInput" />
-        <Label>Juhozapadny Bod Y</Label>
+        <Label>Bod Y</Label>
         <TextBox
             Text="0,0"
             Margin="5,0,5,0"
             TextAlignment="Right"
             Name="yPoint"
             PreviewTextInput="YPoint_OnPreviewTextInput" />
-        <Label>SirkaX</Label>
+        <Label>Sirka (X)</Label>
         <TextBox
             Text="50"
             Margin="5,0,5,0"
             TextAlignment="Right"
             Name="Sikra"
             PreviewTextInput="UIElement_OnPreviewTextInput" />
-        <Label>DlzkaY</Label>
+        <Label>Dĺžka (Y)</Label>
         <TextBox
             Text="50"
             Margin="5,0,5,0"

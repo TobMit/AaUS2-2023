@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PDAAplication"
         xmlns:viewModel="clr-namespace:PDAAplication.MVVM.ViewModel"
         mc:Ignorable="d"
-        Title="PDA Aplication" Height="600" Width="900">
+        Title="PDA Application" Height="600" Width="900">
     <Window.DataContext>
         <viewModel:MainViewModel />
     </Window.DataContext>
@@ -20,7 +20,7 @@
             <MenuItem 
                 Header="Vygenerovať dáta"
                 Command="{Binding GenerateDataCommand}"/>
-            <MenuItem Header="Najsť">
+            <MenuItem Header="Hľadať">
                 <MenuItem 
                     Header="Vyhľadanie nehnuteľnosti"
                     Command="{Binding FindBuildingsCommand}"/>
@@ -31,25 +31,25 @@
                     Header="Vyhľadanie objektov"
                     Command="{Binding FindObjectCommand}"/>
             </MenuItem>
-            <MenuItem Header="Pridavanie objektov">
+            <MenuItem Header="Pridávanie objektov">
                 <MenuItem 
-                    Header="Pridanie nehnutelnosti"
+                    Header="Pridanie nehnuteľnosti"
                     Command="{Binding AddBuildingCommand}"/>
                 <MenuItem 
                     Header="Pridanie parcely"
                     Command="{Binding AddParcelaCommand}"/>
             </MenuItem>
-            <MenuItem Header="Save">
+            <MenuItem Header="Súbor">
                 <MenuItem 
-                    Header="Save as"
+                    Header="Uložiť dáta"
                     Command="{Binding SaveDataCommand}"/>
                 <MenuItem
-                    Header="Load data"
+                    Header="Načítať dáta"
                     Command="{Binding LoadDataCommand}"/>
             </MenuItem>
             <MenuItem
                 Header="Zobraziť všetko"
-                Command="{Binding ShowAllComand}"/>
+                Command="{Binding ShowAllCommand}"/>
             <MenuItem Header="Zdravie">
                 <MenuItem Header="{Binding HealthJednotne}"/>
                 <MenuItem Header="{Binding HealthNehnutelnosti}"/>

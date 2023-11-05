@@ -17,21 +17,33 @@ namespace PDAAplication.Core
         private static Regex xCooridate = new Regex(@"^[WwEe]$");
         private static Regex yCooridate = new Regex(@"^[SsNn]$");
 
+        /// <summary>
+        /// Kontrola či je zadané dobre des číslo
+        /// </summary>
         public static void DoublePreviewCheck(object sender, TextCompositionEventArgs e)
         {
             e.Handled = !decimalNumber.IsMatch(e.Text);
         }
 
+        /// <summary>
+        /// Kontrola či je zadané dobre des číslo
+        /// </summary>
         public static void NumaberPreviewCheck(object sender, TextCompositionEventArgs e)
         {
             e.Handled = number.IsMatch(e.Text);
         }
 
+        /// <summary>
+        /// Kontroluje či je dobré písmenko pri súradniciach
+        /// </summary>
         public static void xPrewiewCheck(object sender, TextCompositionEventArgs e)
         {
             e.Handled = !xCooridate.IsMatch(e.Text);
         }
 
+        /// <summary>
+        /// Kontroluje či je dobré písmenko pri súradniciach
+        /// </summary>
         public static void yPrewiewCheck(object sender, TextCompositionEventArgs e)
         {
             e.Handled = !yCooridate.IsMatch(e.Text);

@@ -18,6 +18,9 @@ namespace PDAAplication.Core.DataManager.FileManager
         }
 
 
+        /// <summary>
+        /// Načíta data zo súboru
+        /// </summary>
         public QuadTree<int, ObjectModel>[] LoadData(QuadTree<int, ObjectModel> nehnutelnostiQuadTree,
             QuadTree<int, ObjectModel> parcelyQuadTree,
             QuadTree<int, ObjectModel> jednotneQuadTree,
@@ -26,21 +29,21 @@ namespace PDAAplication.Core.DataManager.FileManager
             List<ObjectModel> nehnutelnostiList,
             List<ObjectModel> parcelyList)
         {
-            var opneFileDialog = new OpenFileDialog();
-            opneFileDialog.Filter = "Data (*.csv)|*.csv";
-            opneFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            opneFileDialog.Title = "Vyberte súbor s dátami";
+            var openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Data (*.csv)|*.csv";
+            openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            openFileDialog.Title = "Vyberte súbor s dátami";
 
-            if (opneFileDialog.ShowDialog() == true)
+            if (openFileDialog.ShowDialog() == true)
             {
-                var file = opneFileDialog.FileName;
+                var file = openFileDialog.FileName;
                 var lines =  System.IO.File.ReadAllLines(file);
 
                 bool firstLine = true;
 
                 foreach (var line in lines)
                 {
-                    // ak je prvý riadok tak načítam zakladné rzoloženie quadtree
+                    // ak je prvý riadok tak načítam zakladané rozloženie quadtree
                     if (firstLine)
                     {
                         firstLine = false;
@@ -102,11 +105,14 @@ namespace PDAAplication.Core.DataManager.FileManager
             return tree;
         }
 
+        /// <summary>
+        /// Povytvára väzby medzi jednotlivými objektami
+        /// </summary>
         private void LinkData(List<ObjectModel> nehnutelnostiList, QuadTree<int, ObjectModel> parcelyQuadTree)
         {
             foreach (var objectModel in nehnutelnostiList)
             {
-                var tmpListParciel = parcelyQuadTree.FindOverlapingData(objectModel.GpsBod1.X, objectModel.GpsBod1.Y,
+                var tmpListParciel = parcelyQuadTree.FindOverlappingData(objectModel.GpsBod1.X, objectModel.GpsBod1.Y,
                     objectModel.GpsBod2.X, objectModel.GpsBod2.Y);
                 foreach (ObjectModel parcela in tmpListParciel)
                 {

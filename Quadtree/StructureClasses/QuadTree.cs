@@ -26,7 +26,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
     public int Count { get; set; }
     
     /// <summary>
-    /// Helath funkcie je v rozsahu (0,1) kde 0 je najhoršie a 1 je najlepšie
+    /// Health funkcie je v rozsahu (0,1) kde 0 je najhoršie a 1 je najlepšie
     /// </summary>
     public double Health { get; set; }
 
@@ -39,10 +39,10 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
     /// Quad tree structure
     /// </summary>
     /// <param name="pX">down left point</param>
-    /// <param name="pY">donw left point</param>
+    /// <param name="pY">down left point</param>
     /// <param name="width">expand to the right</param>
     /// <param name="height">expand to the up</param>
-    /// <param name="pMaxDepth">max deepth of the tree</param>
+    /// <param name="pMaxDepth">max depth of the tree</param>
     public QuadTree(double pX, double pY, double width, double height, int pMaxDepth)
     {
         if (pMaxDepth <= 0)
@@ -68,10 +68,10 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
     /// Quad tree structure
     /// </summary>
     /// <param name="pX">down left point</param>
-    /// <param name="pY">donw left point</param>
+    /// <param name="pY">down left point</param>
     /// <param name="width">expand to the right</param>
     /// <param name="height">expand to the up</param>
-    /// <param name="pMaxDepth">max deepth of the tree</param>
+    /// <param name="pMaxDepth">max depth of the tree</param>
     public QuadTree(double pX, double pY, double width, double height)
     {
         OriginalPointDownLeft = new(pX, pY);
@@ -89,12 +89,9 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
     }
 
     /// <summary>
-    /// Insert do QaudTree struktur x ma obmedzenie &lt;-180.00000, 180.00000&gt; y ma obmedzenie &lt;-90.00000,90.00000&gt;
+    /// Insert do QuadTree
     /// </summary>
-    /// <param name="pX"></param>
-    /// <param name="pY"></param>
-    /// <param name="pData"></param>
-    /// <exception cref="Exception">Ak su zle suradnice</exception>
+    /// <exception cref="Exception">Ak su zle súradnice</exception>
     public void Insert(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight, TValue pData)
     {
         if (!QuadTreeCanContain(xDownLeft, yDownLeft, xUpRight, yUpRight))
@@ -105,7 +102,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         QuadTreeNodeData<TKey, TValue> currentDataNode = new(new(xDownLeft, yDownLeft), 
             new (xUpRight, yUpRight), pData);
         
-        // zozbieranie info pre optimalizaciu
+        // zozbieranie info pre optimalizáciu
         CalculateOptimalizationQuadrant(currentDataNode, false);
         
         Insert(current, currentDataNode, 0);
@@ -119,14 +116,14 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         while (current is not null)
         {
             // pozrieme sa či sa nejaký polygón nachádza v danom uzle a nie sú listy tak to môžeme vložiť
-            if (current.DataIsEmpty() && !current.LeafsInicialised)
+            if (current.DataIsEmpty() && !current.LeafsInitialised)
             {
                 current.AddData(currentDataNode);
                 Count++;
                 current = null;
             }
             // ak nie je prázdny
-            //Skontrolujeme či nie je naplnená hlbka
+            //Skontrolujeme či nie je naplnená hĺbka
             else if (depth == _maxDepth)
             {
                 current.AddData(currentDataNode);
@@ -139,14 +136,14 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
             {
                 // Ak sa zmestí tak current = poduzol
                 var tmp = current.GetLeafThatCanContainDataNode(currentDataNode);
-                if (tmp is null) throw new Exception("Error in QuadTree, this shouldnt happend");
+                if (tmp is null) throw new Exception("Error in QuadTree, this shouldn't happened");
                 current = tmp;
                 depth++;
             }
-            // Ak sa nezmestí do žiadného poduzla tak skontrolujeme počet objektov v danom uzle
+            // Ak sa nezmestí do žiadneho poduzla tak skontrolujeme počet objektov v danom uzle
             else if (current.DataIsEmpty() || current.DataCount() > 1)
             {
-                // ak ich tam je viack ako 1 alebo žiaden to znamená že objekty ktoré sú tam sa už nikde nedajú presunúť
+                // ak ich tam je viac ako 1 alebo žiaden to znamená že objekty ktoré sú tam sa už nikde nedajú presunúť
                 current.AddData(currentDataNode);
                 Count++;
                 current = null;
@@ -154,7 +151,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
             // Ak je tam jeden objekt tak 
             else
             {
-                // skontrolujeme či tento objekt sa nezmesti do nejakého poduzla
+                // skontrolujeme či tento objekt sa nezmestí do nejakého poduzla
                 var tmpDataNode = current.GetData(0);
                 if (current.AnySubNodeContainDataNode(tmpDataNode))
                 {
@@ -164,17 +161,17 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
                     // ak sa zmestí do niektorého poduzla tak aktuálny objekt vložíme
                     current.AddData(currentDataNode);
                     Count++;
-                    //potom zmeníme premennu currentData na tento nový objekt
+                    //potom zmeníme premenu currentData na tento nový objekt
                     currentDataNode = tmpDataNode;
                     var tmp = current.GetLeafThatCanContainDataNode(currentDataNode);
-                    if (tmp is null) throw new Exception("Error in QuadTree, this shouldnt happend");
+                    if (tmp is null) throw new Exception("Error in QuadTree, this shouldn't happened");
                     // a current = poduzol do ktorého sa zmesti a pokračujeme v cykle
                     current = tmp;
                     depth++;
                 }
                 else
                 {
-                    // ak sa nezmesti nechámeho tam a pridáme aktuálny objekt k nemu
+                    // ak sa nezmestí, necháme ho tam a pridáme aktuálny objekt k nemu
                     current.AddData(currentDataNode);
                     Count++;
                     current = null;
@@ -203,9 +200,9 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
     {
         public QuadTreeNodeLeaf<TKey, TValue>? Node { get; }
         /// <summary>
-        /// <p> 0 - mod vyhľadavanie </p>
+        /// <p> 0 - mod vyhľadávanie </p>
         /// <p> 1 - mod mazania </p>
-        /// <p> Taktiež sa používa pri zmene výšky stromu na ručenie hlbky</p>
+        /// <p> Taktiež sa používa pri zmene výšky stromu na ručenie hĺbky</p>
         /// </summary>
         public int ModeOrDepth { get; }
         
@@ -239,22 +236,22 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
             var current = stack.Pop();
             if (current.ModeOrDepth == 0)
             { 
-                // 1. hľadanie poduzla do ktorého sa zmesti hladaná area
+                // 1. hľadanie poduzla do ktorého sa zmesti hľadaná area
                 if (current.Node.ContainNode(areaToFind))
                 {
                     // hľadanie prebieha tak že sa pozeráme ktorý uzol vie obsiahnuť vymazávanú areu a či aj potomkovia dokážu obsiahnuť hľadanú areu
                     if (current.Node.AnyInitSubNodeContainDataNode(areaToFind))
                     {
-                        // ak áno tak ten poduzol ktorý obsahuje náš objekt pridáme do stacku
+                        // ak áno tak ten poduzol ktorý obsahuje náš objekt pridáme do staku
                         var tmp = current.Node.GetLeafThatCanContainDataNode(areaToFind);
-                        if (tmp is null) throw new Exception("Error in QuadTree, this shouldnt happend");
+                        if (tmp is null) throw new Exception("Error in QuadTree, this shouldn't happened");
                         stack.Push(new(tmp, 0));
                     
                     }
                     else
                     {
-                        // ak nie tak pridáme do stacku všetky listy ktoré sa prekrývajú v rátane seba samáho na kontrolu dát
-                        var tmp = current.Node.GetOverlapingLefs(areaToFind);
+                        // ak nie tak pridáme do staku všetky listy ktoré sa prekrývajú vrátane seba samého na kontrolu dát
+                        var tmp = current.Node.GetOverlappingLeafs(areaToFind);
                         foreach (var leaf in tmp)
                         {
                             stack.Push(new(leaf, 1));
@@ -282,9 +279,9 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
                 // ak sa už nachádzajú vo staku tak už ich nemusíme pridávať
                 if (!current.LeafsAlreadyInStack)
                 {
-                    // 2. skontrolujeme s ktorými potrvkami sa prekrýva vymazávaná area, alebo čiastočne prekrýva
+                    // 2. skontrolujeme s ktorými prvkami sa prekrýva vymazávaná area, alebo čiastočne prekrýva
                         // potomok ktorý sa prekrýva pridáme do staku
-                    var tmp = current.Node.GetOverlapingLefs(areaToFind);
+                    var tmp = current.Node.GetOverlappingLeafs(areaToFind);
                     foreach (var leaf in tmp)
                     {
                         stack.Push(new(leaf, 1));
@@ -297,7 +294,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         if (delete && returnData.Count != 0)
         {
             // prechádza sa to v cykle keďže môže nastať situácia že sa vymaže viac objektov
-            // to je iba v takom prípade ak je kľúč null inak je pole o dlžky 1
+            // to je iba v takom prípade ak je kľúč null inak je pole o dĺžky 1
             foreach (var data in returnData)
             {
                 CalculateOptimalizationQuadrant(areaToFind, true);
@@ -325,7 +322,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
     private List<TValue> FindAndDelete(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight, bool delete, TKey? key = default )
     {
         // Flag = 0 tak vyhľadávame
-        // Flag = 1 tak mazeme
+        // Flag = 1 tak mažeme
         int flag = 0;
         QuadTreeNodeLeaf<TKey, TValue> objectToFind = new(new(xDownLeft, yDownLeft),
             new(xUpRight, yUpRight));
@@ -341,10 +338,10 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
             if (flag == 0)
             {
                 // ak je nastavená na vyhľadávanie bodu
-                // pozriem či sa hladaný objekt nachádza v danom uzle
+                // pozriem či sa hľadaný objekt nachádza v danom uzle
                 if (current.ContainNode(objectToFind))
                 {
-                    // ak áno tak skontrolujem či sa nenacháda hľadaný objekt/objekty v uložených dátach
+                    // ak áno tak skontrolujem či sa nenachádza hľadaný objekt/objekty v uložených dátach
                     // ak áno tak ich pridám k vráteným objektom
                     if (delete)
                     {
@@ -353,13 +350,13 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
                             var tmpData = current.RemoveDataWithSamePointsAndKey(objectToFind, key);
                             Count -= tmpData.Count;
                             returnData.AddRange(tmpData);
-                            // ak sa nič nenašlo tak pokračujeme v prehľadávani daľej, ak sa našlo tak current = null
+                            // ak sa nič nenašlo tak pokračujeme v prehľadávaní dalej, ak sa našlo tak current = null
                             if (tmpData.Count != 0)
                             {
                                 current = null;   
                             }
                         }
-                        // ak by bol kluč null tak sa maže iba podľa súradnic, toto je optional funkcionalita
+                        // ak by bol kľúč null tak sa maže iba podľa súradníc, toto je optional funkcionalita
                         else
                         {
                             var tmpData = current.RemoveDataWithSamePoints(objectToFind);
@@ -376,13 +373,13 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
                     // skontrolujem či current už medzi časom nie je null
                     if (current is not null)
                     {
-                        // skontrolujem či sa hladaný objekt nevie zmestiť do niektorého poduzla
+                        // skontrolujem či sa hladný objekt nevie zmestiť do niektorého poduzla
                         if (current.AnyInitSubNodeContainDataNode(objectToFind))
                         {
                             // ak áno ta current = poduzol
                             current = current.GetLeafThatCanContainDataNode(objectToFind);
                         }
-                        // ak sa stane že nemáme už žiadné dáta a ani potomka tak vrátime do current = predka a flag označíme na vymazávanie nodu
+                        // ak sa stane že nemáme už žiadané dáta a ani potomka tak vrátime do current = predka a flag označíme na vymazávanie nodu
                         else if (current.DataIsEmpty())
                         {
                             //current = current.Parent;
@@ -422,7 +419,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         if (delete && returnData.Count != 0)
         {
             // prechádza sa to v cykle keďže môže nastať situácia že sa vymaže viac objektov
-            // to je iba v takom prípade ak je kľúč null inak je pole o dlžky 1
+            // to je iba v takom prípade ak je kľúč null inak je pole o dĺžky 1
             foreach (var data in returnData)
             {
                 CalculateOptimalizationQuadrant(objectToFind, true);
@@ -437,7 +434,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         return returnData;
     }
 
-    public List<TValue> FindOverlapingData(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight)
+    public List<TValue> FindOverlappingData(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight)
     {
         QuadTreeNodeLeaf<TKey, TValue> objectToFind = new(new(xDownLeft, yDownLeft),
             new(xUpRight, yUpRight));
@@ -445,7 +442,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         List<TValue> returnData = new();
         
         Stack<QuadTreeNodeLeaf<TKey, TValue>> stack = new();
-        // prdidáme do stakú root
+        // pridáme do staku root
         stack.Push(_root);
         
         while (stack.Count!= 0)
@@ -456,10 +453,10 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
             {
                 // pridáme dáta ktoré sa prekrývajú
                 // do staku pridáme listy ktoré sa prekrývajú
-                returnData.AddRange(current.GetOverlapingData(objectToFind));
+                returnData.AddRange(current.GetOverlappingData(objectToFind));
                 
                 // do staku pridáme listy ktoré sa prekrývajú
-                var tmpLeafs = current.GetOverlapingLefs(objectToFind);
+                var tmpLeafs = current.GetOverlappingLeafs(objectToFind);
                 foreach (var leaf in tmpLeafs)
                 {
                     stack.Push(leaf);
@@ -473,7 +470,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
     /// <summary>
     /// Optimalizácia stromu ktorá zväčšuje alebo zmenšuje strom na tú stranu na ktorej sa nachádza viac dát. Tým sa zaručí že najväčší zhluk dát bude v strede alebo blýzko jeho okolia
     /// </summary>
-    /// <param name="force">Ak je nastavené na true tak sa obýdu všetky zábrany spúšťania optimalizácia po každej vykonanej operácií, defaultne je nastavené na false</param>
+    /// <param name="force">Ak je nastavené na true tak sa obídu všetky zábrany spúšťania optimalizácia po každej vykonanej operácií, defaultne je nastavené na false</param>
     public void Optimalise(bool force = false)
     {
         _operationCount++;
@@ -491,12 +488,6 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         double y1 = _root.PointDownLeft.Y;
         double x2 = _root.PointUpRight.X;
         double y2 = _root.PointUpRight.Y;
-        //double xS = (x1 + x2) / 2;
-        //double yS = (y1 + y2) / 2;
-        // int first = FindInterval(x1, y1, xS, yS).Count;
-        // int second = FindInterval(x1, yS, xS, y2).Count;
-        // int third = FindInterval(xS, yS, x2, y2).Count;
-        // int forth = FindInterval(xS, y1, x2, yS).Count;
         int first = _quadrantCount[0];
         int second = _quadrantCount[1];
         int third = _quadrantCount[2];
@@ -545,8 +536,8 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
             newRoot = true;
             
             // ak je sever menší ako juh posunieme Pravé horné y dole, môže ale nastať situácia že y by bolo menšie ako pôvodné
-            // ale musíme dbať na to aby sa neprekročily max hranice štruktúry
-            // tým pádom nastavýme pôvodné Y a posunieme pravé doľné y smerom dolu
+            // ale musíme dbať na to aby sa neprekročili max hranice štruktúry
+            // tým pádom nastavíme pôvodné Y a posunieme pravé dolné y smerom dolu
             
             // takže ak je percentuálne obsadenie severu a juhu väčšie ako 40% tak pravé horné y posunieme o 10 % hore
             if (rozdielSJ > 0)
@@ -554,10 +545,10 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
                 // idem stred posúvať hore
                 var tmpY1 = y2 - (vyska * (1 - CHANGE_SIZE_RATIO));
                 var tmpY2 = y1 + (vyska * (1 + CHANGE_SIZE_RATIO));
-                // skontrolujem či som náhodov niekedy pred tým neposúval spodnú hranicu dole
+                // skontrolujem či som náhodou niekedy pred tým neposúval spodnú hranicu dole
                 if (Math.Abs(y1 - OriginalPointDownLeft.Y) > Double.Epsilon)
                 {
-                    // ak áno posuniem spodnú hranicu hore a ak je validná tak ju priradím ak nie tak pousniem hornú hranicu
+                    // ak áno posuniem spodnú hranicu hore a ak je validná tak ju priradím ak nie tak posuniem hornú hranicu
                     if (tmpY1 <= OriginalPointDownLeft.Y)
                     {
                         newY1 = tmpY1;
@@ -567,7 +558,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
                         newY2 = tmpY2;
                     } 
                 }
-                // ak nie tak pousniem hranicu hore
+                // ak nie tak posuniem hranicu hore
                 else
                 {
                     newY2 = tmpY2;
@@ -581,7 +572,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
                 // skontrolujem či som náhodov niekedy pred tým neposúval hornú hranicu hranicu hore
                 if (Math.Abs(y2 - OriginalPointUpRight.Y) > Double.Epsilon)
                 {
-                    // ak áno posuniem spodnú hornú hore a ak je validná tak ju priradím ak nie tak pousniem dolnú hranicu
+                    // ak áno posuniem spodnú hornú hore a ak je validná tak ju priradím ak nie tak posuniem dolnú hranicu
                     if (tmpY2 >= OriginalPointUpRight.Y)
                     {
                         newY2 = tmpY2;
@@ -591,7 +582,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
                         newY1 = tmpY1;
                     } 
                 }
-                // ak nie tak pousniem hranicu hore
+                // ak nie tak posuniem hranicu hore
                 else
                 {
                     newY1 = tmpY1;
@@ -604,13 +595,13 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
             newRoot = true;
             if (rozdielVZ > 0)
             {
-                // idem stred posúvať do prava
+                // idem stred posúvať doprava
                 var tmpX1 = x2 - (sirka * (1 - CHANGE_SIZE_RATIO));
                 var tmpX2 = x1 + (sirka * (1 + CHANGE_SIZE_RATIO));
-                // skontrolujem či som náhodov niekedy pred tým neposúval spodnú hranicu dole
+                // skontrolujem či som náhodou niekedy pred tým neposúval spodnú hranicu dole
                 if (Math.Abs(x1 - OriginalPointDownLeft.X) > Double.Epsilon)
                 {
-                    // ak áno posuniem spodnú hranicu v úravo a ak je validná tak ju priradím ak nie tak pousniem hornú hranicu
+                    // ak áno posuniem spodnú hranicu v pravo a ak je validná tak ju priradím ak nie tak posuniem hornú hranicu
                     if (tmpX1 <= OriginalPointDownLeft.X)
                     {
                         newX1 = tmpX1;
@@ -620,7 +611,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
                         newX2 = tmpX2;
                     } 
                 }
-                // ak nie tak pousniem hornú hranicu v pravo
+                // ak nie tak posuniem hornú hranicu v pravo
                 else
                 {
                     newX2 = tmpX2;
@@ -631,10 +622,10 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
                 // idem stred posúvať do lava
                 var tmpX2 = x1 + (sirka * (1 - CHANGE_SIZE_RATIO));
                 var tmpX1 = x2 - (sirka * (1 + CHANGE_SIZE_RATIO));
-                // skontrolujem či som náhodov niekedy pred tým neposúval hornú hranicu hranicu v ľavo
+                // skontrolujem či som náhodou niekedy pred tým neposúval hornú hranicu hranicu v ľavo
                 if (Math.Abs(x2 - OriginalPointUpRight.X) > Double.Epsilon)
                 {
-                    // ak áno posuniem spodnú hornú v ľavo a ak je validná tak ju priradím ak nie tak pousniem dolnú hranicu
+                    // ak áno posuniem spodnú hornú v ľavo a ak je validná tak ju priradím ak nie tak posuniem dolnú hranicu
                     if (tmpX2 >= OriginalPointUpRight.X)
                     {
                         newX2 = tmpX2;
@@ -644,7 +635,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
                         newX1 = tmpX1;
                     } 
                 }
-                // ak nie tak pousniem hranicu v ľavo
+                // ak nie tak posuniem hranicu v ľavo
                 else
                 {
                     newX1 = tmpX1;
@@ -661,13 +652,13 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         }
         _operationCount = 0;
 
-        // ak sa root nezmenil nemá zmysl pokračovať
+        // ak sa root nezmenil nemá zmysel pokračovať
         if (!newRoot)
         {
             return;
         }
         
-        // ak nie je optimalizacia zapnutá tak nepokračujem
+        // ak nie je optimalizácia zapnutá tak nepokračujem
         if (!force)
         {
             if (!OptimalizationOn)
@@ -683,7 +674,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         {
             var current = stack.Pop();
             tmpData.AddRange(current.GetArrayListData());
-            if (current.LeafsInicialised)
+            if (current.LeafsInitialised)
             {
                 var tmpLeafs = current.GetLeafs();
                 foreach (var leaf in tmpLeafs)
@@ -701,7 +692,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         
         foreach (var data in tmpData)
         {
-            // znovu zobieram data pre budúcu optimalizaciu
+            // znovu zozbieram data pre budúcu optimalizáciu
             CalculateOptimalizationQuadrant(data, false);
             
             Insert(data.PointDownLeft.X, data.PointDownLeft.Y, data.PointUpRight.X,
@@ -711,7 +702,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         _optimalize = true;
         
         // Znovu spočítame zdravie 
-        // nasjkôr sa zakutalizujú premenné
+        // najskôr sa zaktualizujú premenné
         first = _quadrantCount[0];
         second = _quadrantCount[1];
         third = _quadrantCount[2];
@@ -736,7 +727,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
     /// <summary>
     /// Zmení aktuálnu hĺbku stromu na novú zadanú
     /// </summary>
-    /// <param name="newDepth"> novej hlbky stromu</param>
+    /// <param name="newDepth"> novej hĺbky stromu</param>
     /// <exception cref="Exception"> ak je hĺbka stromu zadaná nesprávna</exception>
     public void SetQuadTreeDepth(int newDepth)
     {
@@ -746,7 +737,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
             throw new Exception("Min depth is 1");
         }
 
-        // ak sa hlbka nezmenila tak nebudem pokračovať
+        // ak sa hĺbka nezmenila tak nebudem pokračovať
         if (newDepth == _maxDepth)
         {
             return;
@@ -768,12 +759,12 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
             if (current.Node is not null)
             {
                 // pozrieme sa či má inicializované listy
-                if (current.Node.LeafsInicialised)
+                if (current.Node.LeafsInitialised)
                 {
                     // skontrolujem hlbku
                     if (current.ModeOrDepth < _maxDepth)
                     {
-                        // ak je hlbka menšia nahram listy do staku a pokračujem v cykle
+                        // ak je hĺbka menšia vložím listy do staku a pokračujem v cykle
                         var tmpLeafs = current.Node.GetLeafs();
                         foreach (var leaf in tmpLeafs)
                         {
@@ -782,7 +773,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
                     }
                     else
                     {
-                        // ak je hlbka rovnaká alebo väčšia ako požadovaná tak skontrolujem či môžem zmazať leafs
+                        // ak je hĺbka rovnaká alebo väčšia ako požadovaná tak skontrolujem či môžem zmazať leafs
                         if (!current.Node.CanLeafsBeRemoved())
                         {
                             // ak nemôžem tak ich pridáme do staku a pri ich vkladaní zvýšime im ich hĺbku
@@ -797,7 +788,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
                         {
                             // ak môžem tak ich vymažem a pridám parenta do staku
                             stack.Push(new(current.Node.Parent, current.ModeOrDepth - 1));
-                            // Ak je hĺbka väčšia ako pžadovaná tak dáta vložím do parenta
+                            // Ak je hĺbka väčšia ako požadovaná tak dáta vložím do parenta
                             if (!current.Node.DataIsEmpty() && current.ModeOrDepth > _maxDepth)
                             {
                                 current.Node.Parent.AddData(current.Node.GetArrayListData());
@@ -809,10 +800,10 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
                 }
                 else
                 {
-                    // ak nemá inicializované listy tak skonrolujem hlbku
+                    // ak nemá inicializované listy tak skontrolujem hĺbku
                     if (current.ModeOrDepth > _maxDepth)
                     {
-                        // ak je hlbka väčšia
+                        // ak je hĺbka väčšia
                         if (!current.Node.DataIsEmpty())
                         {
                             // ak mám dáta, vložím ich k parentovi a u seba zmažem
@@ -831,7 +822,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
                     else if (current.ModeOrDepth < _maxDepth)
                     {
                         // ak je menšia a ja mám dáta
-                        // v cykle budem ich prechádzať a vkladať do listov pomocou praveného importu
+                        // v cykle budem ich prechádzať a vkladať do listov pomocou importu
                         var tmpData = current.Node.GetArrayListData();
                         current.Node.ClearData();
                         foreach (var quadTreeNodeData in tmpData)
@@ -840,7 +831,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
                             Insert(current.Node, quadTreeNodeData, current.ModeOrDepth);
                         }
                         
-                        //môžem pokračovať daľším prvkom z poľa
+                        //môžem pokračovať ďalším prvkom z poľa
                     }
                     // ak je menšia a ja mám dáta
                 }
@@ -850,9 +841,6 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         }
         
         _optimalize = true;
-                
-        
-        
 
     }
     
@@ -864,13 +852,13 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
     {
         int newCount = 0;
         Stack<QuadTreeNodeLeaf<TKey, TValue>> stack = new();
-        // prdidáme do stakú root
+        // pridáme do staku root
         stack.Push(_root);
         while (stack.Count != 0)
         {
             var current = stack.Pop();
             newCount += current.DataCount();
-            if (current.LeafsInicialised)
+            if (current.LeafsInitialised)
             {
                 var tmpLeafs = current.GetLeafs();
                 foreach (var leaf in tmpLeafs)
@@ -891,13 +879,13 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
     {
         List<TValue> newList = new(Count);
         Stack<QuadTreeNodeLeaf<TKey, TValue>> stack = new();
-        // prdidáme do stakú root
+        // pridáme do staku root
         stack.Push(_root);
         while (stack.Count != 0)
         {
             var current = stack.Pop();
             newList.AddRange(current.GetArrayListData().Select(data => data.Data));
-            if (current.LeafsInicialised)
+            if (current.LeafsInitialised)
             {
                 var tmpLeafs = current.GetLeafs();
                 foreach (var leaf in tmpLeafs)
@@ -911,9 +899,9 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
     }
 
     /// <summary>
-    /// Vypočítava naplnenie jednotlvých kvadrantov používaných v optimalizácii
+    /// Vypočítava naplnenie jednotlivých kvadrantov používaných v optimalizácii
     /// </summary>
-    /// <param name="node"> node kotrý sa bude vkladať strome do niektorého z kvadrantov</param>
+    /// <param name="node"> node ktorý sa bude vkladať strome do niektorého z kvadrantov</param>
     /// <param name="delete"> ak True tak odpočítavame hodnoty v kvadrantoch inak pripočítavame hodnoty v kvadrantoch</param>
     private void CalculateOptimalizationQuadrant(QuadTreeNode<TKey, TValue> node, bool delete)
     {
@@ -957,9 +945,9 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
     }
 
     /// <summary>
-        /// Metoda vyhradená iba na testovanie!!!!
-        /// </summary>
-        /// <returns>Root</returns>
+    /// Metoda vyhradená iba na testovanie!!!!
+    /// </summary>
+    /// <returns>Root</returns>
         public QuadTreeNodeLeaf<TKey, TValue> TestGetRoot()
     {
         return _root;

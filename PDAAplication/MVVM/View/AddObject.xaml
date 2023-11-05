@@ -12,7 +12,7 @@
         ShowInTaskbar="False"
         WindowStartupLocation="CenterOwner">
     <StackPanel Orientation="Vertical">
-        <Label Name="LabelID">Súpisne číslo</Label>
+        <Label Name="LabelID">Súpisné číslo</Label>
         <TextBox
             Text="100"
             Name="idCislo"

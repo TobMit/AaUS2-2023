@@ -7,7 +7,6 @@ namespace Quadtree.StructureClasses.Node;
 /// <summary>
 /// Trieda slúži na vytvorenie uzlov
 /// </summary>
-/// <typeparam name="TValue">Hodnota uložená v kluči</typeparam>
 public class QuadTreeNodeLeaf<TKey, TValue> : QuadTreeNode<TKey, TValue> where TKey : IComparable<TKey> where TValue : IComparable<TKey>
 {
     private List<QuadTreeNodeData<TKey, TValue>> data;
@@ -21,10 +20,10 @@ public class QuadTreeNodeLeaf<TKey, TValue> : QuadTreeNode<TKey, TValue> where T
     /// </summary>
     private QuadTreeNodeLeaf<TKey, TValue>[] Leafs;
 
-    private bool _leafsInicialised;
-    public bool LeafsInicialised
+    private bool _leafsInitialised;
+    public bool LeafsInitialised
     {
-        get => _leafsInicialised;
+        get => _leafsInitialised;
     }
 
     public QuadTreeNodeLeaf<TKey, TValue> Parent { get; }
@@ -36,7 +35,7 @@ public class QuadTreeNodeLeaf<TKey, TValue> : QuadTreeNode<TKey, TValue> where T
         _pointUpRight = pPointUpRight;
         Leafs = new QuadTreeNodeLeaf<TKey, TValue>[4];
         data = new();
-        _leafsInicialised = false;
+        _leafsInitialised = false;
     }
     
     public QuadTreeNodeLeaf(PointD pPointDownLeft, PointD pPointUpRight, QuadTreeNodeLeaf<TKey, TValue> parent)
@@ -46,7 +45,7 @@ public class QuadTreeNodeLeaf<TKey, TValue> : QuadTreeNode<TKey, TValue> where T
         Leafs = new QuadTreeNodeLeaf<TKey, TValue>[4];
         data = new();
         Parent = parent;
-        _leafsInicialised = false;
+        _leafsInitialised = false;
     }
     
     public QuadTreeNodeLeaf(PointD pPointDownLeft, PointD pPointUpRight, QuadTreeNodeData<TKey, TValue> pData)
@@ -56,7 +55,7 @@ public class QuadTreeNodeLeaf<TKey, TValue> : QuadTreeNode<TKey, TValue> where T
         Leafs = new QuadTreeNodeLeaf<TKey, TValue>[4];
         data = new();
         data.Add(pData);
-        _leafsInicialised = false;
+        _leafsInitialised = false;
     }
     
     public bool AnyInitSubNodeContainDataNode(QuadTreeNode<TKey, TValue> pData)
@@ -68,12 +67,11 @@ public class QuadTreeNodeLeaf<TKey, TValue> : QuadTreeNode<TKey, TValue> where T
     {
         return AnySubNodeContainDataNode(pData, true);
     }
-    private bool AnySubNodeContainDataNode(QuadTreeNode<TKey, TValue> pData, bool inicialiseLeafs )
+    private bool AnySubNodeContainDataNode(QuadTreeNode<TKey, TValue> pData, bool initialisedLeafs )
     {
-        //todo add tests
         // môžu nastať 2 situácie
             // poduzol existuje a porovnáme do ktorého sa zmestí
-        if (_leafsInicialised)
+        if (_leafsInitialised)
         {
             // skontroluj či sa zmetie s niektorým z listov
             foreach (QuadTreeNodeLeaf<TKey, TValue> leaf in Leafs)
@@ -87,7 +85,7 @@ public class QuadTreeNodeLeaf<TKey, TValue> : QuadTreeNode<TKey, TValue> where T
             // poduzol neexistuje
         else
         {
-            if (!inicialiseLeafs)
+            if (!initialisedLeafs)
             {
                 // ak nechceme inicializovať tak vrátime false
                 return false;
@@ -108,10 +106,8 @@ public class QuadTreeNodeLeaf<TKey, TValue> : QuadTreeNode<TKey, TValue> where T
     }
 
     /// <summary>
-    /// Vráti list v ktorom sa zmestí daný hladany uzol, čo znamená že vráti vždy iba jeden
+    /// Vráti list v ktorom sa zmestí daný hľadaný uzol, čo znamená že vráti vždy iba jeden
     /// </summary>
-    /// <param name="pData"></param>
-    /// <returns></returns>
     public QuadTreeNodeLeaf<TKey, TValue>? GetLeafThatCanContainDataNode(QuadTreeNode<TKey, TValue> pData)
     {
         foreach (QuadTreeNodeLeaf<TKey, TValue> leaf in Leafs)
@@ -125,6 +121,9 @@ public class QuadTreeNodeLeaf<TKey, TValue> : QuadTreeNode<TKey, TValue> where T
         return null;
     }
     
+    /// <summary>
+    /// Vytvorí a nastaví listy
+    /// </summary>
     private void InitLeafs()
     {
         double x1 = _pointDownLeft.X;
@@ -137,13 +136,13 @@ public class QuadTreeNodeLeaf<TKey, TValue> : QuadTreeNode<TKey, TValue> where T
         Leafs[1] = new(new(x1, yS), new(xS, y2), this);
         Leafs[2] = new(new(xS, yS), new(x2, y2), this);
         Leafs[3] = new(new(xS, y1), new(x2, yS), this);
-        _leafsInicialised = true;
+        _leafsInitialised = true;
     }
     
-    public List<QuadTreeNodeLeaf<TKey, TValue>> GetOverlapingLefs(QuadTreeNode<TKey, TValue> pData)
+    public List<QuadTreeNodeLeaf<TKey, TValue>> GetOverlappingLeafs(QuadTreeNode<TKey, TValue> pData)
     {
         List<QuadTreeNodeLeaf<TKey, TValue>> returnList = new();
-        if (_leafsInicialised)
+        if (_leafsInitialised)
         {
             foreach (QuadTreeNodeLeaf<TKey, TValue> leaf in Leafs)
             {
@@ -157,7 +156,7 @@ public class QuadTreeNodeLeaf<TKey, TValue> : QuadTreeNode<TKey, TValue> where T
         return returnList;
     }
 
-    public List<TValue> GetOverlapingData(QuadTreeNode<TKey, TValue> pNode)
+    public List<TValue> GetOverlappingData(QuadTreeNode<TKey, TValue> pNode)
     {
         List<TValue> returnList = new();
         foreach (QuadTreeNodeData<TKey, TValue> dataNode in data)
@@ -258,13 +257,13 @@ public class QuadTreeNodeLeaf<TKey, TValue> : QuadTreeNode<TKey, TValue> where T
     public bool CanLeafsBeRemoved()
     {
         // ak nie sú listy inicializované tak ich môžeme vymazať
-        if (!_leafsInicialised)
+        if (!_leafsInitialised)
         {
             return true;
         }
         
         // skontrolujeme či sa v listoch nachádzajú nejaké dáta a my nemáme žiadne dáta a ak sa nachádza práve 1 tak ich môžeme prehodiť k sebe
-        if (DataIsEmpty() && _leafsInicialised)
+        if (DataIsEmpty() && _leafsInitialised)
         {
             int indexLeaf = 0;
             int dataCount = 0;
@@ -279,7 +278,7 @@ public class QuadTreeNodeLeaf<TKey, TValue> : QuadTreeNode<TKey, TValue> where T
                 }
                 
                 // ak má inicializované listy tak nemôžeme mazať lebo by sme stratili dáta
-                if (Leafs[i].LeafsInicialised)
+                if (Leafs[i].LeafsInitialised)
                 {
                     hasLeafs = true;
                 }
@@ -296,7 +295,7 @@ public class QuadTreeNodeLeaf<TKey, TValue> : QuadTreeNode<TKey, TValue> where T
         bool canBeRemoved = true;
         foreach (var leaf in Leafs)
         {
-            canBeRemoved = canBeRemoved && !leaf.LeafsInicialised && leaf.DataIsEmpty();
+            canBeRemoved = canBeRemoved && !leaf.LeafsInitialised && leaf.DataIsEmpty();
         }
 
         if (canBeRemoved)
@@ -306,7 +305,7 @@ public class QuadTreeNodeLeaf<TKey, TValue> : QuadTreeNode<TKey, TValue> where T
                 Leafs[i] = null;
             }
 
-            _leafsInicialised = false;
+            _leafsInitialised = false;
         }
 
         return canBeRemoved;
@@ -359,7 +358,7 @@ public class QuadTreeNodeLeaf<TKey, TValue> : QuadTreeNode<TKey, TValue> where T
     /// <summary>
     /// Metóda slúži iba na testovanie, nevolajte ju v kódé, testuje správnu inicializáciu listov
     /// </summary>
-    /// <returns>Listy či sú spravne inicializované</returns>
+    /// <returns>Listy či sú správne inicializované</returns>
     public QuadTreeNodeLeaf<TKey, TValue>[] TestInitLeafs()
     {
         InitLeafs();
@@ -367,9 +366,9 @@ public class QuadTreeNodeLeaf<TKey, TValue> : QuadTreeNode<TKey, TValue> where T
     }
 
     /// <summary>
-    /// Zýkame listy ktoré ktoré sú potrebné pri prechádzani v stromu
+    /// Získame listy ktoré ktoré sú potrebné pri prechádzaní v stromu
     /// </summary>
-    /// <returns>Pole listov, je nutene pred tým skontrolovať či sú inicializované</returns>
+    /// <returns>Pole listov, musí byť inicializované</returns>
     public QuadTreeNodeLeaf<TKey, TValue>[] GetLeafs()
     {
         return Leafs;

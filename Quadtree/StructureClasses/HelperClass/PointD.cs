@@ -29,26 +29,26 @@ public class PointD : IEquatable<PointD>
     }
     
     /// <summary>
-    /// Funcia vie porovnať či majú oba PointD rovnaké hodnoty, je to párová funkcia !=
+    /// Func vie porovnať či majú oba PointD rovnaké hodnoty, je to párová funkcia !=
     /// </summary>
-    /// <param name="left">Lavý PointD na porovnávanie</param>
-    /// <param name="right">Pravý PointD na porovavanie</param>
+    /// <param name="left">Ľavý PointD na porovnávanie</param>
+    /// <param name="right">Pravý PointD na porovnávanie</param>
     /// <returns></returns>
     public static bool operator ==(PointD left, PointD right) => Math.Abs(left.X - right.X) < Double.Epsilon && Math.Abs(left.Y - right.Y) < Double.Epsilon;
     
     /// <summary>
-    /// Zistí či sú dva PointD nerovnaké, je to párova funkcia ==
+    /// Zistí či sú dva PointD nerovnaké, je to párová funkcia ==
     /// </summary>
-    /// <param name="left">Lavý PointD na porovnávanie</param>
-    /// <param name="right">Pravý PointD na porovavanie</param>
+    /// <param name="left">Ľavý PointD na porovnávanie</param>
+    /// <param name="right">Pravý PointD na porovnávanie</param>
     /// <returns></returns>
     public static bool operator !=(PointD left, PointD right) => !(left == right);
     
     /// <summary>
-    /// Vynázosby PointD o daný počet
+    /// Vynásobiť PointD o daný počet
     /// </summary>
     /// <param name="left">PointD ktorý násobime</param>
-    /// <param name="right">čislo ktorým násobime</param>
+    /// <param name="right">číslo ktorým násobime</param>
     /// <returns></returns>
     public static PointD operator *(PointD left, double right) => new(left.X * right, left.Y * right);
 }

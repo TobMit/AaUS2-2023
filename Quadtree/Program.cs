@@ -7,7 +7,7 @@ using Quadtree.StructureClasses.Node;
 
 public class Program
 {
-    private static bool parallel = true; // pri paralelnom testovaní treba dať max seed na nejaké rozumné čislo (napr. 30)aby program skončil v nejakom rozumnom čase, keby bolo nejaké veľké čislo, tak sa NET snaží najskôr naplánovať všetky tasky a potom ich spúšťa, a to pri veľom množstve už trvá dlho.
+    private static bool parallel = true; // pri paralelnom testovaní treba dať max seed na nejaké rozumné číslo (napr. 30)aby program skončil v nejakom rozumnom čase, keby bolo nejaké veľké číslo, tak sa NET snaží najskôr naplánovať všetky úlohy a potom ich spúšťa, a to pri veľkom množstve už trvá dlho.
     private static bool testForProfiler = false;
     
     private static int MAX_UNITS = 1000000;
@@ -16,13 +16,13 @@ public class Program
     private static double PROBABILITY_FO_FR = 0.1;
     private static double PROBABILITY_DEPTH = 0.0001;
     private static double FILL_PROBABILITY = 0.3;
-    private static double MAX_SIZE_OF_OBJCET_PERCENTAGE = 0.25;
+    private static double MAX_SIZE_OF_OBJECT_PERCENTAGE = 0.25;
     private static int STARTUP_FILL_COUNT = 11000;
     
     private static int OPERATION_COUNT = 10000;
     private static bool OPTIMALIZATION_ON = true;
         
-    private static int lastestLovest = int.MaxValue;
+    private static int latestLowest = int.MaxValue;
     private static int seed = 0;
     private static int maxSeed = 20;
     // private static int maxSeed = int.MaxValue;
@@ -40,7 +40,7 @@ public class Program
                         int result = TestInstance(iSeed);
                         if (result < 30)
                         {
-                            Console.WriteLine("Najdeny SEED: " + iSeed);
+                            Console.WriteLine("Nájdený SEED: " + iSeed);
                             return;
                         }
                     }
@@ -53,17 +53,17 @@ public class Program
             }
             else
             {
-                while (lastestLovest >= 30)
+                while (latestLowest >= 30)
                 {
-                    lastestLovest = TestInstance(seed);
+                    latestLowest = TestInstance(seed);
                     seed++;
                 }
-                Console.WriteLine("Najdeny SEED: " + --seed);
+                Console.WriteLine("Nájdený SEED: " + --seed);
             }
         }
         else
         {
-            ProfillerTest();
+            ProfilerTest();
         }
     }
 
@@ -100,8 +100,8 @@ public class Program
             {
                 double x = NextDouble(MIN_X, MAX_X-2, rnd);
                 double y = NextDouble(MIN_Y, MAX_Y-2, rnd);
-                var tmpSirka = NextDouble(0, Math.Min(Math.Abs(MAX_X - MIN_X) * MAX_SIZE_OF_OBJCET_PERCENTAGE, MAX_X - 1 - x), rnd);
-                var tmpViska = NextDouble(0, Math.Min(Math.Abs(MAX_Y - MIN_Y) * MAX_SIZE_OF_OBJCET_PERCENTAGE, MAX_Y - 1 - y), rnd);
+                var tmpSirka = NextDouble(0, Math.Min(Math.Abs(MAX_X - MIN_X) * MAX_SIZE_OF_OBJECT_PERCENTAGE, MAX_X - 1 - x), rnd);
+                var tmpViska = NextDouble(0, Math.Min(Math.Abs(MAX_Y - MIN_Y) * MAX_SIZE_OF_OBJECT_PERCENTAGE, MAX_Y - 1 - y), rnd);
                 double x2 = x + tmpSirka;
                 double y2 = y + tmpViska;
             
@@ -120,8 +120,8 @@ public class Program
         {
             double x = NextDouble(MIN_X, MAX_X-2, rnd);
             double y = NextDouble(MIN_Y, MAX_Y-2, rnd);
-            var tmpSirka = NextDouble(0, Math.Min(Math.Abs(MAX_X - MIN_X) * MAX_SIZE_OF_OBJCET_PERCENTAGE, MAX_X - 1 - x), rnd);
-            var tmpViska = NextDouble(0, Math.Min(Math.Abs(MAX_Y - MIN_Y) * MAX_SIZE_OF_OBJCET_PERCENTAGE, MAX_Y - 1 - y), rnd);
+            var tmpSirka = NextDouble(0, Math.Min(Math.Abs(MAX_X - MIN_X) * MAX_SIZE_OF_OBJECT_PERCENTAGE, MAX_X - 1 - x), rnd);
+            var tmpViska = NextDouble(0, Math.Min(Math.Abs(MAX_Y - MIN_Y) * MAX_SIZE_OF_OBJECT_PERCENTAGE, MAX_Y - 1 - y), rnd);
             double x2 = x + tmpSirka;
             double y2 = y + tmpViska;
 
@@ -134,11 +134,11 @@ public class Program
                 if (quadtree.Count != quadtree.Recount())
                 {
                     seedOk = false;
-                    lastestLovest = i;
+                    latestLowest = i;
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Lastest lowest in set depth: " + lastestLovest + " in seed: " + seed);
+                    Console.WriteLine("Latest lowest in set depth: " + latestLowest + " in seed: " + seed);
                     Console.ForegroundColor = ConsoleColor.White;
-                    return lastestLovest;
+                    return latestLowest;
                 }
             }
             else if (rndValue < PROBABILITY_FO_FR)
@@ -150,26 +150,26 @@ public class Program
                     if (tmpData.Count != toDelete.Count)
                     {
                         seedOk = false;
-                        lastestLovest = i;
+                        latestLowest = i;
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Lastest lowest in find interval: " + lastestLovest + " in seed: " + seed);
+                        Console.WriteLine("Latest lowest in find interval: " + latestLowest + " in seed: " + seed);
                         Console.WriteLine("     Find: " + tmpData.Count + " toDelete: " + toDelete.Count + " realCount " + quadtree.Recount());
                         Console.ForegroundColor = ConsoleColor.White;
-                        return lastestLovest;
+                        return latestLowest;
                     }
                 }
                 else
                 {
-                    var tmpData = quadtree.FindOverlapingData(MIN_X, MIN_Y, MAX_X, MAX_Y);
+                    var tmpData = quadtree.FindOverlappingData(MIN_X, MIN_Y, MAX_X, MAX_Y);
                     if (tmpData.Count != toDelete.Count)
                     {
                         seedOk = false;
-                        lastestLovest = i;
+                        latestLowest = i;
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Lastest lowest in find overlaping: " + lastestLovest + " in seed: " + seed);
+                        Console.WriteLine("Latest lowest in find overlapping: " + latestLowest + " in seed: " + seed);
                         Console.WriteLine("     Find: " + tmpData.Count + " toDelete: " + toDelete.Count + " realCount " + quadtree.Recount());
                         Console.ForegroundColor = ConsoleColor.White;
-                        return lastestLovest;
+                        return latestLowest;
                     }
                 }
             }
@@ -191,23 +191,23 @@ public class Program
                     if (!insertedValue.Contains(value))
                     {
                         seedOk = false;
-                        lastestLovest = i;
+                        latestLowest = i;
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Lastest lowest in insert: " + lastestLovest + " in seed: " + seed);
+                        Console.WriteLine("Latest lowest in insert: " + latestLowest + " in seed: " + seed);
                         Console.ForegroundColor = ConsoleColor.White;
-                        return lastestLovest;
+                        return latestLowest;
                     }
 
                     var realCount = quadtree.Recount();
                     if (realCount != toDelete.Count)
                     {
                         seedOk = false;
-                        lastestLovest = i;
+                        latestLowest = i;
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Lastest lowest in insert: " + lastestLovest + " in seed: " + seed);
+                        Console.WriteLine("Latest lowest in insert: " + latestLowest + " in seed: " + seed);
                         Console.WriteLine("real count: " + realCount + " toDelete: " + toDelete.Count);
                         Console.ForegroundColor = ConsoleColor.White;
-                        return lastestLovest;
+                        return latestLowest;
                     }
                 }
                 else
@@ -225,55 +225,39 @@ public class Program
                     var value = toDelete[index];
                     toDelete.RemoveAt(index);
                     toInsert.Add(value.Data);
-                    var deltedValue = quadtree.Delete(value.PointDownLeft.X, value.PointDownLeft.Y,
+                    var deletedValue = quadtree.Delete(value.PointDownLeft.X, value.PointDownLeft.Y,
                         value.PointUpRight.X, value.PointUpRight.Y, value.Data);
-                    if (deltedValue.Count != 1)
+                    if (deletedValue.Count != 1)
                     {
                         seedOk = false;
-                        lastestLovest = i;
+                        latestLowest = i;
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Lastest lowest in delete returned empty: " + lastestLovest + " in seed: " + seed);
+                        Console.WriteLine("Latest lowest in delete returned empty: " + latestLowest + " in seed: " + seed);
                         Console.WriteLine("SEED: " + seed);
                         Console.ForegroundColor = ConsoleColor.White;
-                        return lastestLovest;
+                        return latestLowest;
                     }
-                    if (!deltedValue.Contains(value.Data))
+                    if (!deletedValue.Contains(value.Data))
                     {
                         seedOk = false;
-                        lastestLovest = i;
+                        latestLowest = i;
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Lastest lowest in delete: " + lastestLovest + " in seed: " + seed);
+                        Console.WriteLine("Latest lowest in delete: " + latestLowest + " in seed: " + seed);
                         Console.WriteLine("SEED: " + seed);
                         Console.ForegroundColor = ConsoleColor.White;
-                        return lastestLovest;
+                        return latestLowest;
                     }
-
-                    // foreach (var returnedValue in deltedValue)
-                    // {
-                    //     if (returnedValue != value.Data)
-                    //     {
-                    //         for (int j = 0; j < toDelete.Count; j++)
-                    //         {
-                    //             if (toDelete[j].Data == returnedValue)
-                    //             {
-                    //                 toDelete.RemoveAt(j);
-                    //                 toInsert.Add(returnedValue);
-                    //                 break;
-                    //             }
-                    //         }
-                    //     }
-                    // }
                     
                     var realCount = quadtree.Recount();
                     if (realCount != toDelete.Count)
                     {
                         seedOk = false;
-                        lastestLovest = i;
+                        latestLowest = i;
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Lastest lowest in delete: " + lastestLovest + " in seed: " + seed);
+                        Console.WriteLine("Latest lowest in delete: " + latestLowest + " in seed: " + seed);
                         Console.WriteLine("real count: " + realCount + " toDelete: " + toDelete.Count + " in seed: " + seed);
                         Console.ForegroundColor = ConsoleColor.White;
-                        return lastestLovest;
+                        return latestLowest;
                     }
                     
                 }
@@ -294,7 +278,7 @@ public class Program
         return int.MaxValue;
     }
 
-    private static void ProfillerTest()
+    private static void ProfilerTest()
     {
         double MIN_X = 0;
         double MAX_X = 100;
@@ -318,8 +302,8 @@ public class Program
         {
             double x = NextDouble(MIN_X, MAX_X-2, rnd);
             double y = NextDouble(MIN_Y, MAX_Y-2, rnd);
-            var tmpSirka = NextDouble(0, Math.Min(Math.Abs(MAX_X - MIN_X) * MAX_SIZE_OF_OBJCET_PERCENTAGE, MAX_X - 1 - x), rnd);
-            var tmpViska = NextDouble(0, Math.Min(Math.Abs(MAX_Y - MIN_Y) * MAX_SIZE_OF_OBJCET_PERCENTAGE, MAX_Y - 1 - y), rnd);
+            var tmpSirka = NextDouble(0, Math.Min(Math.Abs(MAX_X - MIN_X) * MAX_SIZE_OF_OBJECT_PERCENTAGE, MAX_X - 1 - x), rnd);
+            var tmpViska = NextDouble(0, Math.Min(Math.Abs(MAX_Y - MIN_Y) * MAX_SIZE_OF_OBJECT_PERCENTAGE, MAX_Y - 1 - y), rnd);
             double x2 = x + tmpSirka;
             double y2 = y + tmpViska;
             
@@ -351,16 +335,16 @@ public class Program
         {
             double x = NextDouble(MIN_X, MAX_X - 2, rnd);
             double y = NextDouble(MIN_Y, MAX_Y - 2, rnd);
-            var tmpSirka = NextDouble(0, Math.Min(Math.Abs(MAX_X - MIN_X) * MAX_SIZE_OF_OBJCET_PERCENTAGE, MAX_X - 1 - x),
+            var tmpSirka = NextDouble(0, Math.Min(Math.Abs(MAX_X - MIN_X) * MAX_SIZE_OF_OBJECT_PERCENTAGE, MAX_X - 1 - x),
                 rnd);
-            var tmpViska = NextDouble(0, Math.Min(Math.Abs(MAX_Y - MIN_Y) * MAX_SIZE_OF_OBJCET_PERCENTAGE, MAX_Y - 1 - y),
+            var tmpViska = NextDouble(0, Math.Min(Math.Abs(MAX_Y - MIN_Y) * MAX_SIZE_OF_OBJECT_PERCENTAGE, MAX_Y - 1 - y),
                 rnd);
             double x2 = x + tmpSirka;
             double y2 = y + tmpViska;
 
             if (rnd.NextDouble() <= 0.5)
             {
-                // ideme insertovať
+                // ideme vkladať
                 int index = rnd.Next(0, toInsert.Count);
                 int value = toInsert[index];
                 toInsert.RemoveAt(index);
@@ -376,7 +360,7 @@ public class Program
                 var value = toDelete[index];
                 toDelete.RemoveAt(index);
                 toInsert.Add(value.Data);
-                var deltedValue = quadTree.Delete(value.PointDownLeft.X, value.PointDownLeft.Y,
+                var deletedValue = quadTree.Delete(value.PointDownLeft.X, value.PointDownLeft.Y,
                     value.PointUpRight.X, value.PointUpRight.Y, value.Data);
             }
         }
