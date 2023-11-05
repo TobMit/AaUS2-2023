@@ -233,7 +233,7 @@ namespace PDAAplication.MVVM.ViewModel
             {
                 return;
             }
-            ListNehnutelnost = new ObservableCollection<ObjectModel>(_quadTreeNehnutelnost.FindOverlappingData(gps1.X, gps1.Y, gps2.X, gps2.Y));
+            ListNehnutelnost = new ObservableCollection<ObjectModel>(_quadTreeNehnutelnost.FindIntervalOverlapping(gps1.X, gps1.Y, gps2.X, gps2.Y));
             ListParcela = new();
         }
 
@@ -259,7 +259,7 @@ namespace PDAAplication.MVVM.ViewModel
             {
                 return;
             }
-            ListParcela = new ObservableCollection<ObjectModel>(_quadTreeParcela.FindOverlappingData(gps1.X, gps1.Y, gps2.X, gps2.Y));
+            ListParcela = new ObservableCollection<ObjectModel>(_quadTreeParcela.FindIntervalOverlapping(gps1.X, gps1.Y, gps2.X, gps2.Y));
             ListNehnutelnost = new();
         }
 
@@ -297,7 +297,7 @@ namespace PDAAplication.MVVM.ViewModel
                 return;
             }
 
-            ListParcela = new ObservableCollection<ObjectModel>(_quadTreeJednotne.FindOverlappingData(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y));
+            ListParcela = new ObservableCollection<ObjectModel>(_quadTreeJednotne.FindIntervalOverlapping(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y));
         }
 
         private void AddBuilding()
@@ -347,7 +347,7 @@ namespace PDAAplication.MVVM.ViewModel
             // pridať nehnuteľnosť do zoznamu všetkých nehnuteľností a všetky parcely do nehnuteľnosti
             // pridať nehnuteľnosť do quad tree
             ObjectModel tmpNehnutelnost = new(idCislo, popis, dlgGps1, dlgGps2, Core.ObjectType.Nehnutelnost);
-            var tmpListParciel = _quadTreeParcela.FindOverlappingData(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y);
+            var tmpListParciel = _quadTreeParcela.FindIntervalOverlapping(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y);
             foreach (ObjectModel parcela in tmpListParciel)
             {
                 tmpNehnutelnost.ZoznamObjektov.Add(parcela);
@@ -404,7 +404,7 @@ namespace PDAAplication.MVVM.ViewModel
                 return;
             }
             ObjectModel tmpNehnutelnost = new(idCislo, popis, dlgGps1, dlgGps2, Core.ObjectType.Parcela);
-            var tmpListParciel = _quadTreeNehnutelnost.FindOverlappingData(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y);
+            var tmpListParciel = _quadTreeNehnutelnost.FindIntervalOverlapping(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y);
             foreach (ObjectModel parcela in tmpListParciel)
             {
                 tmpNehnutelnost.ZoznamObjektov.Add(parcela);
@@ -503,11 +503,11 @@ namespace PDAAplication.MVVM.ViewModel
 
             if (objectModel.ObjectType == ObjectType.Nehnutelnost)
             {
-                tmpListOverlappingData = _quadTreeParcela.FindOverlappingData(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y);
+                tmpListOverlappingData = _quadTreeParcela.FindIntervalOverlapping(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y);
             }
             else
             {
-                tmpListOverlappingData = _quadTreeNehnutelnost.FindOverlappingData(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y);
+                tmpListOverlappingData = _quadTreeNehnutelnost.FindIntervalOverlapping(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y);
             }
 
             foreach (ObjectModel model in tmpListOverlappingData)

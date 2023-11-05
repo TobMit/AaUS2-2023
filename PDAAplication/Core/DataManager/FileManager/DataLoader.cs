@@ -112,7 +112,7 @@ namespace PDAAplication.Core.DataManager.FileManager
         {
             foreach (var objectModel in nehnutelnostiList)
             {
-                var tmpListParciel = parcelyQuadTree.FindOverlappingData(objectModel.GpsBod1.X, objectModel.GpsBod1.Y,
+                var tmpListParciel = parcelyQuadTree.FindIntervalOverlapping(objectModel.GpsBod1.X, objectModel.GpsBod1.Y,
                     objectModel.GpsBod2.X, objectModel.GpsBod2.Y);
                 foreach (ObjectModel parcela in tmpListParciel)
                 {

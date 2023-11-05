@@ -88,7 +88,7 @@ public class FindAndDeleteRange
         quadtree.Insert(-20.0, -20.0, -10, -10, 3);
         quadtree.Insert(-10.0, -10.0, -1, -1, 4);
         Assert.That(quadtree.Count, Is.EqualTo(6));
-        var tmp = quadtree.FindOverlappingData(-20.0, -20.0, -1, -1);
+        var tmp = quadtree.FindIntervalOverlapping(-20.0, -20.0, -1, -1);
         Assert.That(tmp.Count, Is.EqualTo(6));
         Assert.True(tmp.Contains(3));
         Assert.True(tmp.Contains(4));
@@ -97,18 +97,18 @@ public class FindAndDeleteRange
         Assert.True(tmp.Contains(1));
         Assert.True(tmp.Contains(2));
         
-        tmp = quadtree.FindOverlappingData(-10.0, -10.0, -1, -1);
+        tmp = quadtree.FindIntervalOverlapping(-10.0, -10.0, -1, -1);
         Assert.That(tmp.Count, Is.EqualTo(4));
         Assert.True(tmp.Contains(4));
         Assert.True(tmp.Contains(5));
         Assert.True(tmp.Contains(6));
         Assert.True(tmp.Contains(1));
         
-        tmp = quadtree.FindOverlappingData(0, 0, 80, 80);
+        tmp = quadtree.FindIntervalOverlapping(0, 0, 80, 80);
         Assert.That(tmp.Count, Is.EqualTo(1));
         Assert.True(tmp.Contains(1));
         
-        tmp = quadtree.FindOverlappingData(-4, -4, -4, -4);
+        tmp = quadtree.FindIntervalOverlapping(-4, -4, -4, -4);
         Assert.That(tmp.Count, Is.EqualTo(4));
         Assert.True(tmp.Contains(4));
         Assert.True(tmp.Contains(5));

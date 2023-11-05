@@ -76,7 +76,7 @@ namespace PDAAplication.Core.DataManager
                 GPS tmpGps2 = new(tmpGps1.X + tmpSirka, 'E', tmpGps1.Y + tmpViska, 'N');
 
                 ObjectModel tmpNehnutelnost = new(count, "Nehnuteľnosť: " + count, tmpGps1, tmpGps2, Core.ObjectType.Nehnutelnost);
-                var tmpListParciel = parcelyQuadTree.FindOverlappingData(tmpNehnutelnost.GpsBod1.X, tmpNehnutelnost.GpsBod1.Y,
+                var tmpListParciel = parcelyQuadTree.FindIntervalOverlapping(tmpNehnutelnost.GpsBod1.X, tmpNehnutelnost.GpsBod1.Y,
                     tmpNehnutelnost.GpsBod2.X, tmpNehnutelnost.GpsBod2.Y);
                 foreach (ObjectModel parcela in tmpListParciel)
                 {

@@ -31,7 +31,7 @@ public class Utils
         quadtree.SetQuadTreeDepth(2);
         Assert.That(quadtree.Count, Is.EqualTo(quadtree.Recount()));
         Assert.That(quadtree.Recount(), Is.EqualTo(8));
-        var tmp = quadtree.FindOverlappingData(-20.0, -20.0, -1, -1);
+        var tmp = quadtree.FindIntervalOverlapping(-20.0, -20.0, -1, -1);
         Assert.That(tmp.Count, Is.EqualTo(8));
         Assert.True(tmp.Contains(3));
         Assert.True(tmp.Contains(4));
@@ -43,7 +43,7 @@ public class Utils
         quadtree.SetQuadTreeDepth(6);
         Assert.That(quadtree.Count, Is.EqualTo(quadtree.Recount()));
         Assert.That(quadtree.Recount(), Is.EqualTo(8));
-        tmp = quadtree.FindOverlappingData(-20.0, -20.0, -1, -1);
+        tmp = quadtree.FindIntervalOverlapping(-20.0, -20.0, -1, -1);
         Assert.That(tmp.Count, Is.EqualTo(8));
         Assert.True(tmp.Contains(3));
         Assert.True(tmp.Contains(4));

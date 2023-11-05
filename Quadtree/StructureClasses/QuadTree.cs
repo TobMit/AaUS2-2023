@@ -434,7 +434,11 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         return returnData;
     }
 
-    public List<TValue> FindOverlappingData(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight)
+    /// <summary>
+    /// Vyhľadanie dát ktoré sa zo zadanou oblasťou aspoň čiastočne prekrývajú
+    /// </summary>
+    /// <returns>Všetky dáta ktoré do danej oblasti aspoň čiastočne zasahujú</returns>
+    public List<TValue> FindIntervalOverlapping(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight)
     {
         QuadTreeNodeLeaf<TKey, TValue> objectToFind = new(new(xDownLeft, yDownLeft),
             new(xUpRight, yUpRight));
@@ -468,7 +472,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
     }
     
     /// <summary>
-    /// Optimalizácia stromu ktorá zväčšuje alebo zmenšuje strom na tú stranu na ktorej sa nachádza viac dát. Tým sa zaručí že najväčší zhluk dát bude v strede alebo blýzko jeho okolia
+    /// Optimalizácia stromu ktorá zväčšuje alebo zmenšuje strom na tú stranu na ktorej sa nachádza viac dát. Tým sa zaručí že najväčší zhluk dát bude v strede alebo blízko jeho okolia
     /// </summary>
     /// <param name="force">Ak je nastavené na true tak sa obídu všetky zábrany spúšťania optimalizácia po každej vykonanej operácií, defaultne je nastavené na false</param>
     public void Optimalise(bool force = false)

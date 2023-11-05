@@ -160,7 +160,7 @@ public class Program
                 }
                 else
                 {
-                    var tmpData = quadtree.FindOverlappingData(MIN_X, MIN_Y, MAX_X, MAX_Y);
+                    var tmpData = quadtree.FindIntervalOverlapping(MIN_X, MIN_Y, MAX_X, MAX_Y);
                     if (tmpData.Count != toDelete.Count)
                     {
                         seedOk = false;
