@@ -54,6 +54,7 @@
                 <MenuItem Header="{Binding HealthJednotne}"/>
                 <MenuItem Header="{Binding HealthNehnutelnosti}"/>
                 <MenuItem Header="{Binding HealthParcela}"/>
+                <MenuItem Header="Spustiť optimalizáciu" Command="{Binding ForceOptimisationCommand}"/>
             </MenuItem>
         </Menu>
         

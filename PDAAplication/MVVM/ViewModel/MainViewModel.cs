@@ -33,6 +33,7 @@ namespace PDAAplication.MVVM.ViewModel
         public RelayCommand ShowAllCommand { get; set; }
         public RelayCommand SaveDataCommand { get; set; }
         public RelayCommand LoadDataCommand { get; set; }
+        public RelayCommand ForceOptimisationCommand { get; set; }
 
         private Visibility _splitViewShow;
 
@@ -159,6 +160,7 @@ namespace PDAAplication.MVVM.ViewModel
             ShowAllCommand = new RelayCommand(o => { ShowAll(); });
             SaveDataCommand = new RelayCommand(o => { SaveData(); });
             LoadDataCommand = new RelayCommand(o => { LoadData(); });
+            ForceOptimisationCommand = new RelayCommand(o => { ForceOptimisation(); });
         }
 
         private void GenerateData()
@@ -265,7 +267,7 @@ namespace PDAAplication.MVVM.ViewModel
 
         private void FindObject()
         {
-            if (_quadTreeNehnutelnost is null || _quadTreeParcela is null)
+            if (_quadTreeNehnutelnost is null || _quadTreeParcela is null || _quadTreeJednotne is null)
             {
                 return;
             }
@@ -302,7 +304,7 @@ namespace PDAAplication.MVVM.ViewModel
 
         private void AddBuilding()
         {
-            if (_quadTreeNehnutelnost is null)
+            if (_quadTreeNehnutelnost is null || _quadTreeJednotne is null)
             {
                 return;
             }
@@ -363,7 +365,7 @@ namespace PDAAplication.MVVM.ViewModel
 
         private void AddParcela()
         {
-            if (_quadTreeParcela is null)
+            if (_quadTreeParcela is null || _quadTreeJednotne is null)
             {
                 return;
             }
@@ -482,27 +484,11 @@ namespace PDAAplication.MVVM.ViewModel
             {
                 parcela.ZoznamObjektov.Remove(objectModel);
             }
-
-            // vymažem sa z oboch stromov
-            // _quadTreeJednotne.Delete(dlgGpsOriginal1.X, dlgGpsOriginal1.Y, dlgGpsOriginal2.X, dlgGpsOriginal2.Y,
-            //     originalID);
-            // if (objectModel.ObjectType == ObjectType.Nehnutelnost)
-            // {
-            //     _quadTreeNehnutelnost.Delete(dlgGpsOriginal1.X, dlgGpsOriginal1.Y, dlgGpsOriginal2.X, dlgGpsOriginal2.Y,
-            //         originalID);
-            // }
-            // else
-            // {
-            //     _quadTreeParcela.Delete(dlgGpsOriginal1.X, dlgGpsOriginal1.Y, dlgGpsOriginal2.X, dlgGpsOriginal2.Y,
-            //         originalID);
-            // }
             objectModel.ZoznamObjektov.Clear();
 
             // teraz postupujem ako pri vytváraní nového objektu
             // nájdem prekrývajúce sa objekty, seba tam pridám a na záver pridám aj seba do oboch stromov
-
             List<ObjectModel> tmpListOverlappingData;
-
             if (objectModel.ObjectType == ObjectType.Nehnutelnost)
             {
                 tmpListOverlappingData = _quadTreeParcela.FindIntervalOverlapping(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y);
@@ -512,6 +498,7 @@ namespace PDAAplication.MVVM.ViewModel
                 tmpListOverlappingData = _quadTreeNehnutelnost.FindIntervalOverlapping(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y);
             }
 
+            // prepájame
             foreach (ObjectModel model in tmpListOverlappingData)
             {
                 objectModel.ZoznamObjektov.Add(model);
@@ -600,6 +587,10 @@ namespace PDAAplication.MVVM.ViewModel
 
         private void SaveData()
         {
+            if (_quadTreeNehnutelnost is null || _quadTreeParcela is null || _quadTreeJednotne is null)
+            {
+                return;
+            }
             DataSaver<ObjectModel> saver = new();
             saver.AddLine(_quadTreeJednotne.OriginalPointDownLeft.X + ";" + _quadTreeJednotne.OriginalPointDownLeft.Y + ";" + _quadTreeJednotne.OriginalPointUpRight.X + ";" + _quadTreeJednotne.OriginalPointUpRight.Y + "\n");
             saver.PrepareForSave(_quadTreeJednotne.ToList());
@@ -632,9 +623,15 @@ namespace PDAAplication.MVVM.ViewModel
             HealthParcela = Math.Round(_quadTreeParcela.Health * 100).ToString();
         }
 
-        private static double NextDouble(double min, double max, Random rnd)
+        private void ForceOptimisation()
         {
-            return rnd.NextDouble() * (max - min) + min;
+            if (_quadTreeNehnutelnost is null || _quadTreeParcela is null || _quadTreeJednotne is null)
+            {
+                return;
+            }
+            _quadTreeJednotne.Optimalise(true);
+            _quadTreeNehnutelnost.Optimalise(true);
+            _quadTreeParcela.Optimalise(true);
         }
 
 
