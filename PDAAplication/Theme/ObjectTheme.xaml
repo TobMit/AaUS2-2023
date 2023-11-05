@@ -19,7 +19,7 @@
                             <TreeViewItem Header="{Binding GpsBod2.XVypis }"/>
                             <TreeViewItem Header="{Binding GpsBod2.YVypis }"/>
                         </TreeViewItem>
-                        <TreeViewItem Header="Parcely na ktorých sa nachádza">
+                        <TreeViewItem Header="Parcely, na ktorých sa nachádza">
                             <ListView
                                 ItemsSource="{Binding ZoznamObjektov}"
                                 ItemContainerStyle="{StaticResource ObjectTheme}"
@@ -64,7 +64,7 @@
                                     <TreeViewItem Header="{Binding GpsBod2.XVypis }"/>
                                     <TreeViewItem Header="{Binding GpsBod2.YVypis }"/>
                                 </TreeViewItem>
-                                <TreeViewItem Header="Nehnuteľnosti ktoré sa tam nachádzajú">
+                                <TreeViewItem Header="Nehnuteľnosti, ktoré sa tam nachádzajú">
                                     <ListView
                                         ItemsSource="{Binding ZoznamObjektov}"
                                         ItemContainerStyle="{StaticResource ObjectTheme}"

@@ -58,15 +58,24 @@ public class QuadTreeNodeLeaf<TKey, TValue> : QuadTreeNode<TKey, TValue> where T
         _leafsInitialised = false;
     }
     
+    // používa sa pri vyhľadávaní keď nechcem inicializovať listy
     public bool AnyInitSubNodeContainDataNode(QuadTreeNode<TKey, TValue> pData)
     {
         return AnySubNodeContainDataNode(pData, false);
     }
     
+    // požíva sa pri vkladaní keď chceme inicializovať listy
     public bool AnySubNodeContainDataNode(QuadTreeNode<TKey, TValue> pData)
     {
         return AnySubNodeContainDataNode(pData, true);
     }
+    
+    /// <summary>
+    /// Zistí či niektorý sa do niektorého uzla dané dáta nezmestia
+    /// </summary>
+    /// <param name="pData">dáta</param>
+    /// <param name="initialisedLeafs">Ak chceme pri toma aj inicializovať listy pri inserte</param>
+    /// <returns></returns>
     private bool AnySubNodeContainDataNode(QuadTreeNode<TKey, TValue> pData, bool initialisedLeafs )
     {
         // môžu nastať 2 situácie

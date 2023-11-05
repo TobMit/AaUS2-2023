@@ -201,7 +201,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         public QuadTreeNodeLeaf<TKey, TValue>? Node { get; }
         /// <summary>
         /// <p> 0 - mod vyhľadávanie </p>
-        /// <p> 1 - mod mazania </p>
+        /// <p> 1 - mod hladania dát </p>
         /// <p> Taktiež sa používa pri zmene výšky stromu na ručenie hĺbky</p>
         /// </summary>
         public int ModeOrDepth { get; }
@@ -237,7 +237,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
             if (current.ModeOrDepth == 0)
             { 
                 // 1. hľadanie poduzla do ktorého sa zmesti hľadaná area
-                if (current.Node.OverlapNode(areaToFind))
+                if (current.Node.ContainNode(areaToFind))
                 {
                     // hľadanie prebieha tak že sa pozeráme ktorý uzol vie obsiahnuť vymazávanú areu a či aj potomkovia dokážu obsiahnuť hľadanú areu
                     if (current.Node.AnyInitSubNodeContainDataNode(areaToFind))

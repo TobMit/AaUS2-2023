@@ -511,7 +511,7 @@ namespace PDAAplication.MVVM.ViewModel
                     checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, objectModel.IdObjektu);
                 _allNehnutelnosti = new(_quadTreeNehnutelnost.ToList());
                 ListNehnutelnost =
-                    new(_allNehnutelnosti.GetRange(0, _allNehnutelnosti.Count > 500 ? 500 : _allNehnutelnosti.Count)); // zobrazíme len prvých 500 (aby UI išlo normálne a nesekalo sa)
+                    new(_allNehnutelnosti.GetRange(0, _allNehnutelnosti.Count > Constants.MAX_SIZE_TO_SHOW ? Constants.MAX_SIZE_TO_SHOW : _allNehnutelnosti.Count)); // zobrazíme len prvých 500 (aby UI išlo normálne a nesekalo sa)
             }
             else
             {
@@ -519,7 +519,7 @@ namespace PDAAplication.MVVM.ViewModel
                     checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, objectModel.IdObjektu);
                 _allParcelas = new(_quadTreeParcela.ToList());
                 ListParcela =
-                    new(_allParcelas.GetRange(0, _allParcelas.Count > 500 ? 500 : _allParcelas.Count)); // zobrazíme len prvých 500 (aby UI išlo normálne a nesekalo sa)
+                    new(_allParcelas.GetRange(0, _allParcelas.Count > Constants.MAX_SIZE_TO_SHOW ? Constants.MAX_SIZE_TO_SHOW : _allParcelas.Count)); // zobrazíme len prvých 500 (aby UI išlo normálne a nesekalo sa)
             }
             _quadTreeJednotne.Edit(origanalCheckedGps1.X, origanalCheckedGps1.Y, origanalCheckedGps2.X, origanalCheckedGps2.Y,
                 checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, objectModel.IdObjektu);
@@ -565,13 +565,13 @@ namespace PDAAplication.MVVM.ViewModel
             {
                 _allNehnutelnosti = new(_quadTreeNehnutelnost.ToList());
                 ListNehnutelnost =
-                    new(_allNehnutelnosti.GetRange(0, _allNehnutelnosti.Count > 500 ? 500 : _allNehnutelnosti.Count)); // zobrazíme len prvých 500 (aby UI išlo normálne a nesekalo sa)
+                    new(_allNehnutelnosti.GetRange(0, _allNehnutelnosti.Count > Constants.MAX_SIZE_TO_SHOW ? Constants.MAX_SIZE_TO_SHOW : _allNehnutelnosti.Count)); // zobrazíme len prvých 500 (aby UI išlo normálne a nesekalo sa)
             }
             else
             {
                 _allParcelas = new(_quadTreeParcela.ToList());
                 ListParcela =
-                    new(_allParcelas.GetRange(0, _allParcelas.Count > 500 ? 500 : _allParcelas.Count)); // zobrazíme len prvých 500 (aby UI išlo normálne a nesekalo sa)
+                    new(_allParcelas.GetRange(0, _allParcelas.Count > Constants.MAX_SIZE_TO_SHOW ? Constants.MAX_SIZE_TO_SHOW : _allParcelas.Count)); // zobrazíme len prvých 500 (aby UI išlo normálne a nesekalo sa)
             }
 
             ChangeView(true);
