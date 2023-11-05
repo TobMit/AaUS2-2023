@@ -72,6 +72,20 @@ namespace PDAAplication.Core
                 recalculatedGps2.DlzkaY = dlgGps2.DlzkaY;
                 return true;
             }
+            
+            if (char.ToUpper(dlgGps1.SirkaX) == 'E' && char.ToUpper(dlgGps1.DlzkaY) == 'N' && char.ToUpper(dlgGps2.SirkaX) == 'W' && char.ToUpper(dlgGps2.DlzkaY) == 'S')
+            {
+                recalculatedGps2.X = dlgGps1.X;
+                recalculatedGps2.SirkaX = dlgGps1.SirkaX;
+                recalculatedGps2.Y = dlgGps1.Y;
+                recalculatedGps2.DlzkaY = dlgGps1.DlzkaY;
+                recalculatedGps1.X = dlgGps2.X;
+                recalculatedGps1.SirkaX = dlgGps2.SirkaX;
+                recalculatedGps1.Y = dlgGps2.Y;
+                recalculatedGps1.DlzkaY = dlgGps2.DlzkaY;
+                return true;
+            }
+            
             // prepočet do stromu
             if (char.ToUpper(dlgGps1.SirkaX) == 'W' && char.ToUpper(dlgGps1.DlzkaY) == 'N' && char.ToUpper(dlgGps2.SirkaX) == 'E' && char.ToUpper(dlgGps2.DlzkaY) == 'S')
             {
@@ -83,6 +97,19 @@ namespace PDAAplication.Core
                 recalculatedGps2.SirkaX = 'E';
                 recalculatedGps2.Y = dlgGps1.Y;
                 recalculatedGps2.DlzkaY = 'N';
+                return true;
+            }
+            
+            if (char.ToUpper(dlgGps1.SirkaX) == 'E' && char.ToUpper(dlgGps1.DlzkaY) == 'S' && char.ToUpper(dlgGps2.SirkaX) == 'W' && char.ToUpper(dlgGps2.DlzkaY) == 'N')
+            {
+                recalculatedGps2.X = dlgGps1.X;
+                recalculatedGps2.SirkaX = 'W';
+                recalculatedGps2.Y = dlgGps2.Y;
+                recalculatedGps2.DlzkaY = 'S';
+                recalculatedGps1.X = dlgGps2.X;
+                recalculatedGps1.SirkaX = 'E';
+                recalculatedGps1.Y = dlgGps1.Y;
+                recalculatedGps1.DlzkaY = 'N';
                 return true;
             }
             
