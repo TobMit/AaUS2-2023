@@ -237,7 +237,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
             if (current.ModeOrDepth == 0)
             { 
                 // 1. hľadanie poduzla do ktorého sa zmesti hľadaná area
-                if (current.Node.ContainNode(areaToFind))
+                if (current.Node.OverlapNode(areaToFind))
                 {
                     // hľadanie prebieha tak že sa pozeráme ktorý uzol vie obsiahnuť vymazávanú areu a či aj potomkovia dokážu obsiahnuť hľadanú areu
                     if (current.Node.AnyInitSubNodeContainDataNode(areaToFind))
