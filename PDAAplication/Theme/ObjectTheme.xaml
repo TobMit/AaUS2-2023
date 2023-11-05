@@ -27,11 +27,19 @@
                                 VerticalAlignment="Stretch"
                                 BorderThickness="0"/>
                         </TreeViewItem>
-                        <Button
-                            Command="{Binding Path=DataContext.EditCommand, ElementName=ListViewNehnutelnost}"
-                            CommandParameter="{Binding}">
-                            Edit
-                        </Button>
+                        <StackPanel Orientation="Horizontal">
+                            <Button
+                                Command="{Binding Path=DataContext.EditCommand, ElementName=ListViewNehnutelnost}"
+                                CommandParameter="{Binding}">
+                                Edit
+                            </Button>
+                            <Button
+                                Margin="4,0,0,0"
+                                Command="{Binding Path=DataContext.DeleteCommand, ElementName=ListViewNehnutelnost}"
+                                CommandParameter="{Binding}">
+                                Delete
+                            </Button>
+                        </StackPanel>
                     </TreeViewItem>
                 </ControlTemplate>
             </Setter.Value>
@@ -64,11 +72,19 @@
                                         VerticalAlignment="Stretch"
                                         BorderThickness="0"/>
                                 </TreeViewItem>
-                                <Button
-                                    Command="{Binding Path=DataContext.EditCommand, ElementName=ListViewParcela}"
-                                    CommandParameter="{Binding}">
-                                    Edit
-                                </Button>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button
+                                        Command="{Binding Path=DataContext.EditCommand, ElementName=ListViewParcela}"
+                                        CommandParameter="{Binding}">
+                                        Edit
+                                    </Button>
+                                    <Button
+                                        Margin="4,0,0,0"
+                                        Command="{Binding Path=DataContext.DeleteCommand, ElementName=ListViewParcela}"
+                                        CommandParameter="{Binding}">
+                                        Delete
+                                    </Button>
+                                </StackPanel>
                             </TreeViewItem>
                         </ControlTemplate>
                     </Setter.Value>

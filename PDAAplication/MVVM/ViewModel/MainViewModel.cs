@@ -29,6 +29,7 @@ namespace PDAAplication.MVVM.ViewModel
         public RelayCommand AddBuildingCommand { get; set; }
         public RelayCommand AddParcelaCommand { get; set; }
         public RelayCommand EditCommand { get; set; }
+        public RelayCommand DeleteCommand { get; set; }
         public RelayCommand ShowAllComand { get; set; }
         public RelayCommand SaveDataCommand { get; set; }
         public RelayCommand LoadDataCommand { get; set; }
@@ -155,6 +156,11 @@ namespace PDAAplication.MVVM.ViewModel
             {
                 var tmp = (ObjectModel)o;
                 EditObject(tmp);
+            });
+            DeleteCommand = new RelayCommand(o =>
+            {
+                var tmp = (ObjectModel)o;
+                DeleteObject(tmp);
             });
             ShowAllComand = new RelayCommand(o => { ShowAll(); });
             SaveDataCommand = new RelayCommand(o => { SaveData(); });
@@ -497,9 +503,6 @@ namespace PDAAplication.MVVM.ViewModel
                 _quadTreeParcela.Delete(dlgGpsOfiginal1.X, dlgGpsOfiginal1.Y, dlgGpsOriginal2.X, dlgGpsOriginal2.Y,
                     originalID);
             }
-
-            _quadTreeJednotne.Delete(dlgGpsOfiginal1.X, dlgGpsOfiginal1.Y, dlgGpsOriginal2.X, dlgGpsOriginal2.Y,
-                originalID);
             objectModel.ZoznamObjektov.Clear();
 
             // teraz postupujem ako pri vytváraní nového objektu
@@ -525,22 +528,58 @@ namespace PDAAplication.MVVM.ViewModel
             if (objectModel.ObjectType == ObjectType.Nehnutelnost)
             {
                 _quadTreeNehnutelnost.Insert(checketGps1.X, checketGps1.Y, checketGps2.X, checketGps2.Y, objectModel);
-                _listNehnutelnost = new(_quadTreeNehnutelnost.ToList());
+                _allNehnutelnosti = new(_quadTreeNehnutelnost.ToList());
                 ListNehnutelnost =
-                    new(_allNehnutelnosti.GetRange(0, _allNehnutelnosti.Count > 500 ? 500 : _allNehnutelnosti.Count));
+                    new(_allNehnutelnosti.GetRange(0, _allNehnutelnosti.Count > 500 ? 500 : _allNehnutelnosti.Count)); // zobrazíme len prvých 500 (aby UI išlo normálne a nesekalo sa)
             }
             else
             {
                 _quadTreeParcela.Insert(checketGps1.X, checketGps1.Y, checketGps2.X, checketGps2.Y, objectModel);
-                _listParcela = new(_quadTreeNehnutelnost.ToList());
+                _allParcelas = new(_quadTreeParcela.ToList());
                 ListParcela =
-                    new(_allParcelas.GetRange(0, _allParcelas.Count > 500 ? 500 : _allParcelas.Count));
+                    new(_allParcelas.GetRange(0, _allParcelas.Count > 500 ? 500 : _allParcelas.Count)); // zobrazíme len prvých 500 (aby UI išlo normálne a nesekalo sa)
             }
             _quadTreeJednotne.Insert(checketGps1.X, checketGps1.Y, checketGps2.X, checketGps2.Y, objectModel);
 
             HealthParcela = Math.Round(_quadTreeParcela.Health * 100).ToString();
             HealthNehnutelnosti = Math.Round(_quadTreeNehnutelnost.Health * 100).ToString();
             HealthJednotne = Math.Round(_quadTreeJednotne.Health * 100).ToString();
+        }
+
+        private void DeleteObject(ObjectModel objectModel)
+        {
+            // musím zmazať zo všetkých parciel záznam na tento objekt
+            foreach (ObjectModel parcela in objectModel.ZoznamObjektov)
+            {
+                parcela.ZoznamObjektov.Remove(objectModel);
+            }
+
+            // vymažem sa z oboch stromov
+            if (objectModel.ObjectType == ObjectType.Nehnutelnost)
+            {
+                _quadTreeNehnutelnost.Delete(objectModel.GpsBod1.X, objectModel.GpsBod1.Y, objectModel.GpsBod2.X, objectModel.GpsBod2.Y,
+                    objectModel.IdObjektu);
+            }
+            else
+            {
+                _quadTreeParcela.Delete(objectModel.GpsBod1.X, objectModel.GpsBod1.Y, objectModel.GpsBod2.X, objectModel.GpsBod2.Y, objectModel.IdObjektu);
+            }
+
+            _quadTreeJednotne.Delete(objectModel.GpsBod1.X, objectModel.GpsBod1.Y, objectModel.GpsBod2.X, objectModel.GpsBod2.Y, objectModel.IdObjektu);
+            objectModel.ZoznamObjektov.Clear();
+
+            if (objectModel.ObjectType == ObjectType.Nehnutelnost)
+            {
+                _allNehnutelnosti = new(_quadTreeNehnutelnost.ToList());
+                ListNehnutelnost =
+                    new(_allNehnutelnosti.GetRange(0, _allNehnutelnosti.Count > 500 ? 500 : _allNehnutelnosti.Count)); // zobrazíme len prvých 500 (aby UI išlo normálne a nesekalo sa)
+            }
+            else
+            {
+                _allParcelas = new(_quadTreeParcela.ToList());
+                ListParcela =
+                    new(_allParcelas.GetRange(0, _allParcelas.Count > 500 ? 500 : _allParcelas.Count)); // zobrazíme len prvých 500 (aby UI išlo normálne a nesekalo sa)
+            }
         }
 
         private void ShowAll()

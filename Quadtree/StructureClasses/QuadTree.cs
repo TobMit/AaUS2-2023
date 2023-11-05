@@ -797,7 +797,7 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
                         {
                             // ak môžem tak ich vymažem a pridám parenta do staku
                             stack.Push(new(current.Node.Parent, current.ModeOrDepth - 1));
-                            // Ak je hlbka väčšia ako pžadovaná tak dáta vložím do parenta
+                            // Ak je hĺbka väčšia ako pžadovaná tak dáta vložím do parenta
                             if (!current.Node.DataIsEmpty() && current.ModeOrDepth > _maxDepth)
                             {
                                 current.Node.Parent.AddData(current.Node.GetArrayListData());
