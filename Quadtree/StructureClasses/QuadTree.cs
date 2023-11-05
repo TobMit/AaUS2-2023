@@ -662,9 +662,9 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
             return;
         }
         
-        // ak nie je optimalizácia zapnutá tak nepokračujem
         if (!force)
         {
+            // ak nie je optimalizácia zapnutá tak nepokračujem
             if (!OptimalizationOn)
             {
                 return;
@@ -726,6 +726,17 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         
         // vypočítame zdravie
         Health = 1 - (Math.Abs(rozdielSJ) + Math.Abs(rozdielVZ)) / 2;
+    }
+
+    /// <summary>
+    /// Nahradí pôvodné súradnice novými
+    /// </summary>
+    /// <param name="key">Kľúč jednoznačného identifikovania dát</param>
+    public void Edit(double xDownLeft, double yDownLeft, double xUpRight, double yUpRight, double newXDownLeft,
+        double newYDownLeft, double newXUpRight, double newYUpRight, TKey key)
+    {
+        var tmpData = Delete(xDownLeft, yDownLeft, xUpRight, yUpRight, key);
+        Insert(newXDownLeft, newYDownLeft, newXUpRight, newYUpRight, tmpData[0]); // vráti 1 záznam tak to bude vždy ten prvý
     }
 
     /// <summary>

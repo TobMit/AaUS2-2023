@@ -463,6 +463,11 @@ namespace PDAAplication.MVVM.ViewModel
                 MessageBox.Show("Nie je možné zmeniť súradnice, chybný vstup.", "Chyba vstupu", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
+            
+            // prepočítam si dáta pôvodné ktore sa používaju v kúči v stromu
+            GPS origanalCheckedGps1 = new GPS();
+            GPS origanalCheckedGps2 = new GPS();
+            Core.Utils.CheckAndRecalculateGps(objectModel.GpsBod1, objectModel.GpsBod2, origanalCheckedGps1, origanalCheckedGps2);
 
             // kontrolujem či sa môžu zmeniť súradnice
 
@@ -471,10 +476,7 @@ namespace PDAAplication.MVVM.ViewModel
                 MessageBox.Show("Nie je možné zmeniť súradnice, zlý rozsah.", "Chyba vstupu", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-
-            objectModel.GpsBod1 = checkedGps1;
-            objectModel.GpsBod2 = checkedGps2;
-
+            
             // musím zmazať zo všetkých parciel záznam na tento objekt
             foreach (ObjectModel parcela in objectModel.ZoznamObjektov)
             {
@@ -482,18 +484,18 @@ namespace PDAAplication.MVVM.ViewModel
             }
 
             // vymažem sa z oboch stromov
-            _quadTreeJednotne.Delete(dlgGpsOriginal1.X, dlgGpsOriginal1.Y, dlgGpsOriginal2.X, dlgGpsOriginal2.Y,
-                originalID);
-            if (objectModel.ObjectType == ObjectType.Nehnutelnost)
-            {
-                _quadTreeNehnutelnost.Delete(dlgGpsOriginal1.X, dlgGpsOriginal1.Y, dlgGpsOriginal2.X, dlgGpsOriginal2.Y,
-                    originalID);
-            }
-            else
-            {
-                _quadTreeParcela.Delete(dlgGpsOriginal1.X, dlgGpsOriginal1.Y, dlgGpsOriginal2.X, dlgGpsOriginal2.Y,
-                    originalID);
-            }
+            // _quadTreeJednotne.Delete(dlgGpsOriginal1.X, dlgGpsOriginal1.Y, dlgGpsOriginal2.X, dlgGpsOriginal2.Y,
+            //     originalID);
+            // if (objectModel.ObjectType == ObjectType.Nehnutelnost)
+            // {
+            //     _quadTreeNehnutelnost.Delete(dlgGpsOriginal1.X, dlgGpsOriginal1.Y, dlgGpsOriginal2.X, dlgGpsOriginal2.Y,
+            //         originalID);
+            // }
+            // else
+            // {
+            //     _quadTreeParcela.Delete(dlgGpsOriginal1.X, dlgGpsOriginal1.Y, dlgGpsOriginal2.X, dlgGpsOriginal2.Y,
+            //         originalID);
+            // }
             objectModel.ZoznamObjektov.Clear();
 
             // teraz postupujem ako pri vytváraní nového objektu
@@ -518,20 +520,27 @@ namespace PDAAplication.MVVM.ViewModel
 
             if (objectModel.ObjectType == ObjectType.Nehnutelnost)
             {
-                _quadTreeNehnutelnost.Insert(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, objectModel);
+                _quadTreeNehnutelnost.Edit(origanalCheckedGps1.X, origanalCheckedGps1.Y, origanalCheckedGps2.X, origanalCheckedGps2.Y,
+                    checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, objectModel.IdObjektu);
                 _allNehnutelnosti = new(_quadTreeNehnutelnost.ToList());
                 ListNehnutelnost =
                     new(_allNehnutelnosti.GetRange(0, _allNehnutelnosti.Count > 500 ? 500 : _allNehnutelnosti.Count)); // zobrazíme len prvých 500 (aby UI išlo normálne a nesekalo sa)
             }
             else
             {
-                _quadTreeParcela.Insert(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, objectModel);
+                _quadTreeParcela.Edit(origanalCheckedGps1.X, origanalCheckedGps1.Y, origanalCheckedGps2.X, origanalCheckedGps2.Y,
+                    checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, objectModel.IdObjektu);
                 _allParcelas = new(_quadTreeParcela.ToList());
                 ListParcela =
                     new(_allParcelas.GetRange(0, _allParcelas.Count > 500 ? 500 : _allParcelas.Count)); // zobrazíme len prvých 500 (aby UI išlo normálne a nesekalo sa)
             }
-            _quadTreeJednotne.Insert(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, objectModel);
+            _quadTreeJednotne.Edit(origanalCheckedGps1.X, origanalCheckedGps1.Y, origanalCheckedGps2.X, origanalCheckedGps2.Y,
+                checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, objectModel.IdObjektu);
 
+            // nahrám nové súradnice
+            objectModel.GpsBod1 = dlgGps1;
+            objectModel.GpsBod2 = dlgGps2;
+            
             HealthParcela = Math.Round(_quadTreeParcela.Health * 100).ToString();
             HealthNehnutelnosti = Math.Round(_quadTreeNehnutelnost.Health * 100).ToString();
             HealthJednotne = Math.Round(_quadTreeJednotne.Health * 100).ToString();
