@@ -727,6 +727,163 @@ public class QuadTree<TKey, TValue> where TKey : IComparable<TKey> where TValue 
         Health = 1 - (Math.Abs(rozdielSJ) + Math.Abs(rozdielVZ)) / 2;
     }
 
+    private class WrapClassOpt
+    {
+        public QuadTreeNodeData<TKey, TValue>? Node { get; }
+        public double size { get; }
+        
+        public WrapClassOpt(QuadTreeNodeData<TKey, TValue> pNode, double modeOrDepth)
+        {
+            Node = pNode;
+            size = modeOrDepth;
+        }
+        
+    }
+    public void OptimaliseSecond()
+    {
+        if (Count <= 1)
+        {
+            return;
+        }
+        // zoberiem 4 najväčšie objekty
+        // na na základe nich 
+
+        List<QuadTreeNodeData <TKey, TValue>> allData = new(Count);
+        Stack<QuadTreeNodeLeaf<TKey, TValue>> stack = new();
+        // pridáme do staku root
+        stack.Push(_root);
+        while (stack.Count != 0)
+        {
+            var current = stack.Pop();
+            allData.AddRange(current.GetArrayListData());
+            if (current.LeafsInitialised)
+            {
+                var tmpLeafs = current.GetLeafs();
+                foreach (var leaf in tmpLeafs)
+                {
+                    stack.Push(leaf);
+                }
+            }
+        }
+        if (allData.Count == 0)
+        {
+            return;
+        }
+
+        List<WrapClassOpt> dataSVelkostou = new(Count);
+        // musím nájsť najväčšie prvky
+        foreach (var nodeData in allData)
+        {
+            dataSVelkostou.Add(new(nodeData, CalculateArea(nodeData)));
+        }
+        List<WrapClassOpt> usporiadane = dataSVelkostou.OrderByDescending(o=>o.size).ToList();
+        List<WrapClassOpt> prveStiryVelkePrvky = new(4);
+        //Veľke prvky sú na začiatku
+        prveStiryVelkePrvky.AddRange(usporiadane.GetRange(0, usporiadane.Count > 4 ? 4 : allData.Count));
+        
+        
+        double x1 = OriginalPointDownLeft.X;
+        double y1 = OriginalPointDownLeft.Y;
+        double x2 = OriginalPointUpRight.X;
+        double y2 = OriginalPointUpRight.Y;
+        double xS = (x1 + x2) / 2;
+        double yS = (y1 + y2) / 2;
+        // zoberiem si prvý najväčší prvok a podľa neho určím ako sa má posunúť strom
+        // zistím si kde sa nachádza prvok
+        bool jeHore = false;
+        bool jeNaLavo = true;
+        // najdem si stred tohoto objektu a podľa toho zistím
+
+        var najvecsi = prveStiryVelkePrvky[0].Node;
+        double xSObjektu = (najvecsi.PointDownLeft.X + najvecsi.PointUpRight.X) / 2;
+        double ySObjektu = (najvecsi.PointDownLeft.Y + najvecsi.PointUpRight.Y) / 2;
+        // idem zistiť či je hore
+        if (xSObjektu >= xS)
+        {
+            jeNaLavo = false;
+        }
+
+        if (ySObjektu >= yS)
+        {
+            jeHore = true;
+        }
+        
+        // teraz mám kde sa nachádza teraz podľa toho vypočítam nové pozície
+        double newXS;
+        double newYS;
+
+        double newX1;
+        double newY1;
+        double newX2;
+        double newY2;
+        
+        // pracujem s newYs
+        if (jeHore)
+        {
+            // posúvam smerom dole stred
+            newYS = najvecsi.PointDownLeft.Y - (2 * Double.Epsilon);
+            newY2 = y2;
+            double polVyska = Math.Abs(OriginalPointUpRight.Y - newYS);
+            newY1 = newY2 - (2 * polVyska);
+        }
+        else
+        {
+            // posúvam stred smerom hore
+            newYS = najvecsi.PointUpRight.Y + (2 * Double.Epsilon);
+            newY1 = y1;
+            double polVyska = Math.Abs(newYS - OriginalPointDownLeft.Y);
+            newY2 = newY1 + (2 * polVyska);
+        }
+        
+        if (jeNaLavo)
+        {
+            // posúvam stred smerom doprava
+            newXS = najvecsi.PointUpRight.X + (2 * Double.Epsilon);
+            newX1 = x1;
+            double polSirka = Math.Abs(newXS - OriginalPointDownLeft.X);
+            newX2 = newX1 + (2 * polSirka);
+        }
+        else
+        {
+            // posúvam stred smerom dolava
+            newXS = najvecsi.PointDownLeft.X - (2 * Double.Epsilon);
+            newX2 = x2;
+            double polVyska = Math.Abs(OriginalPointUpRight.X - newXS);
+            newX1 = newX2 - (2 * polVyska);
+        }
+        
+        // skontrolujem či som nezmenšil náhodov oblasť
+        if (newX1 >= OriginalPointDownLeft.X)
+        {
+            newX1 = OriginalPointDownLeft.X;
+        }
+
+        if (newX2 <= OriginalPointUpRight.X)
+        {
+            newX2 = OriginalPointUpRight.X;
+        }
+        
+        if (newY1 >= OriginalPointDownLeft.Y) 
+        {
+            newY1 = OriginalPointDownLeft.Y;
+        }
+        
+        
+        // potom sa vytvorí nový root
+        // naplní sa novými prvkami
+        
+
+    }
+
+    private double CalculateArea(QuadTreeNodeData<TKey, TValue> node)
+    {
+        // vypočet plochy z 2 bodov
+        double sirka = Math.Abs(node.PointUpRight.X - node.PointDownLeft.X);
+        double vyska = Math.Abs(node.PointUpRight.Y - node.PointDownLeft.Y);
+
+        return sirka * vyska;
+    }
+
     /// <summary>
     /// Nahradí pôvodné súradnice novými
     /// </summary>

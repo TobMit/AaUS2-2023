@@ -16,8 +16,10 @@ public class Program
     private static double PROBABILITY_FO_FR = 0.1;
     private static double PROBABILITY_DEPTH = 0.0001;
     private static double FILL_PROBABILITY = 0.3;
-    private static double MAX_SIZE_OF_OBJECT_PERCENTAGE = 0.25;
-    private static int STARTUP_FILL_COUNT = 12000;
+    //private static double MAX_SIZE_OF_OBJECT_PERCENTAGE = 0.25;
+    private static double MAX_SIZE_OF_OBJECT_PERCENTAGE = 0.80;
+    //private static int STARTUP_FILL_COUNT = 12000;
+    private static int STARTUP_FILL_COUNT = 10;
     
     private static int OPERATION_COUNT = 20000;
     private static bool OPTIMALIZATION_ON = true;
@@ -320,7 +322,8 @@ public class Program
         if (OPTIMALIZATION_ON)
         {
             quadTree.OptimalizationOn = true;
-            quadTree.Optimalise(true);
+            //quadTree.Optimalise(true);
+            quadTree.OptimaliseSecond();
             quadTree.OptimalizationOn = false;
             Console.WriteLine("Zdravie po optimalizácií: " + quadTree.Health);
         }
