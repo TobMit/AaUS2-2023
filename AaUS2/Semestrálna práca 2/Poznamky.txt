@@ -1,0 +1,80 @@
+Tester aby sa všetko otestovalo
+Dinamické hešovanie
+
+Dikitálny znakový strom
+Služí na traverzovanie, v ľavo je nula v pravo je jednotka
+budem traverzovať tým stromom a tak budem traverzovať tou štruktúrov
+recor má fixnú veľkosť a aj blok má fixnú veľkosť
+Pozor na string: musí mať definovanú max veľkosť, následne je otázka ako ju prevádzať
+ku každému stringu si dať pole platných znakov, pri prevode sa musia znovu používať aj nejaké biele znaky aby sa to dalo prevázdať, a pri čítaní sa potom iba načítajú platné znaky
+Data majú implementovať interface ktorý overridne getData a setData
+
+do budúceho týždňa je potrebené zapísať si jeden blok dát a načítať jeden blok dát všetko len v prvom bloku súboru
+
+mám insert:
+    zoberiem kľúče, zavolám funkciu getHash
+    traverzujem tým stromom a vložím do bloku...
+    
+
+Triedy dinameckého hešovanie D.H
+Triedy dinameckého hešovanie D.H
+    - root: node
+    - blokovací faktor (BF) - počet blokov
+    
+Abstaract node:
+    - parent: node
+
+NodeIntern: node
+    - lavySyn: node
+    - pravySyn: node
+
+NodeExtern: node
+    - addr : int
+    - count: int - čo je počet záznamov 
+    
+Trieda blok
+    - record: pole ktoré je rovnaké ako BF - rozkuskuje pole podľa veľkosti čo je v recorde, vytvorý z neho veľké pole bitov
+    - validCount: int - na začiatku sú platné záznami a na konci sú neplatné, alebo do recordu si dať si dam flagu ktorá bude označovať či je záznam platný alebo nie
+    - getData: []byte - vráti pole bytov
+    - setData: []byte - nastaví pole bytov
+    - getSize: int - vráti veľkosť záznamu
+    
+RekordData
+    - getSize: int -  to je veľkosť záznamu v bitoch, každý záznam musí vrátiť vždy identickú
+    - getHash: bitSet(v jave) - ideálne poľe bytov (dá sa pomocou pola bitov a pomocou posunu bitov by som zistil či tam je 0 alebo 1)
+    - equals alebo operátor rovnása nutne overridnuť
+    - getData :[]byte - musí mať rovnakú veľkosť ako getSize
+    - potrebujem copy construktor (to si viem polsať ako referenciu do DH rekordu)
+    
+    
+Dynamický hešovací súbor
+takže mám súbor ktorý sa skladá z blokov a vždy to vkladám na koniec bloku
+a potom mám seek tak nás prejde na ne najkä časť súboru
+preplňujúci súbor (napr 6 záznamov)
+preplňujúci súbor, je samostaná trieda ktorá je univerzálna, ale ak sa nedá tak aj univerzálne pre danú štruktúru
+každý blok môže pokračovať do preplňujúceho súboru, a aj v rámci preplňujúceho súboru odkazovať na daľší
+menežovanie súboru v preplňujúcom súboru
+    - keďmažeme
+        - zreťazenie prázdnych blokov keď potrebujem prázdny blok tak si zoberiem prvý zreťazený a tak isto mám aj referencie je aj naplnené
+            - ak je na konci prázdne tak sa zmenší súbor pomocou setSize() na konci súboru nebude voľný blok
+            - ak máme na konci súboru že prázdny a plný a ak zmažem ten posledný plný tak mám na konci 2 práznde bloky takže zmenším o 2 prázdne bloky
+            - je potreba obojsmerné zreťazenie
+        - druhý spôsob (nepoužívať) môže to byť zoznam alebo list
+        
+Bloky v hlavnom súbore je rovnakú súbor, kde každú súbor ma rovnaký blokovací faktor a mazanie bude fungovať rovnako
+striasanie z hlavného záznamu odporúča nerobyť, ale spraviť v tedy ak dvaja synovia v tedy sa zlužia synovia do hromady
+
+hlavičku uložiť do nejakej vlastnej režíí a tam užložím riadiace informácie
+čiže budeme mať 3 súbory
+    - hlavný súbor
+    - preplňujúci súbor
+    - hlavička (to bude ako textový súbor)
+    
+Kvad strom sa bude ukladať do súboru (ale len tie nevyhnutné súbori ako kľúč a súradnice...) má byť len minumálny
+takže budeme mať 2 dinamické hešovania a jeden alebo 2 quadstromi
+
+Generátor bude upravený tak aby generoval iba ten počet dát
+
+preved dát v c# má na to peknú triedu
+
+bit converter ktorá premení triedu na pole bitov a ja naspäť
