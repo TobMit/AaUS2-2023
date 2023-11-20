@@ -78,3 +78,57 @@ Generátor bude upravený tak aby generoval iba ten počet dát
 preved dát v c# má na to peknú triedu
 
 bit converter ktorá premení triedu na pole bitov a ja naspäť
+
+
+Vysvetlovanie 2.0
+- odporúča urobiť si sekvenčný vypís binárnych súborov
+    - hlavný súbor a k nemu je preplňujúci, v každom súbore je istý blokový faktro napr 2 a v druhom je 3 toto je príklad,
+    - výpis je myslený tak že zoberiem súbor a blok po bloku vzpíšem všetky atribútu a ak tam je adresa na predchodsu, ako všetko čo sa nacházda v ňom do konzoly
+    - toto je ako prvá vec, toto má byť hlavný debug nástroj, má byť aj na gui
+    - má to byť súčasťou programu
+    
+Ešte raz vysvetlenie
+    - máme strom ten sa nachádza v operačnej pamäti, jeho úlohov je aby som zistil kam mám ísť, čiže je to adresár
+    - máme hash ktorý vracia robno bit
+    - bit set má vraciať max 3 bity (nemusí to byt na gui)
+    
+    - v strome máme 2 typy vrcholov, interný a externý
+    - externý ukazuje na hlavný súbor (index alebo adresu dá sa vypočítať)
+    - na tú adresu sa naseekujem, prečítam si celý blok dát kde to potom deserializujem na triedu blok a pracujem v tom ako programe
+    - ak sme nevyužili všetky bity tak tam vložím jeden interný
+    - tieto dáta vložím presipem do týchto dvoch blokov a nasipem pôvodné dáta
+    - ak sa veštko presipalo na jednú stranu, tak na nový list nebudem davať adresu (-1)
+    - ak som mynul všetky bity z hešu tak musím použiť preplňujúci súbor
+    
+    - v preplňujúcom súbore je adresa na daľší súbor, je to praktycký zreťazený zoznam,
+    - nové miesto v súbore je pomocou manažerá voľných súborov (nie nová klasa),
+        - on ukazuje na prvý voľný blok ukazuje na daľší volný blok
+        - ak nemám tak vytváram nový blok, na konci súboru
+    - pri mazaní budem tak tak spáje aby sa zmestili v hlavnom súbore, ak súčet v záznamov v nich je menší nanajvýš rovný blokovaciemu faktoru v hlavnom súbore
+    - ak sa blok úplne vypráznil, (uvoľni blok - ak je na konci súboru tak ho skráti ak je uprostred tak ho zaradí do zreťazenia)
+    
+    - na súboroch treba 2 metódy, daj voľný blok, uvolni blok
+        - ak je na konci, resp je posledný tak iba pomocou setSize sa konice súboru odreže, skráti
+        - potom treba mazať postupne všetky prázne bloky ak by sme mali stiuáciu že x___x (x - dáta)
+        - a zmažem posledný zázbam takže mám x____ tak súbor skrátim tak že vo výsledku budem mať x a nie x___
+        - preto treba mať zreťazenie blokov obojsmerne aby som sa vedel zmazať jednoducho
+    - inicializačný stav 
+        - môže byť aj taký že mám tam jeden koreň a jeden blok v súbore, ideálne mať inicializačný stav koreň 2 isty a v súbore 2 bloky
+    - nasledovník a predchodca je ako atribút bloku
+    - prázne bloky nepremiestňujem
+    - súbor má byť celý čas otovorený do uzatvorenia súboru
+    - ak môžem zlučovať tak to nasipem do toho čo má menšiu adresu (optional)
+    - ak mažem tak mažem záznamy postupne pomocou metódy stras (tak aby zobralo všetky dáta do arr, naplním tak že posledné ktoré ostanú prázdne tak odošlem do voľneho bloku
+        - strasanie volám iba v tedy keď mám prázdny blok alebo keď viem že nejaký blok viem úšetriť
+        - musíme do stromu pridať nejaké atribúty (počet všetkých záznamov, a počet blokov v zreťazení) a na základe toho zistím či viem ušetriť blok tak potom to strasieme
+        
+    - urobiť 2 testy že pridávam a mažem v rovnakej pravdepodobnosti
+        - naplním strom a potom znovu pridávam a mažem s rovnakou pravdepodobnosťou
+        - a aj také že sa mi to vyprázdnilo
+        
+    - blokovací faktor nemusí zodpovedať realite takže to nemusím riešiť
+    - tieto dáta potrebujeme niekde uložiť, nejaké riadiace informácie uložiť
+    - ukladanie sttomu čo najjednoduchšie tak aby sa to jednoducho uložilo,
+    - nemusí to byť na budúci týždeň, ale treba ten strom ukladať
+    
+    - v strome nemáme mať výsledky hasov tie tam nemajú figurovať 
