@@ -32,12 +32,17 @@ NodeExtern: node
     - addr : int
     - count: int - čo je počet záznamov 
     
-Trieda blok
+Trieda BlokData
     - record: pole ktoré je rovnaké ako BF - rozkuskuje pole podľa veľkosti čo je v recorde, vytvorý z neho veľké pole bitov
     - validCount: int - na začiatku sú platné záznami a na konci sú neplatné, alebo do recordu si dať si dam flagu ktorá bude označovať či je záznam platný alebo nie
     - getData: []byte - vráti pole bytov
     - setData: []byte - nastaví pole bytov
     - getSize: int - vráti veľkosť záznamu
+    - nextBlock: int - adresa na ďalší blok
+    
+Trieda BlokcFreeSpace
+    - nextBlock: int - adresa na ďalší blok
+    - prevBlock: int - adresa na predchádzajúci blok
     
 RekordData
     - getSize: int -  to je veľkosť záznamu v bitoch, každý záznam musí vrátiť vždy identickú
