@@ -12,7 +12,6 @@ public class FileManager
     {
         _fileName = pFilenameAndAddress;
         _blockSize = pBlockSize;
-        _fileStream = new(_fileName, FileMode.OpenOrCreate, FileAccess.ReadWrite);
         InitFile();
     }
 
@@ -37,6 +36,9 @@ public class FileManager
             var fileInfo = new FileInfo(_fileName);
             BlockCount = (int)fileInfo.Length / _blockSize;
         }
+        
+        // otvorím filestream
+        _fileStream = new(_fileName, FileMode.OpenOrCreate, FileAccess.ReadWrite);
     }
     
     /// <summary>
@@ -82,6 +84,12 @@ public class FileManager
         {
             throw new FileNotFoundException("File stream is not open.");
         }
+
+        // aby sme zapisovali iba v rámci súboru
+        if (blockIndex >= BlockCount)
+        {
+            return false;
+        }
         
         try
         {
@@ -111,6 +119,12 @@ public class FileManager
         if (_fileStream is null)
         {
             throw new FileNotFoundException("File stream is not open.");
+        }
+        
+        // aby sme čítali iba v rámci súboru
+        if (blockIndex >= BlockCount)
+        {
+            return null;
         }
         try
         {
@@ -189,8 +203,26 @@ public class FileManager
     /// </summary>
     /// <param name="blockIndex">Index bloku ku ktorému chceme pristúpiť</param>
     /// <returns>Adresu bloku resp offset</returns>
-    private int GetAddress(int blockIndex)
+    private long GetAddress(int blockIndex)
     {
         return blockIndex * _blockSize;
     }
+    
+    /// <summary>
+    /// Iba na testovacie účely
+    /// </summary>
+    /// <returns>Vráti veľkosť daného súboru</returns>
+    public long GetFileSizeTest()
+    {
+        return _fileStream?.Length ?? 0;
+    }
+    
+    /// <summary>
+    /// Iba na testovacie účely
+    /// </summary>
+    public long GetAddressTest(int index)
+    {
+        return GetAddress(index);
+    }
+    
 }
