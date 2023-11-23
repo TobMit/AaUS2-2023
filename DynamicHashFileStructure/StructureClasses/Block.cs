@@ -3,30 +3,51 @@ namespace DynamicHashFileStructure.StructureClasses;
 public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TData>, IRecord<TData>
 {
     private static int _blockFactor = -1;
+    public static int BlockFactor
+    {
+        get => _blockFactor;
+    }
+
     private TData[] _records;
     private int _validRecords;
-    
+
+
+    /// <summary>
+    /// Konštruktor triedy Block, ktorý vytvorí blok s jedným recordom
+    /// </summary>
+    /// <param name="blockFactor">blokovací faktor</param>
+    /// <param name="data">Data ktoré sa tam vložia</param>
+    /// <remarks>Blokovací faktor musí byť nastavený pred tým</remarks>
     public Block(int blockFactor, TData data)
     {
+        
+        // blok faktor nemôže byť záporný
+        if (blockFactor <= 0)
+        {
+            throw new ArgumentException("Block faktor nemôže byť záporný alebo nulový");
+        }
+        
         _blockFactor = blockFactor;
-        _records = new TData[blockFactor];
+        _records = new TData[BlockFactor];
         for (int i = 0; i < _records.Length; i++)
         {
             _records[i] = data;
         }
+        _validRecords = 1;
     }
 
     /// <summary>
     /// Privátny konštruktor, ktorý sa používa pri načítavaní bloku z disku
     /// </summary>
-    /// <param name="blockFactor">Block faktor</param>
+    /// <param name="blockFactor">Blokovací faktor</param>
     /// <param name="records">Vytvorené dáta z disku</param>
-    private Block(int blockFactor, TData[] records)
+    private Block(int blockFactor, TData[] records, int validRecords)
     {
         _blockFactor = blockFactor;
         _records = records;
+        _validRecords = validRecords;
     }
-    
+
     // todo add record function
     // todo remove record function with moving invalid records to the back of the array
     // todo add get record function
@@ -35,15 +56,23 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
     {
         // toto tu je pre to, lebo vieme zavolať túto funkciu ešte pred inicializovaného blokovacieho faktoru,
         // čo by nám sôsobilo nesprávny výpočt veľkosti
-        if (_blockFactor == -1)
+        if (BlockFactor <= 0)
         {
-            throw new OverflowException("Blok nie je inicializovaný, najskôr inicializujte blok dát");
+            throw new OverflowException("Block faktor nie je nastavený!");
         }
-        return _blockFactor * TData.GetSize() + sizeof(int); // posledný sizeof(int) je pre _validRecords
+
+        return BlockFactor * TData.GetSize() + sizeof(int); // posledný sizeof(int) je pre _validRecords
     }
 
     public byte[] GetBytes()
     {
+        // toto tu je pre to, lebo vieme zavolať túto funkciu ešte pred inicializovaného blokovacieho faktoru,
+        // čo by nám sôsobilo nesprávny výpočt veľkosti
+        if (BlockFactor <= 0)
+        {
+            throw new OverflowException("Block faktor nie je nastavený!");
+        }
+        
         //todo add other fields
         List<Byte> bytes = new List<byte>();
         bytes.AddRange(BitConverter.GetBytes(_validRecords));
@@ -55,6 +84,7 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
             //recordBytes.CopyTo(Data, offset);
             //offset += recordBytes.Length;
         }
+
         return bytes.ToArray();
     }
 
@@ -62,35 +92,38 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
     {
         // toto tu je pre to, lebo vieme zavolať túto funkciu ešte pred inicializovaného blokovacieho faktoru,
         // čo by nám sôsobilo nesprávny výpočt veľkosti
-        if (_blockFactor == -1)
+        if (BlockFactor <= 0)
         {
-            throw new OverflowException("Blok nie je inicializovaný, najskôr inicializujte blok dát");
+            throw new OverflowException("Block faktor nie je nastavený!");
         }
+
         
-        int validRecords = BitConverter.ToInt32(bytes, 0);
-        int offset = sizeof(int);
-        
-        TData[] records = new TData[_blockFactor];
-        for (int i = 0; i < validRecords; i++)
+        int offset = 0;
+        int validRecords = BitConverter.ToInt32(bytes, offset);
+        offset = sizeof(int);
+
+        TData[] records = new TData[BlockFactor];
+        for (int i = 0; i < BlockFactor; i++)
         {
             // skopírujem iba potrebnú časť z bitového poľa
             byte[] recordBytes = new byte[TData.GetSize()];
             Array.Copy(bytes, offset, recordBytes, 0, TData.GetSize());
             records[i] = TData.FromBytes(recordBytes);
+            offset += TData.GetSize();
         }
-        
-        return new Block<TData>(_blockFactor, records);
+
+        return new Block<TData>(_blockFactor, records, validRecords);
     }
-    
+
     /// <summary>
     /// Skontrolujem či je už daný blok plný
     /// </summary>
     /// <returns>True ak je plný, inak false</returns>
     public bool IsFull()
     {
-        return _validRecords == _blockFactor;
+        return _validRecords == BlockFactor;
     }
-    
+
     /// <summary>
     /// Pridáme record do bloku
     /// </summary>
@@ -102,10 +135,11 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
         {
             throw new OverflowException("Blok je už plný");
         }
+
         _records[_validRecords] = record;
         _validRecords++;
     }
-    
+
     /// <summary>
     /// Vráti konkrétne record z bloku
     /// </summary>
@@ -118,6 +152,7 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
         {
             throw new IndexOutOfRangeException("Index je mimo rozsah bloku");
         }
+
         return _records[index];
     }
 
@@ -134,9 +169,31 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
         {
             throw new IndexOutOfRangeException("Index je mimo rozsah bloku");
         }
+
         TData tmp = _records[index];
         _records[index] = _records[_validRecords - 1];
         _validRecords--;
         return tmp;
+    }
+
+    /// <summary>
+    /// Vráti počet validných recordov v bloku
+    /// </summary>
+    /// <returns>Počet validných rekordov v bloku</returns>
+    public int Count()
+    {
+        return _validRecords;
+    }
+    
+    
+    /// <summary>
+    /// Only for test purposes
+    /// </summary>
+    /// <returns>True ak sú rovnaké, inak false</returns>
+    public bool TestEquals(Block<TData>? other)
+    {
+        if (ReferenceEquals(null, other)) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return _records.SequenceEqual(other._records) && _validRecords == other._validRecords;
     }
 }
