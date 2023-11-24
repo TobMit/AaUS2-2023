@@ -1,6 +1,6 @@
 namespace DynamicHashFileStructure.StructureClasses;
 
-public class FileManager
+public class LowLevelFileManager
 {
     private  string _fileName;
     private int _blockSize;
@@ -8,7 +8,7 @@ public class FileManager
 
     public int BlockCount { get; set; }
 
-    public FileManager(int pBlockSize, string pFilenameAndAddress)
+    public LowLevelFileManager(int pBlockSize, string pFilenameAndAddress)
     {
         _fileName = pFilenameAndAddress;
         _blockSize = pBlockSize;
@@ -193,7 +193,7 @@ public class FileManager
     /// <summary>
     /// Deštruktor automaticky zatovrí file stream;
     /// </summary>
-    ~FileManager()
+    ~LowLevelFileManager()
     {
         CloseFile();
     }

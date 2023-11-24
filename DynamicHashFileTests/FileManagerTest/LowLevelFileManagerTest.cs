@@ -3,11 +3,11 @@ using DynamicHashFileStructure.StructureClasses;
 
 namespace DynamicHashFileTests.FileManagerTest;
 
-public class FileManagerTest
+public class LowLevelFileManagerTest
 {
     private const int BlockSize = 8;
     private const string FileName = "testFile.bin";
-    private FileManager _manager;
+    private LowLevelFileManager _manager;
     
     private const string Sprava1 = "Blok - 0";
     private const string Sprava2 = "Blok - 1";
