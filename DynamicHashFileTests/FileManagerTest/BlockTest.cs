@@ -6,7 +6,7 @@ namespace DynamicHashFileTests.FileManagerTest;
 
 public class BlockTest
 {
-    private class TestClass : IComparable<TestClass>, IRecord<TestClass>, IEquatable<TestClass>
+    public class TestClass : IComparable<TestClass>, IRecord<TestClass>, IEquatable<TestClass>
     {
         private static int MAX_STRING_LENGTH = 20;
         

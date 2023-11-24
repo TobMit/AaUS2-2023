@@ -66,6 +66,16 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
 
         return BlockFactor * TData.GetSize() + sizeof(int); // posledný sizeof(int) je pre _validRecords
     }
+    
+    /// <summary>
+    /// Vypočíta veľkosť bloku na základe blokovacieho faktoru
+    /// </summary>
+    /// <param name="blockFactor">blokovací faktor</param>
+    /// <returns>veľosť bloku</returns>
+    public static int GetSize(int blockFactor)
+    {
+        return blockFactor * TData.GetSize() + sizeof(int); // posledný sizeof(int) je pre _validRecords
+    }
 
     public byte[] GetBytes()
     {
