@@ -48,9 +48,12 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
         _validRecords = validRecords;
     }
 
-    // todo add record function
-    // todo remove record function with moving invalid records to the back of the array
-    // todo add get record function
+    public Block(int blockFactor)
+    {
+        _blockFactor = blockFactor;
+        _records = new TData[BlockFactor];
+        _validRecords = 0;
+    }
 
     public static int GetSize()
     {
@@ -79,10 +82,15 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
 
         for (int i = 0; i < _records.Length; i++)
         {
-            bytes.AddRange(_records[i].GetBytes());
-            //byte[] recordBytes = _records[i].GetBytes();
-            //recordBytes.CopyTo(Data, offset);
-            //offset += recordBytes.Length;
+            if (i < _validRecords)
+            {
+                bytes.AddRange(_records[i].GetBytes());    
+            }
+            else
+            {
+                // ak nie je vytvorený alebo môže byť null tak to nahradím prázdnym polom
+                bytes.AddRange(new byte[TData.GetSize()]);
+            }
         }
 
         return bytes.ToArray();
@@ -194,6 +202,24 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
     {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
-        return _records.SequenceEqual(other._records) && _validRecords == other._validRecords;
+        
+        if (other._records.Length != _records.Length)
+        {
+            return false;
+        }
+
+        if (_validRecords != other._validRecords)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < _validRecords; i++)
+        {
+            if (_records[i].CompareTo(other._records[i]) != 0)
+            {
+                return false;
+            }
+        }
+        return true;
     }
 }

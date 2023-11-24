@@ -34,12 +34,7 @@ public class BlockTest
 
         public int CompareTo(TestClass? other)
         {
-            // skontrolujeme či majú rovnaké ID
-            if (Id == other?.Id)
-            {
-                return 0;
-            }
-            return Id > other?.Id ? 1 : -1;
+            return this.Equals(other) ? 0 : -1;
         }
         
         /// <summary>
