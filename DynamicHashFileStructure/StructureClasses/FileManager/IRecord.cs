@@ -23,9 +23,4 @@ public interface IRecord<T>
     /// <returns> vytovorený objekt</returns>
     public static abstract T FromBytes(byte[] bytes);
     
-    /// <summary>
-    /// Hešovacia funckia pre záznam
-    /// </summary>
-    /// <returns>Vytvorí pole bytov</returns>
-    public byte[] GetBytesForHash();
 }

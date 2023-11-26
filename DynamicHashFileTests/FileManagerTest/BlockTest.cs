@@ -6,7 +6,7 @@ namespace DynamicHashFileTests.FileManagerTest;
 
 public class BlockTest
 {
-    public class TestClass : IComparable<TestClass>, IRecord<TestClass>, IEquatable<TestClass>
+    public class TestClass : IRecordData<TestClass>, IEquatable<TestClass>
     {
         private static int MAX_STRING_LENGTH = 20;
         private static int PRIME_NUMBER = 541;
@@ -194,6 +194,12 @@ public class BlockTest
         Assert.That(_block.GetRecord(0), Is.EqualTo(_testClass1));
         Assert.That(_block.GetRecord(1), Is.EqualTo(testClass2));
         Assert.That(_block.GetRecord(2), Is.EqualTo(testClass3));
+        
+        var listRekorodov = _block.GetArrayRecords();
+        Assert.That(listRekorodov.Count, Is.EqualTo(3));
+        Assert.That(listRekorodov[0], Is.EqualTo(_testClass1));
+        Assert.That(listRekorodov[1], Is.EqualTo(testClass2));
+        Assert.That(listRekorodov[2], Is.EqualTo(testClass3));
     }
     
     [Test]
@@ -257,6 +263,9 @@ public class BlockTest
         Assert.That(ex.Message, Is.EqualTo("Index je mimo rozsah bloku"));
         
         Assert.False(_block.IsFull());
+        
+        _block.ClearRecords();
+        Assert.That(_block.Count(), Is.EqualTo(0));
     }
     
     [Test]

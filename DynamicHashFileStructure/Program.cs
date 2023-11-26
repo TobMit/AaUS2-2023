@@ -2,10 +2,12 @@
 {
     public static void Main(string[] args)
     {
+
+        List<byte> lit = new();
+        lit.Add(1);
+        lit.Add(2);
+        lit.Add(3);
         
-        for (int i = 0; i < 1000; i++)
-        {
-            Console.WriteLine(i%541);
-        }
+        Console.WriteLine();
     }
 }

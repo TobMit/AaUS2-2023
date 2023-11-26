@@ -1,0 +1,221 @@
+using System.Collections;
+using DynamicHashFileStructure.StructureClasses.Nodes;
+
+namespace DynamicHashFileStructure.StructureClasses;
+
+public class DynamicHashFile<TData> where TData : IRecordData<TData>
+{
+
+    private const int PrimaryFileBlockSize = 3;
+    
+    public int Count { get; private set; }
+    
+    private NodeIntern<TData> _root;
+
+    private FileManager<TData> _fileManager;
+
+    public DynamicHashFile()
+    {
+        _root = new(null);
+        _fileManager = new(PrimaryFileBlockSize, "primaryData.bin");
+
+        InitTree();
+    }
+
+    private void InitTree()
+    {
+        _root.LeftSon = new NodeExtern<TData>(0, _root);
+        _root.RightSon = new NodeExtern<TData>(_fileManager.GetNewBlockIndex(), _root);
+    }
+
+    public void Insert(TData data)
+    {
+        Stack<TData> stackData = new();
+        // vložím data do staku
+        stackData.Push(data);
+        // while stak nie je prázdny
+        while (stackData.Count > 0)
+        {
+            Stack<Node<TData>> stackNode = new();
+            // vložím do staku root a prechádzam vnútroný stak
+            stackNode.Push(_root);
+            // id vrcholu = 0
+            int index = 0;
+            
+            // vytiahnem data zo staku
+            var dataToInsert = stackData.Pop();
+            // zýskam hash
+            var hash = dataToInsert.GetBytesForHash();
+            // premením hash byte na pole bitov
+            BitArray bitArray = new(hash);
+
+            while (stackNode.Count > 0)
+            {
+                //vyberiem zo staku vrchol
+                var node = stackNode.Pop();
+                // tu sa môžu stať 2 veci
+                // 1. vrchol je interný
+                if (node.GetType() == typeof(NodeIntern<TData>))
+                {
+                    var internNode = (NodeIntern<TData>) node;
+                    
+                    // skontrolujem do ktorého 
+                    // ak niektorý syn nie je vytvorený tak ho vytvorím ako externý a tam vložím dáta na nový blok
+                    if (!bitArray[index]) // 0 ak je lavý 1 ak je pravý (čiže false a true)
+                    {
+                        if (internNode.LeftSon == null)
+                        {
+                            internNode.LeftSon = new NodeExtern<TData>(_fileManager.GetNewBlockIndex(), internNode);
+                        }
+                        // vložím do staku toho syna ktorý pokračuje podla kľúča
+                        stackNode.Push(internNode.LeftSon);
+                        index++;
+                    }
+                    else
+                    {
+                        if (internNode.RightSon == null)
+                        {
+                            internNode.RightSon = new NodeExtern<TData>(_fileManager.GetNewBlockIndex(), internNode);
+                        }
+                        // vložím do staku toho syna ktorý pokračuje podla kľúča
+                        stackNode.Push(internNode.RightSon);
+                        index++;
+                    }
+                    // todo ak došli kľúče tak predpokladám že tam je 0 a idem vždy podľa toho syna
+                }
+                // 2. vrchol je externý
+                else
+                {
+                    var externNode = (NodeExtern<TData>) node;
+                    // skontrolujem koľko má uložených dát
+                    // ak má menej ako je BF
+                    if (externNode.Count < PrimaryFileBlockSize) // todo kým sa nedorieši preplňovací blok
+                    {
+                        // skontrolujem či má adresu
+                        if (externNode.Address < 0)
+                        {
+                            // ak nemá tak pridám nový blok
+                            externNode.Address = _fileManager.GetNewBlockIndex();
+                        }
+                        // ak má tak prečítam blok
+                        var block = _fileManager.GetBlock(externNode.Address);
+                        // pridám nové dáta
+                        block.AddRecord(dataToInsert);
+                        // zapíšem blok
+                        _fileManager.WriteBlock(externNode.Address, block);
+                        // zvýšim počet dát
+                        externNode.Count++;
+                    }
+                    // ak je plný
+                    else
+                    {
+                        // todo toto sa dá ešte zlepšiť tým že nepôjdem od rooto
+                        // todo ak majú úplne rovnaký hash tak potom riešime cez preplňovací blok
+                        
+                        // načítam blok postuplne odstránim dáta ktoré sú v bloku a vložím ich do staku
+                        var block = _fileManager.GetBlock(externNode.Address);
+                        var listRecordov = block.GetArrayRecords();
+                        block.ClearRecords();
+                        externNode.Count = 0;
+                        // zapíšem tento prázdny blok do súboru
+                        _fileManager.WriteBlock(externNode.Address, block);
+                        foreach (var record in listRecordov)
+                        {
+                            stackData.Push(record);
+                        }
+                        
+                        // medzi jeho parenta a tento blok vložím nový interný blok,
+                        var parent = externNode.Parent;
+                        if (!bitArray[index]) // ak bol posledný bit 0 tak vložím nový intern node inak pravý
+                        {
+                            // tomu internému bloku nastavím tento blok ako blok pre 0
+                            parent.LeftSon = new NodeIntern<TData>(parent, externNode);
+                        }
+                        else
+                        {
+                            parent.RightSon = new NodeIntern<TData>(parent);
+                        }
+                        // týmto cyklus skončil ale pokračuje sa od znovu s novímy dátami (musím vložiť aj poledné dáta
+                        // todo skontrolovať či nie je hash rovnaký potom preplňovací blok
+                    }
+                }
+            }
+        }
+    }
+
+    //todo lepšie spravť ten kľúč resp hash
+    public TData Find(Byte[] keyHash)
+    {
+        TData returnData = default;
+        
+        BitArray bitArray = new(keyHash);
+        int index = 0;
+
+        Stack<Node<TData>> stackNode = new();
+        stackNode.Push(_root);
+        while (stackNode.Count > 0)
+        {
+            // zýskam vrchol
+            var node = stackNode.Pop();
+            // budem skontrolujem si typ vrcholu
+            // je interny
+            if (node.GetType() == typeof(NodeIntern<TData>))
+            {
+                // zoberiem toho syna ktorý je podľa kľúča
+                // ak ten vrchol neexistuje tak hodím exception
+                var internNode = (NodeIntern<TData>) node;
+                if (!bitArray[index])
+                {
+                    if (internNode.LeftSon is null)
+                    {
+                        throw new ArgumentException("Nenašiel sa záznam");
+                    }
+                    // toho syna vložim do staku
+                    stackNode.Push(internNode.LeftSon);
+                    index++;
+                }
+                else
+                {
+                    if (internNode.RightSon is null)
+                    {
+                        throw new ArgumentException("Nenašiel sa záznam");
+                    }
+                    // toho syna vložim do staku
+                    stackNode.Push(internNode.RightSon);
+                    index++;
+                }
+            }
+            // Ak je externý
+            else
+            {
+                // zoberiem blok
+                var externNode = (NodeExtern<TData>) node;
+                if (externNode.Address < 0)
+                {
+                    throw new ArgumentException("Nenašiel sa záznam");
+                }
+                var block = _fileManager.GetBlock(externNode.Address);
+                // prejdem všetky dáta v bloku
+                for (int i = 0; i < block.Count(); i++)
+                {
+                    // skontrolujem či je to to čo hľadám
+                    if (block.GetRecord(i).GetBytesForHash().Equals(keyHash))
+                    {
+                        // ak áno tak vrátim
+                        returnData = block.GetRecord(i);
+                    }
+                }
+                
+            }
+        }
+        
+        
+        // ak som nenašiel tak hodím exception
+        if (returnData is null)
+        {
+            throw new ArgumentException("Nenašiel sa záznam");
+        }
+        
+        return returnData;
+    }
+}

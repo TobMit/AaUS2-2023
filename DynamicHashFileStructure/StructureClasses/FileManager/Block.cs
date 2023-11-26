@@ -133,11 +133,6 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
         return new Block<TData>(_blockFactor, records, validRecords);
     }
 
-    public byte[] GetBytesForHash()
-    {
-        return new byte[0];
-    }
-
     /// <summary>
     /// Skontrolujem či je už daný blok plný
     /// </summary>
@@ -177,6 +172,29 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
         }
 
         return _records[index];
+    }
+    
+    /// <summary>
+    /// Vráti zoznam všetkých platných recordov v bloku
+    /// </summary>
+    /// <returns> List platných rekordov v bloku</returns>
+    public List<TData> GetArrayRecords()
+    {
+        List<TData> records = new List<TData>();
+        for (int i = 0; i < _validRecords; i++)
+        {
+            records.Add(_records[i]);
+        }
+
+        return records;
+    }
+    
+    /// <summary>
+    /// Zmaže všetky recordy z bloku
+    /// </summary>
+    public void ClearRecords()
+    {
+        _validRecords = 0;
     }
 
     /// <summary>
