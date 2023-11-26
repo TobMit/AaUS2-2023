@@ -44,6 +44,10 @@ public class FileManager<TData> where TData : IComparable<TData>, IRecord<TData>
     
     ~FileManager()
     {
+        if (_lowLevelFileManager is null)
+        {
+            return;
+        }
         _lowLevelFileManager.CloseFile();
     }
     

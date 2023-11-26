@@ -9,6 +9,7 @@ public class BlockTest
     public class TestClass : IComparable<TestClass>, IRecord<TestClass>, IEquatable<TestClass>
     {
         private static int MAX_STRING_LENGTH = 20;
+        private static int PRIME_NUMBER = 541;
         
         public TestClass(int id, float floatValue, double doubleValue, string stringValue, string stringValue2)
         {
@@ -86,7 +87,18 @@ public class BlockTest
             string stringValue2 = Encoding.ASCII.GetString(bytes, offset, MAX_STRING_LENGTH).Trim();
             return new TestClass(id, floatValue, doubleValue, stringValue1, stringValue2);
         }
-        
+
+        /// <summary>
+        /// K mod hasovacia funkcia
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public byte[] GetBytesForHash()
+        {
+            int mod = Id % PRIME_NUMBER;
+            return BitConverter.GetBytes(mod);
+        }
+
         // operátor rovná sa
         public static bool operator ==(TestClass? a, TestClass? b)
         {

@@ -1,3 +1,11 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-Console.WriteLine("Hello, World!");
+﻿public class Program
+{
+    public static void Main(string[] args)
+    {
+        
+        for (int i = 0; i < 1000; i++)
+        {
+            Console.WriteLine(i%541);
+        }
+    }
+}

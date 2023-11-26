@@ -133,6 +133,11 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
         return new Block<TData>(_blockFactor, records, validRecords);
     }
 
+    public byte[] GetBytesForHash()
+    {
+        return new byte[0];
+    }
+
     /// <summary>
     /// Skontrolujem či je už daný blok plný
     /// </summary>

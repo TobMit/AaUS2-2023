@@ -22,4 +22,10 @@ public interface IRecord<T>
     /// <param name="bytes"> pole bitov ktoré sa načítali zo súboru</param>
     /// <returns> vytovorený objekt</returns>
     public static abstract T FromBytes(byte[] bytes);
+    
+    /// <summary>
+    /// Hešovacia funckia pre záznam
+    /// </summary>
+    /// <returns>Vytvorí pole bytov</returns>
+    public byte[] GetBytesForHash();
 }
