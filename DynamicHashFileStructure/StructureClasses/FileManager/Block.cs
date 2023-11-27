@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace DynamicHashFileStructure.StructureClasses;
 
 public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TData>, IRecord<TData>
@@ -131,6 +133,20 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
         }
 
         return new Block<TData>(_blockFactor, records, validRecords);
+    }
+
+    public string ToString()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.Append($"Block factor: {_blockFactor}\n");
+        sb.Append($"Valid records: {_validRecords}\n");
+        sb.Append("Records:\n");
+        for (int i = 0; i < _validRecords; i++)
+        {
+            sb.Append($"{_records[i].ToString()}\n");
+        }
+
+        return sb.ToString();
     }
 
     /// <summary>

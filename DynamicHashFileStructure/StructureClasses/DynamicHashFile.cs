@@ -24,8 +24,11 @@ public class DynamicHashFile<TData> where TData : IRecordData<TData>
 
     private void InitTree()
     {
+        Block<TData> initBlock = new(PrimaryFileBlockSize);
         _root.LeftSon = new NodeExtern<TData>(0, _root);
         _root.RightSon = new NodeExtern<TData>(_fileManager.GetNewBlockIndex(), _root);
+        _fileManager.WriteBlock(0, initBlock);
+        _fileManager.WriteBlock(1, initBlock);
     }
 
     public void Insert(TData data)
@@ -58,7 +61,7 @@ public class DynamicHashFile<TData> where TData : IRecordData<TData>
                 if (node.GetType() == typeof(NodeIntern<TData>))
                 {
                     var internNode = (NodeIntern<TData>) node;
-                    
+                    var tmp = bitArray[index];
                     // skontrolujem do ktorého 
                     // ak niektorý syn nie je vytvorený tak ho vytvorím ako externý a tam vložím dáta na nový blok
                     if (!bitArray[index]) // 0 ak je lavý 1 ak je pravý (čiže false a true)
@@ -124,16 +127,23 @@ public class DynamicHashFile<TData> where TData : IRecordData<TData>
                             stackData.Push(record);
                         }
                         
+                        stackData.Push(dataToInsert);
+                        
                         // medzi jeho parenta a tento blok vložím nový interný blok,
                         var parent = externNode.Parent;
-                        if (!bitArray[index]) // ak bol posledný bit 0 tak vložím nový intern node inak pravý
+                        
+                        var tmp = bitArray[index - 1];
+
+                        var tmpNode = new NodeIntern<TData>(parent, externNode);
+                        externNode.Parent = tmpNode;
+                        
+                        if (!bitArray[index - 1]) // ak bol posledný bit 0 tak vložím nový intern node inak pravý
                         {
-                            // tomu internému bloku nastavím tento blok ako blok pre 0
-                            parent.LeftSon = new NodeIntern<TData>(parent, externNode);
+                            parent.LeftSon = tmpNode;
                         }
                         else
                         {
-                            parent.RightSon = new NodeIntern<TData>(parent);
+                            parent.RightSon = tmpNode;
                         }
                         // týmto cyklus skončil ale pokračuje sa od znovu s novímy dátami (musím vložiť aj poledné dáta
                         // todo skontrolovať či nie je hash rovnaký potom preplňovací blok
@@ -199,7 +209,7 @@ public class DynamicHashFile<TData> where TData : IRecordData<TData>
                 for (int i = 0; i < block.Count(); i++)
                 {
                     // skontrolujem či je to to čo hľadám
-                    if (block.GetRecord(i).GetBytesForHash().Equals(keyHash))
+                    if (block.GetRecord(i).GetBytesForHash().SequenceEqual(keyHash))
                     {
                         // ak áno tak vrátim
                         returnData = block.GetRecord(i);
@@ -217,5 +227,21 @@ public class DynamicHashFile<TData> where TData : IRecordData<TData>
         }
         
         return returnData;
+    }
+    
+    public void CloseFile()
+    {
+        _fileManager.CloseFile();
+    }
+
+
+    public void PrintFile()
+    {
+        for (int i = 0; i < _fileManager.GetBlockCount(); i++)
+        {
+            Console.WriteLine($"Block {i}");
+            var block = _fileManager.GetBlock(i);
+            Console.WriteLine(block.ToString());
+        }
     }
 }

@@ -23,4 +23,6 @@ public interface IRecord<T>
     /// <returns> vytovorený objekt</returns>
     public static abstract T FromBytes(byte[] bytes);
     
+    public string ToString();
+    
 }
