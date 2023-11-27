@@ -48,8 +48,16 @@ public class Program
     
     public static void Main(string[] args)
     {
-        File.Delete("primaryData.bin");
-        Random rnd = new Random(0);
+        for (int i = 0; i < 10; i++)
+        {
+            Console.WriteLine("Test start:  " + i);
+            TestInstance(i);
+        }
+    }
+
+    public static void TestInstance(int Seed)
+    {
+        Random rnd = new Random(Seed);
         List<TestClass> toInsert = new(MAX_UNITS);
         List<TestClass> toDelete = new(MAX_UNITS);
         
@@ -65,19 +73,13 @@ public class Program
         
         for (int i = 0; i < MAX_TEST; i++)
         {
-            if (i == 20)
-            {
-                dhf.PrintFile();
-                Console.WriteLine("som tu");
-            }
-            
             int index = rnd.Next(0, toInsert.Count);
             var toInsertData = toInsert[index];
             dhf.Insert(toInsertData);
             //toDelete.Add(toInsert[index]);
             toInsert.RemoveAt(index);
             
-            Console.WriteLine(i);
+            //Console.WriteLine(i);
 
             //dhf.PrintFile();
             
@@ -97,7 +99,7 @@ public class Program
                 break;
             }
             
-            Console.WriteLine("-----------------------------------");
+            //Console.WriteLine("-----------------------------------");
         }
         
         Console.WriteLine();
@@ -107,6 +109,6 @@ public class Program
         dhf.CloseFile();
         File.Delete("primaryData.bin");
         
-        Console.WriteLine("Koniec");
+        Console.WriteLine("Koniec + " +  Seed);
     }
 }
