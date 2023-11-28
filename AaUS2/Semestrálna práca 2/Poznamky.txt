@@ -137,3 +137,7 @@ Ešte raz vysvetlenie
     - nemusí to byť na budúci týždeň, ale treba ten strom ukladať
     
     - v strome nemáme mať výsledky hasov tie tam nemajú figurovať 
+    
+Pozriem sa do kódu a vyčíslim koľko krát som do toho kódu pristúpil, koľko kľokov som prečítal, koľko som zapísal
+    Má sa dať podľa typov situácií, situácia 1 je takáto, situácia 2 je takáto ...
+Nevyčísluje sa zložitosť

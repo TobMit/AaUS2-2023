@@ -128,7 +128,7 @@ public class DynamicHashFile<TData> where TData : IRecordData<TData>
                         }
                         
                         stackData.Push(dataToInsert);
-                        
+                        // todo nemôže byť voľný blok
                         // medzi jeho parenta a tento blok vložím nový interný blok,
                         var parent = externNode.Parent;
                         
