@@ -13,6 +13,9 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
     private TData[] _records;
     private int _validRecords;
 
+    public int NextFreeBlock { get; set; }
+    public int LastNextBlock { get; set; }
+
 
     /// <summary>
     /// Konštruktor triedy Block, ktorý vytvorí blok s jedným recordom
@@ -36,6 +39,8 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
             _records[i] = data;
         }
         _validRecords = 1;
+        NextFreeBlock = -1;
+        LastNextBlock = -1;
     }
 
     /// <summary>
@@ -43,11 +48,13 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
     /// </summary>
     /// <param name="blockFactor">Blokovací faktor</param>
     /// <param name="records">Vytvorené dáta z disku</param>
-    private Block(int blockFactor, TData[] records, int validRecords)
+    private Block(int blockFactor, TData[] records, int validRecords, int nextFreeBlock, int lastFreeBlock)
     {
         _blockFactor = blockFactor;
         _records = records;
         _validRecords = validRecords;
+        NextFreeBlock = nextFreeBlock;
+        LastNextBlock = lastFreeBlock;
     }
 
     public Block(int blockFactor)
@@ -55,6 +62,8 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
         _blockFactor = blockFactor;
         _records = new TData[BlockFactor];
         _validRecords = 0;
+        NextFreeBlock = -1;
+        LastNextBlock = -1;
     }
 
     public static int GetSize()
@@ -66,9 +75,10 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
             throw new OverflowException("Block faktor nie je nastavený!");
         }
 
-        return BlockFactor * TData.GetSize() + sizeof(int); // posledný sizeof(int) je pre _validRecords
+        //   počt záznamov +          početPlatnýchZáznamov + nextFreeBlock + lastNextBlock
+        return BlockFactor * TData.GetSize() + sizeof(int) + sizeof(int) + sizeof(int); 
     }
-    
+
     /// <summary>
     /// Vypočíta veľkosť bloku na základe blokovacieho faktoru
     /// </summary>
@@ -76,7 +86,8 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
     /// <returns>veľosť bloku</returns>
     public static int GetSize(int blockFactor)
     {
-        return blockFactor * TData.GetSize() + sizeof(int); // posledný sizeof(int) je pre _validRecords
+        //   počt záznamov +          početPlatnýchZáznamov + nextFreeBlock + lastNextBlock
+        return blockFactor * TData.GetSize() + sizeof(int) + sizeof(int) + sizeof(int);
     }
 
     public byte[] GetBytes()
@@ -88,8 +99,10 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
             throw new OverflowException("Block faktor nie je nastavený!");
         }
         
-        //todo add other fields
         List<Byte> bytes = new List<byte>();
+        
+        bytes.AddRange(BitConverter.GetBytes(NextFreeBlock));
+        bytes.AddRange(BitConverter.GetBytes(LastNextBlock));
         bytes.AddRange(BitConverter.GetBytes(_validRecords));
 
         for (int i = 0; i < _records.Length; i++)
@@ -119,8 +132,12 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
 
         
         int offset = 0;
-        int validRecords = BitConverter.ToInt32(bytes, offset);
+        int nextFreeBlock = BitConverter.ToInt32(bytes, offset);
         offset = sizeof(int);
+        int lastFreeBlock = BitConverter.ToInt32(bytes, offset);
+        offset += sizeof(int);
+        int validRecords = BitConverter.ToInt32(bytes, offset);
+        offset += sizeof(int);
 
         TData[] records = new TData[BlockFactor];
         for (int i = 0; i < BlockFactor; i++)
@@ -132,7 +149,7 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
             offset += TData.GetSize();
         }
 
-        return new Block<TData>(_blockFactor, records, validRecords);
+        return new Block<TData>(_blockFactor, records, validRecords, nextFreeBlock, lastFreeBlock);
     }
 
     public string ToString()
