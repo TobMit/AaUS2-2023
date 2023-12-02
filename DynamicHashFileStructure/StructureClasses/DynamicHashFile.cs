@@ -26,7 +26,7 @@ public class DynamicHashFile<TData> where TData : IRecordData<TData>
     {
         Block<TData> initBlock = new(PrimaryFileBlockSize);
         _root.LeftSon = new NodeExtern<TData>(0, _root);
-        _root.RightSon = new NodeExtern<TData>(_fileManager.GetNewBlockIndex(), _root);
+        _root.RightSon = new NodeExtern<TData>(_fileManager.GetFreeBlock().First, _root);
         _fileManager.WriteBlock(0, initBlock);
         _fileManager.WriteBlock(1, initBlock);
     }
@@ -68,7 +68,7 @@ public class DynamicHashFile<TData> where TData : IRecordData<TData>
                     {
                         if (internNode.LeftSon == null)
                         {
-                            internNode.LeftSon = new NodeExtern<TData>(_fileManager.GetNewBlockIndex(), internNode);
+                            internNode.LeftSon = new NodeExtern<TData>(_fileManager.GetFreeBlock().First, internNode);
                         }
                         // vložím do staku toho syna ktorý pokračuje podla kľúča
                         stackNode.Push(internNode.LeftSon);
@@ -78,7 +78,7 @@ public class DynamicHashFile<TData> where TData : IRecordData<TData>
                     {
                         if (internNode.RightSon == null)
                         {
-                            internNode.RightSon = new NodeExtern<TData>(_fileManager.GetNewBlockIndex(), internNode);
+                            internNode.RightSon = new NodeExtern<TData>(_fileManager.GetFreeBlock().First, internNode);
                         }
                         // vložím do staku toho syna ktorý pokračuje podla kľúča
                         stackNode.Push(internNode.RightSon);
@@ -98,7 +98,7 @@ public class DynamicHashFile<TData> where TData : IRecordData<TData>
                         if (externNode.Address < 0)
                         {
                             // ak nemá tak pridám nový blok
-                            externNode.Address = _fileManager.GetNewBlockIndex();
+                            externNode.Address = _fileManager.GetFreeBlock().First;
                         }
                         // ak má tak prečítam blok
                         var block = _fileManager.GetBlock(externNode.Address);

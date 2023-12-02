@@ -57,7 +57,7 @@ public class HighLevelFileManagerTest
         var testRecord = new BlockTest.TestClass(1, 1.1f, 1.2, "string jeden", "sTring dva");
         var block = new Block<BlockTest.TestClass>(BlockFactor, testRecord);
 
-        var newId = _manager.GetNewBlockIndex();
+        var newId = _manager.GetFreeBlock().First;
         Assert.That(newId, Is.EqualTo(1));
         Assert.That(_manager.GetBlockCount(), Is.EqualTo(2));
         

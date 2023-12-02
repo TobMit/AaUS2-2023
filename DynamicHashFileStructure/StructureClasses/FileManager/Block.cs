@@ -14,7 +14,7 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
     private int _validRecords;
 
     public int NextFreeBlock { get; set; }
-    public int LastNextBlock { get; set; }
+    public int LastNextFreeBlock { get; set; }
 
 
     /// <summary>
@@ -40,7 +40,7 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
         }
         _validRecords = 1;
         NextFreeBlock = -1;
-        LastNextBlock = -1;
+        LastNextFreeBlock = -1;
     }
 
     /// <summary>
@@ -48,13 +48,13 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
     /// </summary>
     /// <param name="blockFactor">Blokovací faktor</param>
     /// <param name="records">Vytvorené dáta z disku</param>
-    private Block(int blockFactor, TData[] records, int validRecords, int nextFreeBlock, int lastFreeBlock)
+    private Block(int blockFactor, TData[] records, int validRecords, int nextFreeBlock, int lastFreeFreeBlock)
     {
         _blockFactor = blockFactor;
         _records = records;
         _validRecords = validRecords;
         NextFreeBlock = nextFreeBlock;
-        LastNextBlock = lastFreeBlock;
+        LastNextFreeBlock = lastFreeFreeBlock;
     }
 
     public Block(int blockFactor)
@@ -63,7 +63,7 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
         _records = new TData[BlockFactor];
         _validRecords = 0;
         NextFreeBlock = -1;
-        LastNextBlock = -1;
+        LastNextFreeBlock = -1;
     }
 
     public static int GetSize()
@@ -102,7 +102,7 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
         List<Byte> bytes = new List<byte>();
         
         bytes.AddRange(BitConverter.GetBytes(NextFreeBlock));
-        bytes.AddRange(BitConverter.GetBytes(LastNextBlock));
+        bytes.AddRange(BitConverter.GetBytes(LastNextFreeBlock));
         bytes.AddRange(BitConverter.GetBytes(_validRecords));
 
         for (int i = 0; i < _records.Length; i++)
