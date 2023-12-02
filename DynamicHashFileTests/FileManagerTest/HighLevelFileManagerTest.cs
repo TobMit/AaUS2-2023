@@ -35,16 +35,22 @@ public class HighLevelFileManagerTest
     public void WriteAndReadBlock()
     {
         Assert.That(_manager.GetBlockCount(), Is.EqualTo(1));
+        Assert.That(_manager.BlockUsedCount, Is.EqualTo(0));
         var testRecord = new BlockTest.TestClass(1, 1.1f, 1.2, "string jeden", "sTring dva");
-        var block = new Block<BlockTest.TestClass>(BlockFactor, testRecord);
-        _manager.WriteBlock(0, block);
+        
+        var tmpPair = _manager.GetFreeBlock();
+        Assert.That(tmpPair.First, Is.EqualTo(0));
+        Assert.That(_manager.BlockUsedCount, Is.EqualTo(1));
         Assert.That(_manager.GetBlockCount(), Is.EqualTo(1));
+        tmpPair.Second.AddRecord(testRecord);
+        _manager.WriteBlock(tmpPair.First, tmpPair.Second);
+        
         var tmp = _manager.GetBlock(0);
         Assert.NotNull(tmp);
-        Assert.True(tmp.TestEquals(block));
+        Assert.True(tmp.TestEquals(tmpPair.Second));
         Assert.That(tmp.GetRecord(0), Is.EqualTo(testRecord));
         
-        var ex = Assert.Throws<ArgumentOutOfRangeException>(() => _manager.WriteBlock(2, block));
+        var ex = Assert.Throws<ArgumentOutOfRangeException>(() => _manager.WriteBlock(2, tmpPair.Second));
         Assert.That(ex.Message, Is.EqualTo("ID bloku je mimo rozsah (Parameter 'id')"));
         
         ex = Assert.Throws<ArgumentOutOfRangeException>(() => _manager.GetBlock(2));
@@ -55,16 +61,34 @@ public class HighLevelFileManagerTest
     {
         Assert.That(_manager.GetBlockCount(), Is.EqualTo(1));
         var testRecord = new BlockTest.TestClass(1, 1.1f, 1.2, "string jeden", "sTring dva");
-        var block = new Block<BlockTest.TestClass>(BlockFactor, testRecord);
 
-        var newId = _manager.GetFreeBlock().First;
-        Assert.That(newId, Is.EqualTo(1));
-        Assert.That(_manager.GetBlockCount(), Is.EqualTo(2));
+        // prvý block
+        var tmpPair = _manager.GetFreeBlock();
+        Assert.That(tmpPair.First, Is.EqualTo(0));
+        Assert.That(_manager.GetBlockCount(), Is.EqualTo(1));
         
-        _manager.WriteBlock(1, block);
-        var tmp = _manager.GetBlock(1);
+        tmpPair.Second.AddRecord(testRecord);
+        _manager.WriteBlock(tmpPair.First, tmpPair.Second);
+        var tmp = _manager.GetBlock(0);
         Assert.NotNull(tmp);
-        Assert.True(tmp.TestEquals(block));
+        Assert.True(tmp.TestEquals(tmpPair.Second));
         Assert.That(tmp.GetRecord(0), Is.EqualTo(testRecord));
+        
+        // nový daľší block
+        Assert.That(_manager.GetBlockCount(), Is.EqualTo(1));
+        Assert.That(_manager.BlockUsedCount, Is.EqualTo(1));
+        tmpPair = _manager.GetFreeBlock();
+        Assert.That(tmpPair.First, Is.EqualTo(1));
+        Assert.That(_manager.GetBlockCount(), Is.EqualTo(2));
+        Assert.That(_manager.BlockUsedCount, Is.EqualTo(2));
+        Assert.That(tmpPair.Second.Count(), Is.EqualTo(0));
+        tmpPair.Second.AddRecord(testRecord);
+        _manager.WriteBlock(tmpPair.First, tmpPair.Second);
+        
+        tmp = _manager.GetBlock(1);
+        Assert.NotNull(tmp);
+        Assert.True(tmp.TestEquals(tmpPair.Second));
+        Assert.That(tmp.GetRecord(0), Is.EqualTo(testRecord));
+        Assert.That(tmp.Count(), Is.EqualTo(1));
     }
 }

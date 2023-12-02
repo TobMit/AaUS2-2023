@@ -31,7 +31,9 @@ public class FileManager<TData> where TData : IComparable<TData>, IRecord<TData>
         }
         _blockFactor = blockFactor;
         _fileName = fileName;
-        _lowLevelFileManager = new(Block<TData>.GetSize(blockFactor), _fileName);
+        Block<TData> firstBlock = new(blockFactor);
+        _lowLevelFileManager = new(Block<TData>.GetSize(), _fileName);
+        _lowLevelFileManager.WriteDataToBlock(0, firstBlock.GetBytes());
         _blockTotalCount = _lowLevelFileManager.BlockCount;
         BlockUsedCount = 0;
         _firstFreeBlock = 0;
@@ -92,7 +94,6 @@ public class FileManager<TData> where TData : IComparable<TData>, IRecord<TData>
             }
             BlockUsedCount++;
         }
-        _blockTotalCount++;
         return returnPair;
     }
 
