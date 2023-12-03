@@ -42,7 +42,7 @@ public class Program
         public static byte[] GetBytesForHash(int key)
         {
             // aby som nemal konflikty pri hashovani
-            return BitConverter.GetBytes(key);
+            return BitConverter.GetBytes(key % 7919);
         }
 
         public int GetKey()

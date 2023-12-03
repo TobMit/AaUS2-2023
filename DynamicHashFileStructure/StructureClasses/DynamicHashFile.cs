@@ -296,9 +296,36 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                     {
                         // ak áno tak vrátim
                         returnData = block.GetRecord(i);
+                        break;
                     }
                 }
                 
+                // ak sa nenašiel v hlavnom bloku tak idem do preplňujúceho ak existuje
+                if (externNode.CountPreplnovaciBlock > 0 && returnData is null)
+                {
+                    int current = block.NextDataBlock;
+                    while (current >= 0)
+                    {
+                        // načítam blok a skontrolujem dáta vňom
+                        block = _filePreplnovaciManager.GetBlock(current);
+                        for (int i = 0; i < block.Count(); i++)
+                        {
+                            // skontrolujem či je to to čo hľadám
+                            if (block.GetRecord(i).CompareTo(key) == 0)
+                            {
+                                // ak áno tak vrátim
+                                returnData = block.GetRecord(i);
+                                current = -1; // aby sa ukončil cyklus
+                                break;
+                            }
+                        }
+                        // ak je stále return data null, to znamená že som stále nenašiel záznam a musim pokračovať daľším preplňujúcim blokom
+                        if (returnData is null)
+                        {
+                            current = block.NextDataBlock;
+                        }
+                    }
+                }
             }
         }
         

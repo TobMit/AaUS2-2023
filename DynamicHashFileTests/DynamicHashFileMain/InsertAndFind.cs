@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Runtime.InteropServices.JavaScript;
 using DynamicHashFileStructure.StructureClasses;
 using DynamicHashFileTests.FileManagerTest;
 
@@ -10,10 +11,12 @@ public class InsertAndFind
     {
         
         public int ID { get; set; }
+        public int AnotherInt { get; set; }
 
-        public InsertClass(int id)
+        public InsertClass(int id, int anotherInt)
         {
             ID = id;
+            AnotherInt = anotherInt;
         }
         public int CompareTo(object? obj)
         {
@@ -22,17 +25,24 @@ public class InsertAndFind
 
         public static int GetSize()
         {
-            return sizeof(int);
+            return sizeof(int) + sizeof(int);
         }
 
         public byte[] GetBytes()
         {
-            return BitConverter.GetBytes(ID);
+            List<Byte> bytes = new List<byte>();
+        
+            bytes.AddRange(BitConverter.GetBytes(ID));
+            bytes.AddRange(BitConverter.GetBytes(AnotherInt));
+            return bytes.ToArray();
         }
 
         public static object FromBytes(byte[] bytes)
         {
-            return new InsertClass(BitConverter.ToInt32(bytes));
+            int id = BitConverter.ToInt32(bytes);
+            int offset = sizeof(int);
+            int another = BitConverter.ToInt32(bytes, offset);
+            return new InsertClass(id, another);
         }
 
         public int CompareTo(int other)
@@ -55,7 +65,7 @@ public class InsertAndFind
 
         public override string ToString()
         {
-            return $"ID: {ID}";
+            return $"ID: {ID}, AnotherInt: {AnotherInt}";
         }
     }
 
@@ -78,7 +88,7 @@ public class InsertAndFind
     [Test]
     public void InsertTest()
     {
-        InsertClass tmpClass = new InsertClass(1);
+        InsertClass tmpClass = new InsertClass(1, 1);
         _dynamicHashFile.Insert(tmpClass.GetKey(),tmpClass);
         _dynamicHashFile.Insert(tmpClass.GetKey(),tmpClass);
         _dynamicHashFile.Insert(tmpClass.GetKey(),tmpClass);
@@ -95,5 +105,30 @@ public class InsertAndFind
         _dynamicHashFile.PrintFile();
         
         Assert.That(_dynamicHashFile.Count, Is.EqualTo(12));
+    }
+
+    [Test]
+    public void FindTest()
+    {
+        for (int i = 0; i < 12; i++)
+        {
+            // fabrikujem kľúče tak aby mi prvý byt ostal rovnaký ale lýšil sa v iných
+            byte[] fabricedBytes = BitConverter.GetBytes(1);
+            fabricedBytes[1] = BitConverter.GetBytes(i)[0];
+            
+            _dynamicHashFile.Insert(BitConverter.ToInt32(fabricedBytes), new(BitConverter.ToInt32(fabricedBytes), i));
+        }
+        
+        _dynamicHashFile.PrintFile();
+        Assert.That(_dynamicHashFile.Count, Is.EqualTo(12));
+        for (int i = 0; i < 12; i++)
+        {
+            // fabrikujem kľúče tak aby mi prvý byt ostal rovnaký ale lýšil sa v iných
+            byte[] fabricedBytes = BitConverter.GetBytes(1);
+            fabricedBytes[1] = BitConverter.GetBytes(i)[0];
+            
+            var tmp = _dynamicHashFile.Find(BitConverter.ToInt32(fabricedBytes));
+            Assert.That(tmp.AnotherInt, Is.EqualTo(i));
+        }
     }
 }
