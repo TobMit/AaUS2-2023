@@ -24,11 +24,11 @@ public class DynamicHashFile<TData> where TData : IRecordData<TData>
 
     private void InitTree()
     {
-        Block<TData> initBlock = new(PrimaryFileBlockSize);
-        _root.LeftSon = new NodeExtern<TData>(0, _root);
-        _root.RightSon = new NodeExtern<TData>(_fileManager.GetFreeBlock().First, _root);
-        _fileManager.WriteBlock(0, initBlock);
-        _fileManager.WriteBlock(1, initBlock);
+        //Block<TData> initBlock = new(PrimaryFileBlockSize);
+        //_root.LeftSon = new NodeExtern<TData>(0, _root);
+        //_root.RightSon = new NodeExtern<TData>(_fileManager.GetFreeBlock().First, _root);
+        //_fileManager.WriteBlock(0, initBlock);
+        //_fileManager.WriteBlock(1, initBlock);
     }
 
     public void Insert(TData data)
@@ -68,7 +68,9 @@ public class DynamicHashFile<TData> where TData : IRecordData<TData>
                     {
                         if (internNode.LeftSon == null)
                         {
-                            internNode.LeftSon = new NodeExtern<TData>(_fileManager.GetFreeBlock().First, internNode);
+                            var tmpBlock = _fileManager.GetFreeBlock();
+                            _fileManager.WriteBlock(tmpBlock.First, tmpBlock.Second);
+                            internNode.LeftSon = new NodeExtern<TData>(tmpBlock.First, internNode);
                         }
                         // vložím do staku toho syna ktorý pokračuje podla kľúča
                         stackNode.Push(internNode.LeftSon);
@@ -78,7 +80,9 @@ public class DynamicHashFile<TData> where TData : IRecordData<TData>
                     {
                         if (internNode.RightSon == null)
                         {
-                            internNode.RightSon = new NodeExtern<TData>(_fileManager.GetFreeBlock().First, internNode);
+                            var tmpBlock = _fileManager.GetFreeBlock();
+                            _fileManager.WriteBlock(tmpBlock.First, tmpBlock.Second);
+                            internNode.RightSon = new NodeExtern<TData>(tmpBlock.First, internNode);
                         }
                         // vložím do staku toho syna ktorý pokračuje podla kľúča
                         stackNode.Push(internNode.RightSon);
@@ -95,13 +99,19 @@ public class DynamicHashFile<TData> where TData : IRecordData<TData>
                     if (externNode.Count < PrimaryFileBlockSize) // todo kým sa nedorieši preplňovací blok
                     {
                         // skontrolujem či má adresu
+                        Block<TData>? block = null;
                         if (externNode.Address < 0)
                         {
                             // ak nemá tak pridám nový blok
-                            externNode.Address = _fileManager.GetFreeBlock().First;
+                            var tmpBlock = _fileManager.GetFreeBlock();
+                            block = tmpBlock.Second;
+                            externNode.Address = tmpBlock.First;
                         }
                         // ak má tak prečítam blok
-                        var block = _fileManager.GetBlock(externNode.Address);
+                        else
+                        {
+                            block = _fileManager.GetBlock(externNode.Address);
+                        }
                         // pridám nové dáta
                         block.AddRecord(dataToInsert);
                         // zapíšem blok

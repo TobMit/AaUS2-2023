@@ -109,6 +109,6 @@ public class Program
         dhf.CloseFile();
         File.Delete("primaryData.bin");
         
-        Console.WriteLine("Koniec + " +  Seed);
+        Console.WriteLine("Koniec: " +  Seed);
     }
 }
