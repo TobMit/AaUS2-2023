@@ -39,10 +39,15 @@ public class Program
         }
 
 
-        public byte[] GetBytesForHash()
+        public static byte[] GetBytesForHash(int key)
         {
             // aby som nemal konflikty pri hashovani
-            return BitConverter.GetBytes(ID);
+            return BitConverter.GetBytes(key);
+        }
+
+        public int GetKey()
+        {
+            return ID;
         }
 
         public int CompareTo(TestClass? other)
@@ -124,7 +129,7 @@ public class Program
         {
             int index = rnd.Next(0, toInsert.Count);
             var toInsertData = toInsert[index];
-            dhf.Insert(toInsertData);
+            dhf.Insert( toInsertData.ID ,toInsertData);
             //toDelete.Add(toInsert[index]);
             toInsert.RemoveAt(index);
             
@@ -134,7 +139,7 @@ public class Program
             
             try
             {
-                var findData = dhf.Find(toInsertData.GetBytesForHash());
+                var findData = dhf.Find(toInsertData.ID);
                 if (toInsertData.CompareTo(findData) != 0)
                 {
                     seedOk = false;

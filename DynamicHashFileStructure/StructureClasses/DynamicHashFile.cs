@@ -1,4 +1,5 @@
 using System.Collections;
+using DynamicHashFileStructure.StructureClasses.HelperClasses;
 using DynamicHashFileStructure.StructureClasses.Nodes;
 
 namespace DynamicHashFileStructure.StructureClasses;
@@ -31,11 +32,11 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
         //_fileManager.WriteBlock(1, initBlock);
     }
 
-    public void Insert(TData data)
+    public void Insert(TKey key ,TData data)
     {
-        Stack<TData> stackData = new();
+        Stack<Pair<TKey, TData>> stackData = new();
         // vložím data do staku
-        stackData.Push(data);
+        stackData.Push(new(key, data));
         // while stak nie je prázdny
         while (stackData.Count > 0)
         {
@@ -48,7 +49,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
             // vytiahnem data zo staku
             var dataToInsert = stackData.Pop();
             // zýskam hash
-            var hash = dataToInsert.GetBytesForHash();
+            var hash = TData.GetBytesForHash(dataToInsert.First);
             // premením hash byte na pole bitov
             BitArray bitArray = new(hash);
 
@@ -113,7 +114,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                             block = _fileManager.GetBlock(externNode.Address);
                         }
                         // pridám nové dáta
-                        block.AddRecord(dataToInsert);
+                        block.AddRecord(dataToInsert.Second);
                         // zapíšem blok
                         _fileManager.WriteBlock(externNode.Address, block);
                         // zvýšim počet dát
@@ -134,7 +135,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                         _fileManager.WriteBlock(externNode.Address, block);
                         foreach (var record in listRecordov)
                         {
-                            stackData.Push(record);
+                            stackData.Push(new(record.GetKey(), record));
                         }
                         
                         stackData.Push(dataToInsert);
@@ -164,11 +165,12 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
     }
 
     //todo lepšie spravť ten kľúč resp hash
-    public TData Find(Byte[] keyHash)
+    public TData Find(TKey key)
     {
+        
         TData returnData = default;
         
-        BitArray bitArray = new(keyHash);
+        BitArray bitArray = new(TData.GetBytesForHash(key));
         int index = 0;
 
         Stack<Node<TData>> stackNode = new();
@@ -219,7 +221,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                 for (int i = 0; i < block.Count(); i++)
                 {
                     // skontrolujem či je to to čo hľadám
-                    if (block.GetRecord(i).GetBytesForHash().SequenceEqual(keyHash))
+                    if (block.GetRecord(i).CompareTo(key) == 0)
                     {
                         // ak áno tak vrátim
                         returnData = block.GetRecord(i);
