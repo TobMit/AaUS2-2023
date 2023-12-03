@@ -14,11 +14,14 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
     private NodeIntern<TData> _root;
 
     private FileManager<TData> _fileManager;
+    private FileManager<TData> _filePreplnovaciManager;
 
     public DynamicHashFile()
     {
         _root = new(null);
         _fileManager = new(PrimaryFileBlockSize, "primaryData.bin");
+        _filePreplnovaciManager = new(PrimaryFileBlockSize, "secondaryData.bin");
+        Count = 0;
 
         InitTree();
     }
@@ -69,8 +72,6 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                     {
                         if (internNode.LeftSon == null)
                         {
-                            // var tmpBlock = _fileManager.GetFreeBlock();
-                            // _fileManager.WriteBlock(tmpBlock.First, tmpBlock.Second);
                             internNode.LeftSon = new NodeExtern<TData>(-1, internNode);
                         }
                         // vložím do staku toho syna ktorý pokračuje podla kľúča
@@ -81,15 +82,12 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                     {
                         if (internNode.RightSon == null)
                         {
-                            // var tmpBlock = _fileManager.GetFreeBlock();
-                            // _fileManager.WriteBlock(tmpBlock.First, tmpBlock.Second);
                             internNode.RightSon = new NodeExtern<TData>(-1, internNode);
                         }
                         // vložím do staku toho syna ktorý pokračuje podla kľúča
                         stackNode.Push(internNode.RightSon);
                         index++;
                     }
-                    // todo ak došli kľúče tak predpokladám že tam je 0 a idem vždy podľa toho syna
                 }
                 // 2. vrchol je externý
                 else
@@ -97,7 +95,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                     var externNode = (NodeExtern<TData>) node;
                     // skontrolujem koľko má uložených dát
                     // ak má menej ako je BF
-                    if (externNode.Count < PrimaryFileBlockSize) // todo kým sa nedorieši preplňovací blok
+                    if (externNode.CountPrimaryData < PrimaryFileBlockSize)
                     {
                         // skontrolujem či má adresu
                         Block<TData>? block = null;
@@ -118,46 +116,120 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                         // zapíšem blok
                         _fileManager.WriteBlock(externNode.Address, block);
                         // zvýšim počet dát
-                        externNode.Count++;
+                        externNode.CountPrimaryData++;
+                        Count++;
                     }
                     // ak je plný
                     else
                     {
-                        // todo toto sa dá ešte zlepšiť tým že nepôjdem od rooto
-                        // todo ak majú úplne rovnaký hash tak potom riešime cez preplňovací blok
-                        
-                        // načítam blok postuplne odstránim dáta ktoré sú v bloku a vložím ich do staku
-                        var block = _fileManager.GetBlock(externNode.Address);
-                        var listRecordov = block.GetArrayRecords();
-                        block.ClearRecords();
-                        externNode.Count = 0;
-                        // zapíšem tento prázdny blok do súboru
-                        _fileManager.WriteBlock(externNode.Address, block);
-                        foreach (var record in listRecordov)
+                        // skontrolujem či som už mynul všetky bity
+                        if (index >= bitArray.Length)
                         {
-                            stackData.Push(new(record.GetKey(), record));
-                        }
-                        
-                        stackData.Push(dataToInsert);
-                        // todo nemôže byť voľný blok
-                        // medzi jeho parenta a tento blok vložím nový interný blok,
-                        var parent = externNode.Parent;
-                        
-                        var tmp = bitArray[index - 1];
+                            // ak áno tak vkladám do preplňovacieho bloku
+                            
+                            // načítam blok a skontrolujem či má adresu na prepňlovaci blok
+                            if (externNode.CountPreplnovaciBlock > 0)
+                            {
+                                // načítam si blok aby som získal adresu z preplňovacieho bloku
+                                var mainBlock = _fileManager.GetBlock(externNode.Address);
+                                Block<TData>? block = null;
+                                
+                                int current = mainBlock.NextDataBlock;
+                                int lastCurrent = mainBlock.NextDataBlock; // keď mám blok ktorý nemá daľší blok ktorý pokračuje tak potrebujem vedieť jeho adresu
+                                // budeme prechádzať kým nenarazíme na posledný blok alebo pokiaľ nenarazíme na blok v ktorom je voľné miesto
+                                while (current >= 0)
+                                {
+                                    block = _filePreplnovaciManager.GetBlock(current);
+                                    
+                                    // ak je plný tak pokračujeme ak nie je plný tak vyskakujeme
+                                    if (block.IsFull())
+                                    {
+                                        lastCurrent = current;
+                                        current = block.NextDataBlock;
+                                    }
+                                    else
+                                    {
+                                        break;
+                                    }
+                                }
+                                // ešte raz kontrolujeme či je blok plný (môže nastať situácia že je blok plný a nemá daľší blok)
 
-                        var tmpNode = new NodeIntern<TData>(parent, externNode);
-                        externNode.Parent = tmpNode;
-                        
-                        if (!bitArray[index - 1]) // ak bol posledný bit 0 tak vložím nový intern node inak pravý
-                        {
-                            parent.LeftSon = tmpNode;
+                                if (block is null)
+                                {
+                                    throw new Exception("Toto nemalo nastat, chyba v Inserte pri prehľadávanií preplňovacích blokov, block je null!");
+                                }
+                                if (block.IsFull())
+                                {
+                                    // tak najdeme nový block
+                                    var tmpPair = _filePreplnovaciManager.GetFreeBlock();
+                                    externNode.CountPreplnovaciBlock++;
+                                    // do pôvodne načítaného bloku pridame linkovaciu adresu a zapíšeme ho
+                                    block.NextDataBlock = tmpPair.First;
+                                    _filePreplnovaciManager.WriteBlock(lastCurrent, block);
+                                    current = tmpPair.First;
+                                    block = tmpPair.Second;
+                                }
+                                // zapíšeme dáta do bloku a uložíme
+                                block.AddRecord(dataToInsert.Second);
+                                _filePreplnovaciManager.WriteBlock(current, block);
+                                Count++;
+                                externNode.CountPreplnovaciData++;
+
+                            }
+                            // ak nemá tak pridám nový preplňovaci blok
+                            else
+                            {
+                                // vytvorím nový blok z preplňovacieho súboru a uložíme tam dáta
+                                var tmpPair = _filePreplnovaciManager.GetFreeBlock();
+                                externNode.CountPreplnovaciBlock++;
+                                tmpPair.Second.AddRecord(dataToInsert.Second);
+                                externNode.CountPreplnovaciData++;
+                                Count++;
+                                _filePreplnovaciManager.WriteBlock(tmpPair.First, tmpPair.Second);
+                                
+                                // musíme vložiť do bloku v hlavnom súbore linkovaciu adresu
+                                var block = _fileManager.GetBlock(externNode.Address);
+                                block.NextDataBlock = tmpPair.First;
+                                _fileManager.WriteBlock(externNode.Address, block);
+
+                            }
+                                // zapíšem tieto dáta do tohto preplňovacieho bloku
                         }
                         else
                         {
-                            parent.RightSon = tmpNode;
+                            // načítam blok postuplne odstránim dáta ktoré sú v bloku a vložím ich do staku
+                            var block = _fileManager.GetBlock(externNode.Address);
+                            var listRecordov = block.GetArrayRecords();
+                            block.ClearRecords();
+                            externNode.CountPrimaryData = 0;
+                            // zapíšem tento prázdny blok do súboru
+                            _fileManager.WriteBlock(externNode.Address, block);
+                            foreach (var record in listRecordov)
+                            {
+                                stackData.Push(new(record.GetKey(), record));
+                                Count--;
+                            }
+                        
+                            stackData.Push(dataToInsert);
+                            // todo nemôže byť voľný blok
+                            // medzi jeho parenta a tento blok vložím nový interný blok,
+                            var parent = externNode.Parent;
+                        
+                            var tmp = bitArray[index - 1];
+
+                            var tmpNode = new NodeIntern<TData>(parent, externNode);
+                            externNode.Parent = tmpNode;
+                        
+                            if (!bitArray[index - 1]) // ak bol posledný bit 0 tak vložím nový intern node inak pravý
+                            {
+                                parent.LeftSon = tmpNode;
+                            }
+                            else
+                            {
+                                parent.RightSon = tmpNode;
+                            }
+                            // týmto cyklus skončil ale pokračuje sa od znovu s novímy dátami (musím vložiť aj poledné dáta   
                         }
-                        // týmto cyklus skončil ale pokračuje sa od znovu s novímy dátami (musím vložiť aj poledné dáta
-                        // todo skontrolovať či nie je hash rovnaký potom preplňovací blok
                     }
                 }
             }
@@ -248,10 +320,19 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
 
     public void PrintFile()
     {
+        Console.WriteLine("------------  PRIMARY FILE ------------");
         for (int i = 0; i < _fileManager.GetBlockCount(); i++)
         {
             Console.WriteLine($"Block {i}");
             var block = _fileManager.GetBlock(i);
+            Console.WriteLine(block.ToString());
+        }
+        
+        Console.WriteLine("------------  PREPLNOVACI FILE ------------");
+        for (int i = 0; i < _filePreplnovaciManager.GetBlockCount(); i++)
+        {
+            Console.WriteLine($"Block {i}");
+            var block = _filePreplnovaciManager.GetBlock(i);
             Console.WriteLine(block.ToString());
         }
     }
