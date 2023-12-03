@@ -260,6 +260,15 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
     {
         return _validRecords;
     }
+
+    /// <summary>
+    /// Zmaže (-1) referencie na iné free blocky
+    /// </summary>
+    public void ClearLinkReferences()
+    {
+        NextFreeBlock = -1;
+        LastNextFreeBlock = -1;
+    }
     
     
     /// <summary>

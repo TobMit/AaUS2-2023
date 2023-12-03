@@ -102,6 +102,9 @@ public class FileManager<TData> where TData : IComparable<TData>, IRecord<TData>
             }
             BlockUsedCount++;
         }
+        
+        returnPair.Second.ClearLinkReferences();
+        returnPair.Second.ClearRecords();
         return returnPair;
     }
 

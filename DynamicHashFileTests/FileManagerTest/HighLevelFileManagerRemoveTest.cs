@@ -294,4 +294,143 @@ public class HighLevelFileManagerRemoveTest
         Assert.That(tmpBlock.Count(), Is.EqualTo(1));
         Assert.That(tmpBlock.GetRecord(0).Id, Is.EqualTo(3));
     }
+
+    /// <summary>
+    /// Pre pre zýskavanie voľnych blokov je pripravený úsek ktorý je neprerušovaný
+    /// </summary>
+    [Test]
+    public void GetFreeBlockFromContinualRemovedBlock()
+    {
+        Assert.That(_manager.BlockUsedCount, Is.EqualTo(10));
+        Assert.That(_manager.GetBlockCount(), Is.EqualTo(10));
+
+        for (int i = 4; i < 9; i++)
+        {
+            _manager.RemoveBlock(i);
+        }
+        Assert.That(_manager.BlockUsedCount, Is.EqualTo(5));
+        Assert.That(_manager.GetBlockCount(), Is.EqualTo(10));
+        
+        for (int i = 4; i < 9; i++)
+        {
+            var tmpPair = _manager.GetFreeBlock();
+            Assert.That(_manager.BlockUsedCount, Is.EqualTo(i + 2));
+            Assert.That(_manager.GetBlockCount(), Is.EqualTo(10));
+            Assert.That(tmpPair.First, Is.EqualTo(i));
+        }
+        
+        var tmp = _manager.GetFreeBlock();
+        Assert.That(_manager.BlockUsedCount, Is.EqualTo(11));
+        Assert.That(_manager.GetBlockCount(), Is.EqualTo(11));
+        Assert.That(tmp.First, Is.EqualTo(10));
+    }
+    
+    /// <summary>
+    /// Pre pre zýskavanie voľnych blokov je prerušovaný úsek, musí sa skákať
+    /// </summary>
+    [Test]
+    public void GetFreeBlockFromNotContinualRemovedBlock()
+    {
+        Assert.That(_manager.BlockUsedCount, Is.EqualTo(10));
+        Assert.That(_manager.GetBlockCount(), Is.EqualTo(10));
+
+        _manager.RemoveBlock(1);
+        _manager.RemoveBlock(3);
+        _manager.RemoveBlock(6);
+        _manager.RemoveBlock(8);
+        
+        Assert.That(_manager.BlockUsedCount, Is.EqualTo(6));
+        Assert.That(_manager.GetBlockCount(), Is.EqualTo(10));
+        
+        var tmpPair = _manager.GetFreeBlock();
+        Assert.That(_manager.BlockUsedCount, Is.EqualTo(7));
+        Assert.That(_manager.GetBlockCount(), Is.EqualTo(10));
+        Assert.That(tmpPair.First, Is.EqualTo(1));
+        
+        tmpPair = _manager.GetFreeBlock();
+        Assert.That(_manager.BlockUsedCount, Is.EqualTo(8));
+        Assert.That(_manager.GetBlockCount(), Is.EqualTo(10));
+        Assert.That(tmpPair.First, Is.EqualTo(3));
+        
+        tmpPair = _manager.GetFreeBlock();
+        Assert.That(_manager.BlockUsedCount, Is.EqualTo(9));
+        Assert.That(_manager.GetBlockCount(), Is.EqualTo(10));
+        Assert.That(tmpPair.First, Is.EqualTo(6));
+        
+        tmpPair = _manager.GetFreeBlock();
+        Assert.That(_manager.BlockUsedCount, Is.EqualTo(10));
+        Assert.That(_manager.GetBlockCount(), Is.EqualTo(10));
+        Assert.That(tmpPair.First, Is.EqualTo(8));
+        
+        var tmp = _manager.GetFreeBlock();
+        Assert.That(_manager.BlockUsedCount, Is.EqualTo(11));
+        Assert.That(_manager.GetBlockCount(), Is.EqualTo(11));
+        Assert.That(tmp.First, Is.EqualTo(10));
+    }
+    
+    /// <summary>
+    /// Pre pre zýskavanie voľnych blokov je prerušovaný úsek, musí sa skákať
+    /// </summary>
+    [Test]
+    public void GetFreeBlockFromNotContinualFirstBlockIsFreeRemovedBlock()
+    {
+        Assert.That(_manager.BlockUsedCount, Is.EqualTo(10));
+        Assert.That(_manager.GetBlockCount(), Is.EqualTo(10));
+
+        _manager.RemoveBlock(0);
+        _manager.RemoveBlock(3);
+        _manager.RemoveBlock(6);
+        _manager.RemoveBlock(8);
+        
+        Assert.That(_manager.BlockUsedCount, Is.EqualTo(6));
+        Assert.That(_manager.GetBlockCount(), Is.EqualTo(10));
+        
+        var tmpPair = _manager.GetFreeBlock();
+        Assert.That(_manager.BlockUsedCount, Is.EqualTo(7));
+        Assert.That(_manager.GetBlockCount(), Is.EqualTo(10));
+        Assert.That(tmpPair.First, Is.EqualTo(0));
+        
+        tmpPair = _manager.GetFreeBlock();
+        Assert.That(_manager.BlockUsedCount, Is.EqualTo(8));
+        Assert.That(_manager.GetBlockCount(), Is.EqualTo(10));
+        Assert.That(tmpPair.First, Is.EqualTo(3));
+        
+        tmpPair = _manager.GetFreeBlock();
+        Assert.That(_manager.BlockUsedCount, Is.EqualTo(9));
+        Assert.That(_manager.GetBlockCount(), Is.EqualTo(10));
+        Assert.That(tmpPair.First, Is.EqualTo(6));
+        
+        tmpPair = _manager.GetFreeBlock();
+        Assert.That(_manager.BlockUsedCount, Is.EqualTo(10));
+        Assert.That(_manager.GetBlockCount(), Is.EqualTo(10));
+        Assert.That(tmpPair.First, Is.EqualTo(8));
+        
+        var tmp = _manager.GetFreeBlock();
+        Assert.That(_manager.BlockUsedCount, Is.EqualTo(11));
+        Assert.That(_manager.GetBlockCount(), Is.EqualTo(11));
+        Assert.That(tmp.First, Is.EqualTo(10));
+    }
+
+    [Test]
+    public void RemoveToEmptyThenNewBlock()
+    {
+        Assert.That(_manager.BlockUsedCount, Is.EqualTo(10));
+        Assert.That(_manager.GetBlockCount(), Is.EqualTo(10));
+
+        for (int i = 10 - 1; i >= 0; i--)
+        {
+            _manager.RemoveBlock(i);
+        
+            Assert.That(_manager.BlockUsedCount, Is.EqualTo(i));
+            Assert.That(_manager.GetBlockCount(), Is.EqualTo(i));
+        }
+        
+        Assert.That(_manager.BlockUsedCount, Is.EqualTo(0));
+        Assert.That(_manager.GetBlockCount(), Is.EqualTo(0));
+        
+        var tmpPair = _manager.GetFreeBlock();
+        Assert.That(_manager.BlockUsedCount, Is.EqualTo(1));
+        Assert.That(_manager.GetBlockCount(), Is.EqualTo(1));
+        Assert.That(tmpPair.First, Is.EqualTo(0));
+    }
 }
