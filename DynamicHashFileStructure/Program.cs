@@ -53,20 +53,59 @@ public class Program
         }
     }
     
+    private static bool parallel = false;
+    
     private static int MAX_UNITS = 1000000;
     private static int MAX_TEST = 100000;
     
+    private static int latestLowest = int.MaxValue;
+    private static int seed = 0;
+    private static int maxSeed = 5;
+    //private static int maxSeed = int.MaxValue;
     public static void Main(string[] args)
     {
-        for (int i = 0; i < 10; i++)
+        
+        if (parallel) // not suported for now
         {
-            Console.WriteLine("Test start:  " + i);
-            TestInstance(i);
+            Parallel.For(seed, maxSeed, (iSeed) =>
+            {
+                try
+                {
+                    int result = TestInstance(iSeed);
+                    if (result < 30)
+                    {
+                        Console.WriteLine($"Nájdený SEED: {iSeed}");
+                        return;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"---------------------------Error v seede: {iSeed} \n {e.Message}");
+                    return;
+                }
+            });
+        }
+        else
+        {
+            for (int i = seed; i < maxSeed; i++)
+            {
+                latestLowest = TestInstance(i);
+                
+                if (latestLowest <= 30)
+                {
+                    Console.WriteLine($"Nájdený SEED: {i}");
+                    return;
+                }
+            }
         }
     }
 
-    public static void TestInstance(int Seed)
+    public static int TestInstance(int Seed)
     {
+        Console.WriteLine($"SEED: {Seed}");
+        
+        bool seedOk = true;
+        
         Random rnd = new Random(Seed);
         List<TestClass> toInsert = new(MAX_UNITS);
         List<TestClass> toDelete = new(MAX_UNITS);
@@ -98,15 +137,19 @@ public class Program
                 var findData = dhf.Find(toInsertData.GetBytesForHash());
                 if (toInsertData.CompareTo(findData) != 0)
                 {
-                    Console.WriteLine("Error at " + i);
-                    break;
+                    seedOk = false;
+                    latestLowest = i;
+                    Console.WriteLine($"Error in dint Find what should be find at {i} in SEED: {Seed}");
+                    return latestLowest;
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine("Error v find " + i);
-                Console.WriteLine(e.Message);
-                break;
+                seedOk = false;
+                latestLowest = i;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Error in Find at {i} in SEED: {Seed} \n {e.Message}");
+                return latestLowest;
             }
             
             //Console.WriteLine("-----------------------------------");
@@ -119,6 +162,12 @@ public class Program
         dhf.CloseFile();
         File.Delete("primaryData.bin");
         
-        Console.WriteLine("Koniec: " +  Seed);
+        if (seedOk)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("SEED OK: " + Seed);
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+        return int.MaxValue;
     }
 }
