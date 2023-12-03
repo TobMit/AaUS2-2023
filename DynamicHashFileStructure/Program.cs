@@ -65,7 +65,7 @@ public class Program
     
     private static int latestLowest = int.MaxValue;
     private static int seed = 0;
-    private static int maxSeed = 5;
+    private static int maxSeed = 20;
     //private static int maxSeed = int.MaxValue;
     public static void Main(string[] args)
     {

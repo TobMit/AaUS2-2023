@@ -6,7 +6,7 @@ namespace DynamicHashFileTests.FileManagerTest;
 
 public class BlockTest
 {
-    public class TestClass : IRecordData<TestClass>, IEquatable<TestClass>
+    public class TestClass : IRecordData<int>, IEquatable<TestClass>
     {
         private static int MAX_STRING_LENGTH = 20;
         private static int PRIME_NUMBER = 541;
@@ -39,6 +39,11 @@ public class BlockTest
             return this.Equals(other) ? 0 : -1;
         }
         
+        public int CompareTo(int other)
+        {
+            return Id.CompareTo(other);
+        }
+
         /// <summary>
         /// Porovnáva či sú 2 pointy rovnaké.
         /// </summary>
@@ -94,9 +99,9 @@ public class BlockTest
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public byte[] GetBytesForHash()
+        public static byte[] GetBytesForHash(int key)
         {
-            int mod = Id % PRIME_NUMBER;
+            int mod = key % PRIME_NUMBER;
             return BitConverter.GetBytes(mod);
         }
 
@@ -131,6 +136,11 @@ public class BlockTest
         {
             
             return this.Equals((TestClass)obj) ? 0 : -1;
+        }
+
+        public int GetKey()
+        {
+            return Id;
         }
     }
     

@@ -15,6 +15,8 @@ public class Block<TData> : IRecord where TData : IRecord
 
     public int NextFreeBlock { get; set; }
     public int LastNextFreeBlock { get; set; }
+    
+    public int NextDataBlock { get; set; }
 
 
     /// <summary>
@@ -41,6 +43,7 @@ public class Block<TData> : IRecord where TData : IRecord
         _validRecords = 1;
         NextFreeBlock = -1;
         LastNextFreeBlock = -1;
+        NextDataBlock = -1;
     }
 
     /// <summary>
@@ -48,13 +51,14 @@ public class Block<TData> : IRecord where TData : IRecord
     /// </summary>
     /// <param name="blockFactor">Blokovací faktor</param>
     /// <param name="records">Vytvorené dáta z disku</param>
-    private Block(int blockFactor, TData[] records, int validRecords, int nextFreeBlock, int lastFreeFreeBlock)
+    private Block(int blockFactor, TData[] records, int validRecords, int nextFreeBlock, int lastFreeFreeBlock, int nextDataBlock)
     {
         _blockFactor = blockFactor;
         _records = records;
         _validRecords = validRecords;
         NextFreeBlock = nextFreeBlock;
         LastNextFreeBlock = lastFreeFreeBlock;
+        NextDataBlock = nextDataBlock;
     }
 
     public Block(int blockFactor)
@@ -64,6 +68,7 @@ public class Block<TData> : IRecord where TData : IRecord
         _validRecords = 0;
         NextFreeBlock = -1;
         LastNextFreeBlock = -1;
+        NextDataBlock = -1;
     }
 
     public static int GetSize()
@@ -75,8 +80,8 @@ public class Block<TData> : IRecord where TData : IRecord
             throw new OverflowException("Block faktor nie je nastavený!");
         }
 
-        //   počt záznamov +          početPlatnýchZáznamov + nextFreeBlock + lastNextBlock
-        return BlockFactor * TData.GetSize() + sizeof(int) + sizeof(int) + sizeof(int); 
+        //   počt záznamov +          početPlatnýchZáznamov + nextFreeBlock + lastNextBlock + nextDataBlock
+        return BlockFactor * TData.GetSize() + sizeof(int) + sizeof(int) + sizeof(int) + sizeof(int); 
     }
 
     /// <summary>
@@ -86,8 +91,8 @@ public class Block<TData> : IRecord where TData : IRecord
     /// <returns>veľosť bloku</returns>
     public static int GetSize(int blockFactor)
     {
-        //   počt záznamov +          početPlatnýchZáznamov + nextFreeBlock + lastNextBlock
-        return blockFactor * TData.GetSize() + sizeof(int) + sizeof(int) + sizeof(int);
+        //   počt záznamov +          početPlatnýchZáznamov + nextFreeBlock + lastNextBlock + nextDataBlock
+        return blockFactor * TData.GetSize() + sizeof(int) + sizeof(int) + sizeof(int) + sizeof(int);
     }
 
     public byte[] GetBytes()
@@ -104,6 +109,7 @@ public class Block<TData> : IRecord where TData : IRecord
         bytes.AddRange(BitConverter.GetBytes(NextFreeBlock));
         bytes.AddRange(BitConverter.GetBytes(LastNextFreeBlock));
         bytes.AddRange(BitConverter.GetBytes(_validRecords));
+        bytes.AddRange(BitConverter.GetBytes(NextDataBlock));
 
         for (int i = 0; i < _records.Length; i++)
         {
@@ -138,6 +144,8 @@ public class Block<TData> : IRecord where TData : IRecord
         offset += sizeof(int);
         int validRecords = BitConverter.ToInt32(bytes, offset);
         offset += sizeof(int);
+        int nextDataBlock = BitConverter.ToInt32(bytes, offset);
+        offset += sizeof(int);
 
         TData[] records = new TData[BlockFactor];
         for (int i = 0; i < BlockFactor; i++)
@@ -149,7 +157,7 @@ public class Block<TData> : IRecord where TData : IRecord
             offset += TData.GetSize();
         }
 
-        return new Block<TData>(_blockFactor, records, validRecords, nextFreeBlock, lastFreeBlock);
+        return new Block<TData>(_blockFactor, records, validRecords, nextFreeBlock, lastFreeBlock, nextDataBlock);
     }
 
     public override string ToString()
@@ -159,6 +167,7 @@ public class Block<TData> : IRecord where TData : IRecord
         sb.Append($"Last free block: {LastNextFreeBlock}\n");
         sb.Append($"Block factor: {_blockFactor}\n");
         sb.Append($"Valid records: {_validRecords}\n");
+        sb.Append($"Next data block: {NextDataBlock}\n");
         sb.Append("Records:\n");
         for (int i = 0; i < _validRecords; i++)
         {
@@ -288,6 +297,21 @@ public class Block<TData> : IRecord where TData : IRecord
         }
 
         if (_validRecords != other._validRecords)
+        {
+            return -1;
+        }
+        
+        if (NextFreeBlock != other.NextFreeBlock)
+        {
+            return -1;
+        }
+        
+        if (LastNextFreeBlock != other.LastNextFreeBlock)
+        {
+            return -1;
+        }
+        
+        if (NextDataBlock != other.NextDataBlock)
         {
             return -1;
         }

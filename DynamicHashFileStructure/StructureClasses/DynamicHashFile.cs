@@ -69,9 +69,9 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                     {
                         if (internNode.LeftSon == null)
                         {
-                            var tmpBlock = _fileManager.GetFreeBlock();
-                            _fileManager.WriteBlock(tmpBlock.First, tmpBlock.Second);
-                            internNode.LeftSon = new NodeExtern<TData>(tmpBlock.First, internNode);
+                            // var tmpBlock = _fileManager.GetFreeBlock();
+                            // _fileManager.WriteBlock(tmpBlock.First, tmpBlock.Second);
+                            internNode.LeftSon = new NodeExtern<TData>(-1, internNode);
                         }
                         // vložím do staku toho syna ktorý pokračuje podla kľúča
                         stackNode.Push(internNode.LeftSon);
@@ -81,9 +81,9 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                     {
                         if (internNode.RightSon == null)
                         {
-                            var tmpBlock = _fileManager.GetFreeBlock();
-                            _fileManager.WriteBlock(tmpBlock.First, tmpBlock.Second);
-                            internNode.RightSon = new NodeExtern<TData>(tmpBlock.First, internNode);
+                            // var tmpBlock = _fileManager.GetFreeBlock();
+                            // _fileManager.WriteBlock(tmpBlock.First, tmpBlock.Second);
+                            internNode.RightSon = new NodeExtern<TData>(-1, internNode);
                         }
                         // vložím do staku toho syna ktorý pokračuje podla kľúča
                         stackNode.Push(internNode.RightSon);
@@ -164,7 +164,6 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
         }
     }
 
-    //todo lepšie spravť ten kľúč resp hash
     public TData Find(TKey key)
     {
         
