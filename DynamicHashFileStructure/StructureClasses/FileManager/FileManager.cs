@@ -1,4 +1,5 @@
-﻿using DynamicHashFileStructure.StructureClasses.HelperClasses;
+﻿using System.ComponentModel.Design;
+using DynamicHashFileStructure.StructureClasses.HelperClasses;
 
 namespace DynamicHashFileStructure.StructureClasses;
 
@@ -92,6 +93,13 @@ public class FileManager<TData> where TData : IComparable<TData>, IRecord<TData>
             {
                 _lastFreeBlock = -1;
             }
+            else
+            {
+                // ak nie je tak načítame ten blok ktorý je za tým ktorý sme práve načítali a nastavíme mu last free block na -1
+                var nextBlock = Block<TData>.FromBytes(_lowLevelFileManager.ReadBlock(_firstFreeBlock));
+                nextBlock.LastNextFreeBlock = -1;
+                _lowLevelFileManager.WriteDataToBlock(_firstFreeBlock, nextBlock.GetBytes());
+            }
             BlockUsedCount++;
         }
         return returnPair;
@@ -122,22 +130,40 @@ public class FileManager<TData> where TData : IComparable<TData>, IRecord<TData>
                 var block = Block<TData>.FromBytes(_lowLevelFileManager.ReadBlock(current));
                 // posledný index zmažeme
                 _lowLevelFileManager.DeleteLastBlock();
-                // current nastavíme last free block zo zýkaného bloku
-                if (current == block.LastNextFreeBlock - 1)
+                // current nastavíme last free block zo zýkaného bloku, pri prvom mazaní z konca keď blok nemá nastavené linkovacie hodnoty, tak má tam -1 všade čo je vlastne chyba a preto musíme overovať voči _lastFreeBlock
+                if (current - 1 == (block.LastNextFreeBlock != -1 ? block.LastNextFreeBlock : _lastFreeBlock))
                 {
-                    current = block.LastNextFreeBlock;
+                    // nahrá sa hodnota z bloku len v tedy ak je rozdielana -1 (tento prípad nastáva prvý krát keď sa maže s konca, linkovacie hodnoty ešte niesú nastavené)
+                    if (block.LastNextFreeBlock != -1)
+                    {
+                        current = block.LastNextFreeBlock;   
+                    }
+                    else
+                    {
+                        current = _lastFreeBlock;
+                    }
                 }
                 // ak nie je
                 else
                 {
-                    // načítame ten blok ktorý je pred ním a zmeníme mu adresu next free na -1
-                    var prevBlock = Block<TData>.FromBytes(_lowLevelFileManager.ReadBlock(block.LastNextFreeBlock));
-                    prevBlock.NextFreeBlock = -1;
-                    _lowLevelFileManager.WriteDataToBlock(block.LastNextFreeBlock, prevBlock.GetBytes());
+                    // tak nebudeme pokračovať v cykle
+                    current = -1;
+                    // ak má informáciu o predchádzajúcom voľnom bloku
+                    if (block.LastNextFreeBlock != -1)
+                    {
+                        // načítame ten blok ktorý je pred ním a zmeníme mu adresu next free na -1
+                        var prevBlock = Block<TData>.FromBytes(_lowLevelFileManager.ReadBlock(block.LastNextFreeBlock));
+                        prevBlock.NextFreeBlock = -1;
+                        _lowLevelFileManager.WriteDataToBlock(block.LastNextFreeBlock, prevBlock.GetBytes());
+                    }
+                    // ak nemá tak nič nenastavujeme
                 }
                 
-                // nastavíme _lastBlock na hodnotu z nacitaného bloku
-                _lastFreeBlock = block.LastNextFreeBlock;
+                // nastavíme _lastBlock na hodnotu z nacitaného bloku ak pred tým nebola -1
+                if (block.LastNextFreeBlock != -1)
+                {
+                    _lastFreeBlock = block.LastNextFreeBlock;
+                }
                 
                 // ak je last next free blcok z bloku -1 tak nastavíme aj prvý na -1 čo znamená že je 
                 if (current == -1)

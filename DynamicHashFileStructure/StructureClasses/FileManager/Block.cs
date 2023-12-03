@@ -152,9 +152,11 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
         return new Block<TData>(_blockFactor, records, validRecords, nextFreeBlock, lastFreeBlock);
     }
 
-    public string ToString()
+    public override string ToString()
     {
         StringBuilder sb = new StringBuilder();
+        sb.Append($"Next free block: {NextFreeBlock}\n");
+        sb.Append($"Last free block: {LastNextFreeBlock}\n");
         sb.Append($"Block factor: {_blockFactor}\n");
         sb.Append($"Valid records: {_validRecords}\n");
         sb.Append("Records:\n");

@@ -120,6 +120,11 @@ public class BlockTest
         {
             return !(a == b);
         }
+
+        public override string ToString()
+        {
+            return $"ID: {Id}, Float: {FloatValue}, Double: {DoubleValue}, String1: {StringValue1}, String2: {StringValue2}";
+        }
     }
     
     private Block<TestClass> _block;

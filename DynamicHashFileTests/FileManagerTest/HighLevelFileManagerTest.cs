@@ -91,4 +91,11 @@ public class HighLevelFileManagerTest
         Assert.That(tmp.GetRecord(0), Is.EqualTo(testRecord));
         Assert.That(tmp.Count(), Is.EqualTo(1));
     }
+
+    [Test]
+    public void RemoveBlockException()
+    {
+        var ex = Assert.Throws<ArgumentOutOfRangeException>(() => _manager.RemoveBlock(-1));
+        Assert.That(ex.Message, Is.EqualTo("ID bloku je mimo rozsah (Parameter 'index')"));
+    }
 }
