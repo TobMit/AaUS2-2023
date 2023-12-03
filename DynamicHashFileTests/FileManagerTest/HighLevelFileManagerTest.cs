@@ -47,7 +47,7 @@ public class HighLevelFileManagerTest
         
         var tmp = _manager.GetBlock(0);
         Assert.NotNull(tmp);
-        Assert.True(tmp.TestEquals(tmpPair.Second));
+        Assert.True(tmp.CompareTo(tmpPair.Second) == 0);
         Assert.That(tmp.GetRecord(0), Is.EqualTo(testRecord));
         
         var ex = Assert.Throws<ArgumentOutOfRangeException>(() => _manager.WriteBlock(2, tmpPair.Second));
@@ -71,7 +71,7 @@ public class HighLevelFileManagerTest
         _manager.WriteBlock(tmpPair.First, tmpPair.Second);
         var tmp = _manager.GetBlock(0);
         Assert.NotNull(tmp);
-        Assert.True(tmp.TestEquals(tmpPair.Second));
+        Assert.True(tmp.CompareTo(tmpPair.Second) == 0);
         Assert.That(tmp.GetRecord(0), Is.EqualTo(testRecord));
         
         // nový daľší block
@@ -87,7 +87,7 @@ public class HighLevelFileManagerTest
         
         tmp = _manager.GetBlock(1);
         Assert.NotNull(tmp);
-        Assert.True(tmp.TestEquals(tmpPair.Second));
+        Assert.True(tmp.CompareTo(tmpPair.Second) == 0);
         Assert.That(tmp.GetRecord(0), Is.EqualTo(testRecord));
         Assert.That(tmp.Count(), Is.EqualTo(1));
     }

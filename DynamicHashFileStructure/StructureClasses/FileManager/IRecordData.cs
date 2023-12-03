@@ -1,6 +1,6 @@
 namespace DynamicHashFileStructure.StructureClasses;
 
-public interface IRecordData<T> : IRecord<T>, IComparable<T>
+public interface IRecordData<T> : IRecord, IComparable<T>
 {
     /// <summary>
     /// Hešovacia funckia pre záznam

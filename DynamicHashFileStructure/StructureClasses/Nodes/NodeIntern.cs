@@ -1,6 +1,6 @@
 namespace DynamicHashFileStructure.StructureClasses.Nodes;
 
-public class NodeIntern<TData> : Node<TData> where TData : IRecord<TData>
+public class NodeIntern<TData> : Node<TData> where TData : IRecord
 {
     public Node<TData>? LeftSon { get; set; }
     public Node<TData>? RightSon { get; set; }

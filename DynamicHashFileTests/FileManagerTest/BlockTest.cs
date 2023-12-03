@@ -35,6 +35,7 @@ public class BlockTest
 
         public int CompareTo(TestClass? other)
         {
+            if (ReferenceEquals(null, other)) return -1;
             return this.Equals(other) ? 0 : -1;
         }
         
@@ -69,7 +70,7 @@ public class BlockTest
             return bytes.ToArray();
         }
 
-        public static TestClass FromBytes(byte[] bytes)
+        public static object FromBytes(byte[] bytes)
         {
             int offset = 0;
             int id = BitConverter.ToInt32(bytes, offset);
@@ -125,6 +126,12 @@ public class BlockTest
         {
             return $"ID: {Id}, Float: {FloatValue}, Double: {DoubleValue}, String1: {StringValue1}, String2: {StringValue2}";
         }
+
+        public int CompareTo(object? obj)
+        {
+            
+            return this.Equals((TestClass)obj) ? 0 : -1;
+        }
     }
     
     private Block<TestClass> _block;
@@ -146,7 +153,7 @@ public class BlockTest
     [Test]
     public void TestClass_FromBytes()
     {
-        TestClass testClass2 = TestClass.FromBytes(_testClass1.GetBytes());
+        TestClass testClass2 = (TestClass)TestClass.FromBytes(_testClass1.GetBytes());
         Assert.NotNull(testClass2);
         Assert.True(testClass2 == _testClass1);
         Assert.That(testClass2, Is.EqualTo(_testClass1));
@@ -172,9 +179,9 @@ public class BlockTest
     [Test]
     public void Block_FromBytes()
     {
-        Block<TestClass> block2 = Block<TestClass>.FromBytes(_block.GetBytes());
+        Block<TestClass> block2 =  (Block<TestClass>)Block<TestClass>.FromBytes(_block.GetBytes());
         Assert.NotNull(block2);
-        Assert.True(_block.TestEquals(block2));
+        Assert.True(_block.CompareTo(block2) == 0);
     }
 
     [Test]

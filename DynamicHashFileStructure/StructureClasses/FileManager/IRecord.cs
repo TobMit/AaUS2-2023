@@ -2,7 +2,7 @@ using System.ComponentModel;
 
 namespace DynamicHashFileStructure.StructureClasses;
 
-public interface IRecord<T>
+public interface IRecord : IComparable
 {
     /// <summary>
     /// Veľkosť záznamu v bajtoch
@@ -21,7 +21,7 @@ public interface IRecord<T>
     /// </summary>
     /// <param name="bytes"> pole bitov ktoré sa načítali zo súboru</param>
     /// <returns> vytovorený objekt</returns>
-    public static abstract T FromBytes(byte[] bytes);
+    public static abstract object FromBytes(byte[] bytes);
     
     public string ToString();
     

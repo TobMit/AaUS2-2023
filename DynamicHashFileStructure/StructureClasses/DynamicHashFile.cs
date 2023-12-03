@@ -3,7 +3,7 @@ using DynamicHashFileStructure.StructureClasses.Nodes;
 
 namespace DynamicHashFileStructure.StructureClasses;
 
-public class DynamicHashFile<TData> where TData : IRecordData<TData>
+public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
 {
 
     private const int PrimaryFileBlockSize = 3;

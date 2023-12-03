@@ -1,6 +1,6 @@
 namespace DynamicHashFileStructure.StructureClasses.Nodes;
 
-public class NodeExtern<TData> : Node<TData> where TData : IRecord<TData>
+public class NodeExtern<TData> : Node<TData> where TData : IRecord
 {
     public int Address { get; set; }
     public int Count { get; set; }

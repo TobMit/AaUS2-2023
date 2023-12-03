@@ -2,7 +2,7 @@
 
 public class Program
 {
-    private class TestClass : IRecordData<TestClass>
+    private class TestClass : IRecordData<int>
     {
         public int ID { get; set; }
         public static int GetSize()
@@ -15,7 +15,7 @@ public class Program
             return BitConverter.GetBytes(ID);
         }
 
-        public static TestClass FromBytes(byte[] bytes)
+        public static object FromBytes(byte[] bytes)
         {
             return new TestClass()
             {
@@ -23,9 +23,19 @@ public class Program
             };
         }
 
+        public int CompareTo(int other)
+        {
+            return ID.CompareTo(other);
+        }
+
         public string ToString()
         {
             return ID.ToString();
+        }
+
+        public int CompareTo(object? obj)
+        {
+            throw new NotImplementedException();
         }
 
 
@@ -69,7 +79,7 @@ public class Program
             });
         }
 
-        DynamicHashFile<TestClass> dhf = new();
+        DynamicHashFile<int, TestClass> dhf = new();
         
         for (int i = 0; i < MAX_TEST; i++)
         {

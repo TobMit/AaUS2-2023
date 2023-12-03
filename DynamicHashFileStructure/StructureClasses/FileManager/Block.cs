@@ -2,7 +2,7 @@ using System.Text;
 
 namespace DynamicHashFileStructure.StructureClasses;
 
-public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TData>, IRecord<TData>
+public class Block<TData> : IRecord where TData : IRecord
 {
     private static int _blockFactor = -1;
     public static int BlockFactor
@@ -121,7 +121,7 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
         return bytes.ToArray();
     }
 
-    public static Block<TData> FromBytes(byte[] bytes)
+    public static object FromBytes(byte[] bytes)
     {
         // toto tu je pre to, lebo vieme zavolať túto funkciu ešte pred inicializovaného blokovacieho faktoru,
         // čo by nám sôsobilo nesprávny výpočt veľkosti
@@ -145,7 +145,7 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
             // skopírujem iba potrebnú časť z bitového poľa
             byte[] recordBytes = new byte[TData.GetSize()];
             Array.Copy(bytes, offset, recordBytes, 0, TData.GetSize());
-            records[i] = TData.FromBytes(recordBytes);
+            records[i] = (TData)TData.FromBytes(recordBytes);
             offset += TData.GetSize();
         }
 
@@ -275,28 +275,30 @@ public class Block<TData> : IRecord<Block<TData>> where TData : IComparable<TDat
     /// Only for test purposes
     /// </summary>
     /// <returns>True ak sú rovnaké, inak false</returns>
-    public bool TestEquals(Block<TData>? other)
+    public int CompareTo(object? obj)
     {
-        if (ReferenceEquals(null, other)) return false;
-        if (ReferenceEquals(this, other)) return true;
+        if (ReferenceEquals(null, obj)) return -1;
+        if (ReferenceEquals(this, obj)) return -1;
+        
+        Block<TData>? other = (Block<TData>)obj; 
         
         if (other._records.Length != _records.Length)
         {
-            return false;
+            return -1;
         }
 
         if (_validRecords != other._validRecords)
         {
-            return false;
+            return -1;
         }
 
         for (int i = 0; i < _validRecords; i++)
         {
             if (_records[i].CompareTo(other._records[i]) != 0)
             {
-                return false;
+                return -1;
             }
         }
-        return true;
+        return 0;
     }
 }
