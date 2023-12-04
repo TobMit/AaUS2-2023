@@ -121,6 +121,7 @@ public class FileManager<TData> where TData : IRecord
             throw new ArgumentOutOfRangeException(nameof(index),"ID bloku je mimo rozsah");
         }
         
+        //todo toto sa postupne tak ako sa maže a nie prechádzaníe
         // skontrolujeme či toto nie je posledny blok v zozname
         if (index == _blockTotalCount - 1)
         {

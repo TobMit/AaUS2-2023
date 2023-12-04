@@ -44,6 +44,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
     /// <param name="data">dáta ktoré sa vkladajú</param>
     public void Insert(TKey key ,TData data)
     {
+        // todo môžem pomocou metódy find najsť či sa nachdáza a ak sa nachádza tak ho tam nevkladám
         Stack<Pair<TKey, TData>> stackData = new();
         // vložím data do staku
         stackData.Push(new(key, data));
@@ -473,6 +474,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
         }
         
         // robiť zosipanie dát
+        // todo pridať do dokumentácie, to že teraz ako to mám tak má výhodu pri inom zreťazený
         if (lastNode is null)
         {
             throw new Exception("Toto sa nemalo stať, chyba v Remove pri presípani a zmenšovaní bloku");
