@@ -8,6 +8,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
 {
 
     private const int PrimaryFileBlockSize = 3;
+    private const int PreplnovaciFileBlockSize = 3;
     
     public int Count { get; private set; }
     
@@ -20,7 +21,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
     {
         _root = new(null);
         _fileManager = new(PrimaryFileBlockSize, "primaryData.bin");
-        _filePreplnovaciManager = new(PrimaryFileBlockSize, "secondaryData.bin");
+        _filePreplnovaciManager = new(PreplnovaciFileBlockSize, "secondaryData.bin");
         Count = 0;
 
         InitTree();
@@ -35,6 +36,12 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
         //_fileManager.WriteBlock(1, initBlock);
     }
 
+    
+    /// <summary>
+    /// Vloží dáta do dynamického hešovacieho súboru
+    /// </summary>
+    /// <param name="key">kľúč ktorý sa použije pri hešovacej funkcie</param>
+    /// <param name="data">dáta ktoré sa vkladajú</param>
     public void Insert(TKey key ,TData data)
     {
         Stack<Pair<TKey, TData>> stackData = new();
@@ -235,7 +242,13 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
             }
         }
     }
-
+    
+    /// <summary>
+    /// Vyhľadá dáta pomocou kľúča
+    /// </summary>
+    /// <param name="key">Kľúč ktorý sa používa pri hľadaní</param>
+    /// <returns>Najedné dáta</returns>
+    /// <exception cref="ArgumentException">Ak sa nejaký záznam nenašiel</exception>
     public TData Find(TKey key)
     {
         
@@ -334,6 +347,238 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
         if (returnData is null)
         {
             throw new ArgumentException("Nenašiel sa záznam");
+        }
+        
+        return returnData;
+    }
+    
+    /// <summary>
+    /// Zmaže dáta pomocou kľúča
+    /// </summary>
+    /// <param name="key">Kľúč ktorý sa používa pri hľadaní a následnom mazaní</param>
+    /// <returns>Vymazané dáta</returns>
+    /// <exception cref="ArgumentException">Ak sa mazaný záznam nenašiel</exception>
+    public TData Remove(TKey key)
+    {
+        
+        TData returnData = default;
+        
+        BitArray bitArray = new(TData.GetBytesForHash(key));
+        int index = 0;
+
+
+        NodeExtern<TData>? lastNode = null;
+        
+        Stack<Node<TData>> stackNode = new();
+        stackNode.Push(_root);
+        while (stackNode.Count > 0)
+        {
+            // zýskam vrchol
+            var node = stackNode.Pop();
+            // budem skontrolujem si typ vrcholu
+            // je interny
+            if (node.GetType() == typeof(NodeIntern<TData>))
+            {
+                // zoberiem toho syna ktorý je podľa kľúča
+                // ak ten vrchol neexistuje tak hodím exception
+                var internNode = (NodeIntern<TData>) node;
+                if (!bitArray[index])
+                {
+                    if (internNode.LeftSon is null)
+                    {
+                        throw new ArgumentException("Nenašiel sa záznam");
+                    }
+                    // toho syna vložim do staku
+                    stackNode.Push(internNode.LeftSon);
+                    index++;
+                }
+                else
+                {
+                    if (internNode.RightSon is null)
+                    {
+                        throw new ArgumentException("Nenašiel sa záznam");
+                    }
+                    // toho syna vložim do staku
+                    stackNode.Push(internNode.RightSon);
+                    index++;
+                }
+            }
+            // Ak je externý
+            else
+            {
+                // zoberiem blok
+                var externNode = (NodeExtern<TData>) node;
+                lastNode = externNode;
+                if (externNode.Address < 0)
+                {
+                    throw new ArgumentException("Nenašiel sa záznam");
+                }
+                var block = _fileManager.GetBlock(externNode.Address);
+                // prejdem všetky dáta v bloku
+                for (int i = 0; i < block.Count(); i++)
+                {
+                    // skontrolujem či je to to čo hľadám
+                    if (block.GetRecord(i).CompareTo(key) == 0)
+                    {
+                        // ak áno tak vrátim
+                        returnData = block.GetRecord(i);
+                        block.RemoverRecord(i);
+                        externNode.CountPrimaryData--;
+                        Count--;
+                        _fileManager.WriteBlock(externNode.Address, block);
+                        break;
+                    }
+                }
+                
+                // ak sa nenašiel v hlavnom bloku tak idem do preplňujúceho ak existuje
+                if (externNode.CountPreplnovaciBlock > 0 && returnData is null)
+                {
+                    int current = block.NextDataBlock;
+                    while (current >= 0)
+                    {
+                        // načítam blok a skontrolujem dáta vňom
+                        block = _filePreplnovaciManager.GetBlock(current);
+                        for (int i = 0; i < block.Count(); i++)
+                        {
+                            // skontrolujem či je to to čo hľadám
+                            if (block.GetRecord(i).CompareTo(key) == 0)
+                            {
+                                // ak áno tak vrátim
+                                returnData = block.GetRecord(i);
+                                block.RemoverRecord(i);
+                                externNode.CountPreplnovaciData--;
+                                Count--;
+                                _filePreplnovaciManager.WriteBlock(current, block);
+                                current = -1; // aby sa ukončil cyklus
+                                break;
+                            }
+                        }
+                        // ak je stále return data null, to znamená že som stále nenašiel záznam a musim pokračovať daľším preplňujúcim blokom
+                        if (returnData is null)
+                        {
+                            current = block.NextDataBlock;
+                        }
+                    }
+                }
+            }
+        }
+        
+        
+        // ak som nenašiel tak hodím exception
+        if (returnData is null)
+        {
+            throw new ArgumentException("Nenašiel sa záznam");
+        }
+        
+        // robiť zosipanie dát
+        if (lastNode is null)
+        {
+            throw new Exception("Toto sa nemalo stať, chyba v Remove pri presípani a zmenšovaní bloku");
+        }
+        
+        // zosipanie robýme iba v tedy ak máme preplňovaci blok
+        if (lastNode.CountPreplnovaciBlock > 0)
+        {
+            // spočítame či sa oplati robyť presipanie, presipanie sa oplatí robyť v tedy ak sa odstráni toľko dát že vieme vyprázdniť blok
+
+            bool presipanie = false;
+            // môžu nastať 2 prípady
+            // máme práve 1 preplňujúci blok
+            if (lastNode.CountPreplnovaciBlock == 1)
+            {
+                presipanie = (lastNode.CountPrimaryData + lastNode.CountPreplnovaciData) <= PrimaryFileBlockSize;
+            }
+            // máme viac preplňujúci blokov
+            else
+            {
+                // rozdiel medzi zapísanímy dátami a dátami ktoré by sa tam vošli musí byť väčší ako veľkosť prepňujúceho bloku
+                int zapisaneData = lastNode.CountPrimaryData + lastNode.CountPreplnovaciData;
+                int plnaKapacita = PrimaryFileBlockSize + (PreplnovaciFileBlockSize * lastNode.CountPreplnovaciBlock);
+                presipanie = plnaKapacita - zapisaneData >= PreplnovaciFileBlockSize;
+            }
+
+            if (presipanie)
+            {
+                // do listu si načítam všetký data a popri tom mažem aj bloky v ktorych sa nachádzali
+                List<TData> tmpData = new();
+                var block = _fileManager.GetBlock(lastNode.Address);
+                tmpData.AddRange(block.GetArrayRecords());
+                block.ClearRecords();
+                int current = block.NextDataBlock;
+                _fileManager.RemoveBlock(lastNode.Address);
+                
+                while (current >= 0)
+                {
+                    block = _filePreplnovaciManager.GetBlock(current);
+                    tmpData.AddRange(block.GetArrayRecords());
+                    block.ClearRecords();
+                    _filePreplnovaciManager.RemoveBlock(current);
+                    current = block.NextDataBlock;
+                }
+
+                lastNode.CountPreplnovaciBlock = 0;
+                lastNode.CountPrimaryData = 0;
+                lastNode.CountPreplnovaciData = 0;
+                
+                // ideme na novo napĺňať
+                var tmpPair = _fileManager.GetFreeBlock();
+                lastNode.Address = tmpPair.First;
+                for (int i = 0; i < PrimaryFileBlockSize; i++)
+                {
+                    // iba ak máme čo zapisovať
+                    if (tmpData.Count > 0)
+                    {
+                        tmpPair.Second.AddRecord(tmpData[tmpData.Count - 1]);
+                        tmpData.RemoveAt(tmpData.Count - 1);
+                        lastNode.CountPrimaryData++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                // ak máme šte dáta tak vytvárame preplňujúci súbor
+                if (tmpData.Count > 0)
+                {
+                    var tmpPairPreplnovak = _filePreplnovaciManager.GetFreeBlock();
+                    lastNode.CountPreplnovaciBlock++;
+                    tmpPair.Second.NextDataBlock = tmpPairPreplnovak.First;
+                    while (tmpData.Count > 0)
+                    {
+                        for (int i = 0; i < PreplnovaciFileBlockSize; i++)
+                        {
+                            // iba ak máme čo zapisovať
+                            if (tmpData.Count > 0)
+                            {
+                                tmpPairPreplnovak.Second.AddRecord(tmpData[tmpData.Count - 1]);
+                                tmpData.RemoveAt(tmpData.Count - 1);
+                                lastNode.CountPreplnovaciData++;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                        // ak potrebujem daľší blok tak ho zýskam
+                        if (tmpData.Count > 0)
+                        {
+                            var tmpTmpPair = _filePreplnovaciManager.GetFreeBlock();
+                            lastNode.CountPreplnovaciBlock++;
+                            tmpPairPreplnovak.Second.NextDataBlock = tmpTmpPair.First;
+                            _filePreplnovaciManager.WriteBlock(tmpPairPreplnovak.First, tmpPairPreplnovak.Second);
+                            tmpPairPreplnovak = tmpTmpPair;
+                        }
+                        else
+                        {
+                            _filePreplnovaciManager.WriteBlock(tmpPairPreplnovak.First, tmpPairPreplnovak.Second); 
+                        }  
+                    }
+                }
+                    
+                _fileManager.WriteBlock(tmpPair.First, tmpPair.Second);
+            }
+            
+            
         }
         
         return returnData;

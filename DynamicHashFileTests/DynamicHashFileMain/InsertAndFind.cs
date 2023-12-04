@@ -7,7 +7,7 @@ namespace DynamicHashFileTests.DynamicHashFileMain;
 
 public class InsertAndFind
 {
-    private class InsertClass : IRecordData<int>
+    public class InsertClass : IRecordData<int>
     {
         
         public int ID { get; set; }

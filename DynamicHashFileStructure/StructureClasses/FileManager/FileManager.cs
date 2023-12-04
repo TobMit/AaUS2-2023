@@ -172,6 +172,7 @@ public class FileManager<TData> where TData : IRecord
                 if (current == -1)
                 {
                     _firstFreeBlock = -1;
+                    _lastFreeBlock = -1;
                 }
 
                 _blockTotalCount--;
