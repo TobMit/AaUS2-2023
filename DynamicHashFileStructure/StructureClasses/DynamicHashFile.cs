@@ -218,7 +218,6 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                             }
                         
                             stackData.Push(dataToInsert);
-                            // todo nemôže byť voľný blok
                             // medzi jeho parenta a tento blok vložím nový interný blok,
                             var parent = externNode.Parent;
                         
@@ -235,6 +234,9 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                             {
                                 parent.RightSon = tmpNode;
                             }
+                            // zamžem voľný blok
+                            _fileManager.RemoveBlock(externNode.Address);
+                            externNode.Address = -1;
                             // týmto cyklus skončil ale pokračuje sa od znovu s novímy dátami (musím vložiť aj poledné dáta   
                         }
                     }
