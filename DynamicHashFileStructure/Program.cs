@@ -43,6 +43,7 @@ public class Program
         {
             // aby som nemal konflikty pri hashovani
             return BitConverter.GetBytes(key % 7919);
+            //return BitConverter.GetBytes(key % 19);
         }
 
         public int GetKey()
@@ -65,7 +66,7 @@ public class Program
     
     private static int latestLowest = int.MaxValue;
     private static int seed = 0;
-    private static int maxSeed = 20;
+    private static int maxSeed = 10;
     //private static int maxSeed = int.MaxValue;
     public static void Main(string[] args)
     {
@@ -127,6 +128,12 @@ public class Program
         
         for (int i = 0; i < MAX_TEST; i++)
         {
+            
+            // if (i == 1000)
+            // {
+                // Console.WriteLine("som tu");
+            // }
+            
             int index = rnd.Next(0, toInsert.Count);
             var toInsertData = toInsert[index];
             dhf.Insert( toInsertData.ID ,toInsertData);
