@@ -63,6 +63,7 @@ public class Program
     
     private static int MAX_UNITS = 1000000;
     private static int MAX_TEST = 100000;
+    private static double PROBABILIT_INSERT_DELETE = 0.7;
     
     private static int latestLowest = int.MaxValue;
     private static int seed = 0;
@@ -128,40 +129,85 @@ public class Program
         
         for (int i = 0; i < MAX_TEST; i++)
         {
-            
+            Console.WriteLine(i);
             // if (i == 1000)
             // {
                 // Console.WriteLine("som tu");
             // }
-            
-            int index = rnd.Next(0, toInsert.Count);
-            var toInsertData = toInsert[index];
-            dhf.Insert( toInsertData.ID ,toInsertData);
-            //toDelete.Add(toInsert[index]);
-            toInsert.RemoveAt(index);
-            
-            //Console.WriteLine(i);
 
-            //dhf.PrintFile();
-            
-            try
+            if (rnd.NextDouble() < PROBABILIT_INSERT_DELETE)
             {
-                var findData = dhf.Find(toInsertData.ID);
-                if (toInsertData.CompareTo(findData) != 0)
+                // insertujeme
+                int index = rnd.Next(0, toInsert.Count);
+                var toInsertData = toInsert[index];
+                dhf.Insert( toInsertData.ID ,toInsertData);
+                toDelete.Add(toInsert[index]);
+                toInsert.RemoveAt(index);
+            
+                //Console.WriteLine(i);
+
+                //dhf.PrintFile();
+            
+                try
+                {
+                    var findData = dhf.Find(toInsertData.ID);
+                    if (toInsertData.CompareTo(findData) != 0)
+                    {
+                        seedOk = false;
+                        latestLowest = i;
+                        Console.WriteLine($"Error in dint Find what should be find at {i} in SEED: {Seed}");
+                        return latestLowest;
+                    }
+                }
+                catch (Exception e)
                 {
                     seedOk = false;
                     latestLowest = i;
-                    Console.WriteLine($"Error in dint Find what should be find at {i} in SEED: {Seed}");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"Error in Find at {i} in SEED: {Seed} \n {e.Message}");
                     return latestLowest;
                 }
             }
-            catch (Exception e)
+            else
             {
-                seedOk = false;
-                latestLowest = i;
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Error in Find at {i} in SEED: {Seed} \n {e.Message}");
-                return latestLowest;
+                // mažeme
+                if (toDelete.Count <= 0)
+                {
+                    i--; // aby sme zachovali počet operácií
+                }
+                else
+                {
+                    try
+                    {
+                        if (i == 1363)
+                        {
+                            Console.WriteLine("som tu");
+                        }
+                        
+                        int index = rnd.Next(0, toDelete.Count);
+                        var toDeleteData = toDelete[index];
+                        var removed = dhf.Remove(toDeleteData.ID);
+                        toInsert.Add(toInsert[index]);
+                        toDelete.RemoveAt(index);
+                        if (toDeleteData.CompareTo(removed) != 0)
+                        {
+                            seedOk = false;
+                            latestLowest = i;
+                            Console.WriteLine($"Error in dint Find what should be find at {i} in SEED: {Seed}");
+                            return latestLowest;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        seedOk = false;
+                        latestLowest = i;
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"Error in Delete at {i} in SEED: {Seed} \n {e.Message}");
+                        return latestLowest;
+                    }
+                    
+                    
+                }
             }
             
             //Console.WriteLine("-----------------------------------");
@@ -173,6 +219,7 @@ public class Program
         // zmažeme vytvorený file
         dhf.CloseFile();
         File.Delete("primaryData.bin");
+        File.Delete("secondaryData.bin");
         
         if (seedOk)
         {
