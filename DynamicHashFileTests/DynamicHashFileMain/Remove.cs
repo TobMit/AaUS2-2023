@@ -2,7 +2,7 @@ using DynamicHashFileStructure.StructureClasses;
 
 namespace DynamicHashFileTests.DynamicHashFileMain;
 
-public class Delete
+public class Remove
 {
     private DynamicHashFile<int, InsertAndFind.InsertClass> _dynamicHashFile;
     [SetUp]
@@ -71,6 +71,27 @@ public class Delete
         _dynamicHashFile.Insert(GetFabricedKey(4), new(GetFabricedKey(4), 4));
         _dynamicHashFile.PrintFile();
 
+    }
+
+    [Test]
+    public void RemoveZmensovanie()
+    {
+        Assert.That(_dynamicHashFile.Count, Is.EqualTo(12));
+        //_dynamicHashFile.PrintFile();
+        for (int i = 0; i < 9; i++)
+        {
+            _dynamicHashFile.Remove(GetFabricedKey(i));
+        }
+        Assert.That(_dynamicHashFile.Count, Is.EqualTo(3));
+        
+        _dynamicHashFile.Remove(GetFabricedKey(9));
+        Assert.That(_dynamicHashFile.Count, Is.EqualTo(2));
+        _dynamicHashFile.Remove(GetFabricedKey(10));
+        Assert.That(_dynamicHashFile.Count, Is.EqualTo(1));
+        _dynamicHashFile.Remove(GetFabricedKey(11));
+        Assert.That(_dynamicHashFile.Count, Is.EqualTo(0));
+        
+        _dynamicHashFile.PrintFile();
     }
 
     private int GetFabricedKey(int i)

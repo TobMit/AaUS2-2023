@@ -74,6 +74,7 @@ public class Program
     public static void Main(string[] args)
     {
         
+        
         if (parallel) // not suported for now
         {
             Parallel.For(seed, maxSeed, (iSeed) =>
