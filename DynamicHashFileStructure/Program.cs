@@ -28,9 +28,9 @@ public class Program
             return ID.CompareTo(other);
         }
 
-        public string ToString()
+        public override string ToString()
         {
-            return ID.ToString();
+            return $"{ID}";
         }
 
         public int CompareTo(object? obj)
@@ -66,7 +66,7 @@ public class Program
     private static double PROBABILIT_INSERT_DELETE = 0.7;
     
     private static int latestLowest = int.MaxValue;
-    private static int seed = 0;
+    private static int seed = 2;
     private static int maxSeed = 10;
     //private static int maxSeed = int.MaxValue;
     public static void Main(string[] args)
@@ -129,12 +129,45 @@ public class Program
         
         for (int i = 0; i < MAX_TEST; i++)
         {
-            Console.WriteLine(i);
+            //Console.WriteLine(i);
             // if (i == 1000)
             // {
                 // Console.WriteLine("som tu");
             // }
+            
+            // if (i > 36724)
+            // {
+            //     try
+            //     {
+            //         var findData = dhf.Find(774964);
+            //         if (findData.CompareTo(findData) != 0)
+            //         {
+            //             seedOk = false;
+            //             latestLowest = i;
+            //             Console.ForegroundColor = ConsoleColor.Red;
+            //             Console.WriteLine($"--Zaznam sa nenasel na: {i}");
+            //             Console.ForegroundColor = ConsoleColor.White;
+            //             return latestLowest;
+            //         }
+            //     }
+            //     catch (Exception e)
+            //     {
+            //         seedOk = false;
+            //         latestLowest = i;
+            //         Console.ForegroundColor = ConsoleColor.Red;
+            //         Console.WriteLine($"--Error v hľadaní 774964, at: {i}\n {e.Message}");
+            //         Console.ForegroundColor = ConsoleColor.White;
+            //
+            //         return latestLowest;
+            //     }
+            // }
+            
 
+            // if (i == 47369)
+            // {
+            //     Console.WriteLine("tu som");
+            //     //dhf.Find(774964);
+            // }
             if (rnd.NextDouble() < PROBABILIT_INSERT_DELETE)
             {
                 // insertujeme
@@ -143,8 +176,7 @@ public class Program
                 dhf.Insert( toInsertData.ID ,toInsertData);
                 toDelete.Add(toInsert[index]);
                 toInsert.RemoveAt(index);
-            
-                //Console.WriteLine(i);
+
 
                 //dhf.PrintFile();
             
@@ -155,7 +187,9 @@ public class Program
                     {
                         seedOk = false;
                         latestLowest = i;
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine($"Error in dint Find what should be find at {i} in SEED: {Seed}");
+                        Console.ForegroundColor = ConsoleColor.White;
                         return latestLowest;
                     }
                 }
@@ -165,6 +199,8 @@ public class Program
                     latestLowest = i;
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine($"Error in Find at {i} in SEED: {Seed} \n {e.Message}");
+                    Console.ForegroundColor = ConsoleColor.White;
+
                     return latestLowest;
                 }
             }
@@ -177,23 +213,23 @@ public class Program
                 }
                 else
                 {
+                    TestClass toDeleteData = null;
                     try
                     {
-                        if (i == 1363)
-                        {
-                            Console.WriteLine("som tu");
-                        }
                         
                         int index = rnd.Next(0, toDelete.Count);
-                        var toDeleteData = toDelete[index];
+                        toDeleteData = toDelete[index];
                         var removed = dhf.Remove(toDeleteData.ID);
-                        toInsert.Add(toInsert[index]);
+                        toInsert.Add(toDelete[index]);
                         toDelete.RemoveAt(index);
                         if (toDeleteData.CompareTo(removed) != 0)
                         {
                             seedOk = false;
                             latestLowest = i;
+                            Console.ForegroundColor = ConsoleColor.Red;
                             Console.WriteLine($"Error in dint Find what should be find at {i} in SEED: {Seed}");
+                            Console.ForegroundColor = ConsoleColor.White;
+
                             return latestLowest;
                         }
                     }
@@ -202,7 +238,9 @@ public class Program
                         seedOk = false;
                         latestLowest = i;
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine($"Error in Delete at {i} in SEED: {Seed} \n {e.Message}");
+                        Console.WriteLine($"Error in Delete at {i} in SEED: {Seed}, RemovedID: {toDeleteData.ID} \n {e.Message}");
+                        Console.ForegroundColor = ConsoleColor.White;
+
                         return latestLowest;
                     }
                     

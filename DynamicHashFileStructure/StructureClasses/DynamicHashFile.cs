@@ -588,7 +588,21 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
             // budem odstraňovať node dokiaľ nenarazím na nejaký z dátami
             while (lastNode is not null)
             {
-                bool leftSon = ReferenceEquals(lastNode, lastNode.Parent.LeftSon);
+                if (lastNode.Parent.Parent is null)
+                {
+                    lastNode = null;
+                    break;
+                }
+
+                bool leftSon;
+                if (lastNode.Parent.LeftSon is null)
+                {
+                    leftSon = false;
+                }
+                else
+                {
+                    leftSon = ReferenceEquals(lastNode, lastNode.Parent.LeftSon);   
+                }
                 if (leftSon)
                 {
                     // zistím či má pravého syna

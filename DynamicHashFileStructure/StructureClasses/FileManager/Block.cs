@@ -277,6 +277,7 @@ public class Block<TData> : IRecord where TData : IRecord
     {
         NextFreeBlock = -1;
         LastNextFreeBlock = -1;
+        NextDataBlock = -1;
     }
     
     

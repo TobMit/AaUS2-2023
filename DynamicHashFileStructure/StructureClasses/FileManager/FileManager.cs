@@ -244,6 +244,7 @@ public class FileManager<TData> where TData : IRecord
             // načítam last free block a nastavím mu next free block na index tohoto vymazaného bloku
             var block = (Block<TData>)Block<TData>.FromBytes(_lowLevelFileManager.ReadBlock(_lastFreeBlock));
             block.NextFreeBlock = index;
+            block.ClearRecords();
             _lowLevelFileManager.WriteDataToBlock(_lastFreeBlock, block.GetBytes());
             
             // načítam vymazávaný blok a nastavím mu lastFreeBlock na posledný _lastFreeBock a next je -1
