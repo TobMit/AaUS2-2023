@@ -17,6 +17,15 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
     private FileManager<TData> _fileManager;
     private FileManager<TData> _filePreplnovaciManager;
 
+    public DynamicHashFile(string primaryFile, string preplnovakFile)
+    {
+        _root = new(null);
+        _fileManager = new(PrimaryFileBlockSize, primaryFile);
+        _filePreplnovaciManager = new(PreplnovaciFileBlockSize, preplnovakFile);
+        Count = 0;
+
+        InitTree();
+    }
     public DynamicHashFile()
     {
         _root = new(null);

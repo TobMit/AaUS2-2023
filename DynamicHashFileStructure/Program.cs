@@ -59,14 +59,16 @@ public class Program
         }
     }
     
-    private static bool parallel = false;
+    private static bool parallel = true;
     
     private static int MAX_UNITS = 1000000;
     private static int MAX_TEST = 100000;
-    private static double PROBABILIT_INSERT_DELETE = 0.7;
+    private static int STARTUP_FILL_COUNT = 12000;
+    private static double PROBABILIT_INSERT_DELETE = 0.55;
+    private static double FILL_PROBABILITY = 0.3;
     
     private static int latestLowest = int.MaxValue;
-    private static int seed = 2;
+    private static int seed = 0;
     private static int maxSeed = 10;
     //private static int maxSeed = int.MaxValue;
     public static void Main(string[] args)
@@ -125,7 +127,22 @@ public class Program
             });
         }
 
-        DynamicHashFile<int, TestClass> dhf = new();
+        string primaryFile = $"primaryFile{Seed}.bin";
+        string preplnovakFile = $"preplnovakFile{Seed}.bin";
+
+        DynamicHashFile<int, TestClass> dhf = new(primaryFile, preplnovakFile);
+
+        if (rnd.NextDouble() < FILL_PROBABILITY)
+        {
+            for (int i = 0; i < STARTUP_FILL_COUNT; i++)
+            {
+                int index = rnd.Next(0, toInsert.Count);
+                var toInsertData = toInsert[index];
+                dhf.Insert( toInsertData.ID ,toInsertData);
+                toDelete.Add(toInsert[index]);
+                toInsert.RemoveAt(index);
+            }
+        }
         
         for (int i = 0; i < MAX_TEST; i++)
         {
@@ -232,6 +249,27 @@ public class Program
 
                             return latestLowest;
                         }
+                        
+                        
+                        // kontrola či sa naozaj zmazalo
+                        try
+                        {
+                            var findData = dhf.Find(removed.ID);
+                            if (findData.CompareTo(findData) == 0)
+                            {
+                                seedOk = false;
+                                latestLowest = i;
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine($"Error in Delete at {i}, intem was not removed in SEED: {Seed}");
+                                Console.ForegroundColor = ConsoleColor.White;
+                                return latestLowest;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            seedOk = true;
+                        }
+                        
                     }
                     catch (Exception e)
                     {
@@ -256,8 +294,10 @@ public class Program
         
         // zmažeme vytvorený file
         dhf.CloseFile();
-        File.Delete("primaryData.bin");
-        File.Delete("secondaryData.bin");
+        //File.Delete("primaryData.bin");
+        //File.Delete("secondaryData.bin");
+        File.Delete(primaryFile);
+        File.Delete(preplnovakFile);
         
         if (seedOk)
         {
