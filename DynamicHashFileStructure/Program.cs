@@ -59,53 +59,26 @@ public class Program
         }
     }
     
-    private static bool parallel = true;
-    
     private static int MAX_UNITS = 1000000;
-    private static int MAX_TEST = 100000;
+    private static int MAX_TEST = 200000;
     private static int STARTUP_FILL_COUNT = 12000;
     private static double PROBABILIT_INSERT_DELETE = 0.55;
     private static double FILL_PROBABILITY = 0.3;
     
     private static int latestLowest = int.MaxValue;
     private static int seed = 0;
-    private static int maxSeed = 10;
+    private static int maxSeed = 20;
     //private static int maxSeed = int.MaxValue;
     public static void Main(string[] args)
     {
-        
-        
-        if (parallel) // not suported for now
+        for (int i = seed; i < maxSeed; i++)
         {
-            Parallel.For(seed, maxSeed, (iSeed) =>
-            {
-                try
-                {
-                    int result = TestInstance(iSeed);
-                    if (result < 30)
-                    {
-                        Console.WriteLine($"Nájdený SEED: {iSeed}");
-                        return;
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine($"---------------------------Error v seede: {iSeed} \n {e.Message}");
-                    return;
-                }
-            });
-        }
-        else
-        {
-            for (int i = seed; i < maxSeed; i++)
-            {
-                latestLowest = TestInstance(i);
+            latestLowest = TestInstance(i);
                 
-                if (latestLowest <= 30)
-                {
-                    Console.WriteLine($"Nájdený SEED: {i}");
-                    return;
-                }
+            if (latestLowest <= 30)
+            {
+                Console.WriteLine($"Nájdený SEED: {i}");
+                return;
             }
         }
     }

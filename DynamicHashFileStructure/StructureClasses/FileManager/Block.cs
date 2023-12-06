@@ -159,6 +159,31 @@ public class Block<TData> : IRecord where TData : IRecord
 
         return new Block<TData>(_blockFactor, records, validRecords, nextFreeBlock, lastFreeBlock, nextDataBlock);
     }
+    
+    public static object FromBytes(byte[] bytes, int blockFactor)
+    {
+        int offset = 0;
+        int nextFreeBlock = BitConverter.ToInt32(bytes, offset);
+        offset = sizeof(int);
+        int lastFreeBlock = BitConverter.ToInt32(bytes, offset);
+        offset += sizeof(int);
+        int validRecords = BitConverter.ToInt32(bytes, offset);
+        offset += sizeof(int);
+        int nextDataBlock = BitConverter.ToInt32(bytes, offset);
+        offset += sizeof(int);
+
+        TData[] records = new TData[blockFactor];
+        for (int i = 0; i < blockFactor; i++)
+        {
+            // skopírujem iba potrebnú časť z bitového poľa
+            byte[] recordBytes = new byte[TData.GetSize()];
+            Array.Copy(bytes, offset, recordBytes, 0, TData.GetSize());
+            records[i] = (TData)TData.FromBytes(recordBytes);
+            offset += TData.GetSize();
+        }
+
+        return new Block<TData>(blockFactor, records, validRecords, nextFreeBlock, lastFreeBlock, nextDataBlock);
+    }
 
     public override string ToString()
     {
