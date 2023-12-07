@@ -61,9 +61,9 @@ public class FullSizeTest
         }
     }
     
-    private static int MAX_UNITS = 1000000;
-    private static int MAX_TEST = 100000;
-    private static int STARTUP_FILL_COUNT = 12000;
+    private static int MAX_UNITS = 200000;
+    private static int MAX_TEST = 50000;
+    private static int STARTUP_FILL_COUNT = 10000;
     private static double PROBABILIT_INSERT_DELETE = 0.55;
     
     private static int seed = 0;
@@ -90,7 +90,6 @@ public class FullSizeTest
     
     public void TestInstance(int Seed, bool fill)
     {
-        Console.WriteLine($"SEED: {Seed}");
         
         bool seedOk = true;
         
@@ -113,7 +112,6 @@ public class FullSizeTest
 
         if (fill)
         {
-            Console.WriteLine("som tu");
             for (int i = 0; i < STARTUP_FILL_COUNT; i++)
             {
                 int index = rnd.Next(0, toInsert.Count);
@@ -127,7 +125,6 @@ public class FullSizeTest
         
         for (int i = 0; i < MAX_TEST; i++)
         {
-            
             if (rnd.NextDouble() < PROBABILIT_INSERT_DELETE)
             {
                 // insertujeme

@@ -88,23 +88,30 @@ public class InsertAndFind
     [Test]
     public void InsertTest()
     {
-        InsertClass tmpClass = new InsertClass(1, 1);
-        _dynamicHashFile.Insert(tmpClass.GetKey(),tmpClass);
-        _dynamicHashFile.Insert(tmpClass.GetKey(),tmpClass);
-        _dynamicHashFile.Insert(tmpClass.GetKey(),tmpClass);
-        _dynamicHashFile.Insert(tmpClass.GetKey(),tmpClass);
-        _dynamicHashFile.Insert(tmpClass.GetKey(),tmpClass);
-        _dynamicHashFile.Insert(tmpClass.GetKey(),tmpClass);
-        _dynamicHashFile.Insert(tmpClass.GetKey(),tmpClass);
-        _dynamicHashFile.Insert(tmpClass.GetKey(),tmpClass);
-        _dynamicHashFile.Insert(tmpClass.GetKey(),tmpClass);
-        _dynamicHashFile.Insert(tmpClass.GetKey(),tmpClass);
-        _dynamicHashFile.Insert(tmpClass.GetKey(),tmpClass);
-        _dynamicHashFile.Insert(tmpClass.GetKey(),tmpClass);
+        for (int i = 0; i < 12; i++)
+        {
+            // fabrikujem kľúče tak aby mi prvý byt ostal rovnaký ale lýšil sa v iných
+            byte[] fabricedBytes = BitConverter.GetBytes(1);
+            fabricedBytes[1] = BitConverter.GetBytes(i)[0];
+            
+            _dynamicHashFile.Insert(BitConverter.ToInt32(fabricedBytes), new(BitConverter.ToInt32(fabricedBytes), i));
+        }
         
-        _dynamicHashFile.PrintFile();
+        //_dynamicHashFile.PrintFile();
         
         Assert.That(_dynamicHashFile.Count, Is.EqualTo(12));
+    }
+    
+    [Test]
+    public void InsertTestException()
+    {
+        InsertClass tmpClass = new InsertClass(1, 1);
+        Assert.DoesNotThrow(() => _dynamicHashFile.Insert(tmpClass.GetKey(),tmpClass));
+        var ex = Assert.Throws<ArgumentException>(() => _dynamicHashFile.Insert(tmpClass.GetKey(),tmpClass));
+        Assert.That(ex.Message, Is.EqualTo("Dáta s týmto kľúčom už existujú!"));
+        
+        
+        Assert.That(_dynamicHashFile.Count, Is.EqualTo(1));
     }
 
     [Test]

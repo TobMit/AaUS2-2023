@@ -104,12 +104,11 @@ public class Program
         string primaryFile = $"primaryFile{Seed}.bin";
         string preplnovakFile = $"preplnovakFile{Seed}.bin";
         
-        //File.Delete(primaryFile);
-        //File.Delete(preplnovakFile);
+        File.Delete(primaryFile);
+        File.Delete(preplnovakFile);
 
         DynamicHashFile<int, TestClass> dhf = new(primaryFile, preplnovakFile);
         
-        //dhf.PrintFile();
 
         if (rnd.NextDouble() < FILL_PROBABILITY)
         {
@@ -128,18 +127,19 @@ public class Program
                 }
             }
         }
-        //652228
         
-        //dhf.Find(652228);
+        
+        
         Console.WriteLine("Prep done, starting test");
         for (int i = 0; i < MAX_TEST; i++)
         {
-            //Console.WriteLine(i);
+            
             if (rnd.NextDouble() < PROBABILIT_INSERT_DELETE)
             {
                 TestClass toInsertData = default;
                 try
                 {
+                    
                     // insertujeme
                     int index = rnd.Next(0, toInsert.Count);
                     toInsertData = toInsert[index];
@@ -158,8 +158,7 @@ public class Program
                     return latestLowest;
                 }
 
-
-                //dhf.PrintFile();
+                
             
                 try
                 {
@@ -184,33 +183,6 @@ public class Program
 
                     return latestLowest;
                 }
-                //
-                // try
-                // {
-                //     var findData652228 = dhf.Find(652228);
-                //     if (findData652228.ID != 652228)
-                //     {
-                //         seedOk = false;
-                //         latestLowest = i;
-                //         Console.ForegroundColor = ConsoleColor.Red;
-                //         Console.WriteLine($"Error in Insert Find 652228 at {i} in SEED: {Seed}");
-                //         Console.ForegroundColor = ConsoleColor.White;
-                //         return latestLowest;
-                //     }
-                //     else
-                //     {
-                //         Console.WriteLine($"Insert Find 652228 OK at {i} in SEED: {Seed}");
-                //     }
-                // }
-                // catch (Exception e)
-                // {
-                //     seedOk = false;
-                //     latestLowest = i;
-                //     Console.ForegroundColor = ConsoleColor.Red;
-                //     Console.WriteLine($"Error in Insert Find 652228 at {i} in SEED: {Seed}");
-                //     Console.ForegroundColor = ConsoleColor.White;
-                //     return latestLowest;
-                // }
             }
             else
             {
@@ -224,10 +196,6 @@ public class Program
                     TestClass toDeleteData = null;
                     try
                     {
-                        if (i == 36)
-                        {
-                            Console.WriteLine("tu som");
-                        }
                         int index = rnd.Next(0, toDelete.Count);
                         toDeleteData = toDelete[index];
                         var removed = dhf.Remove(toDeleteData.ID);
@@ -263,33 +231,6 @@ public class Program
                         {
                             seedOk = true;
                         }
-                        //
-                        // try
-                        // {
-                        //     var findData652228 = dhf.Find(652228);
-                        //     if (findData652228.ID != 652228)
-                        //     {
-                        //         seedOk = false;
-                        //         latestLowest = i;
-                        //         Console.ForegroundColor = ConsoleColor.Red;
-                        //         Console.WriteLine($"Error in Delete Find 652228 at {i} in SEED: {Seed}");
-                        //         Console.ForegroundColor = ConsoleColor.White;
-                        //         return latestLowest;
-                        //     }
-                        //     else
-                        //     {
-                        //         Console.WriteLine($"Delete Find 652228 OK at {i} in SEED: {Seed}");
-                        //     }
-                        // }
-                        // catch (Exception e)
-                        // {
-                        //     seedOk = false;
-                        //     latestLowest = i;
-                        //     Console.ForegroundColor = ConsoleColor.Red;
-                        //     Console.WriteLine($"Error in Delete Find 652228 at {i} in SEED: {Seed}");
-                        //     Console.ForegroundColor = ConsoleColor.White;
-                        //     return latestLowest;
-                        // }
                         
                     }
                     catch (Exception e)
@@ -313,7 +254,6 @@ public class Program
         Console.WriteLine();
         //dhf.PrintFile();
         
-        // zmažeme vytvorený file
         dhf.CloseFile();
         //File.Delete("primaryData.bin");
         //File.Delete("secondaryData.bin");

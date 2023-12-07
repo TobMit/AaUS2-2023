@@ -53,7 +53,21 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
     /// <param name="data">dáta ktoré sa vkladajú</param>
     public void Insert(TKey key ,TData data)
     {
-        // todo môžem pomocou metódy find najsť či sa nachdáza a ak sa nachádza tak ho tam nevkladám
+        bool continueInsert = false;
+        try
+        {
+            Find(key);
+        }
+        catch (Exception e)
+        {
+            continueInsert = true;
+        }
+
+        if (!continueInsert)
+        {
+            throw new ArgumentException("Dáta s týmto kľúčom už existujú!");
+        }
+        
         Stack<Pair<TKey, TData>> stackData = new();
         // vložím data do staku
         stackData.Push(new(key, data));
@@ -75,15 +89,12 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
 
             while (stackNode.Count > 0)
             {
-                //vyberiem zo staku vrchol
                 var node = stackNode.Pop();
-                // tu sa môžu stať 2 veci
                 // 1. vrchol je interný
                 if (node.GetType() == typeof(NodeIntern<TData>))
                 {
                     var internNode = (NodeIntern<TData>) node;
                     var tmp = bitArray[index];
-                    // skontrolujem do ktorého 
                     // ak niektorý syn nie je vytvorený tak ho vytvorím ako externý a tam vložím dáta na nový blok
                     if (!bitArray[index]) // 0 ak je lavý 1 ak je pravý (čiže false a true)
                     {
@@ -111,7 +122,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                 {
                     var externNode = (NodeExtern<TData>) node;
                     // skontrolujem koľko má uložených dát
-                    // ak má menej ako je BF
+                    
                     if (externNode.CountPrimaryData < PrimaryFileBlockSize)
                     {
                         // skontrolujem či má adresu
@@ -128,11 +139,10 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                         {
                             block = _fileManager.GetBlock(externNode.Address);
                         }
+                        
                         // pridám nové dáta
                         block.AddRecord(dataToInsert.Second);
-                        // zapíšem blok
                         _fileManager.WriteBlock(externNode.Address, block);
-                        // zvýšim počet dát
                         externNode.CountPrimaryData++;
                         Count++;
                     }
@@ -144,7 +154,6 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                         {
                             // ak áno tak vkladám do preplňovacieho bloku
                             
-                            // načítam blok a skontrolujem či má adresu na prepňlovaci blok
                             if (externNode.CountPreplnovaciBlock > 0)
                             {
                                 // načítam si blok aby som získal adresu z preplňovacieho bloku
@@ -170,7 +179,6 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                                     }
                                 }
                                 // ešte raz kontrolujeme či je blok plný (môže nastať situácia že je blok plný a nemá daľší blok)
-
                                 if (block is null)
                                 {
                                     throw new Exception("Toto nemalo nastat, chyba v Inserte pri prehľadávanií preplňovacích blokov, block je null!");
@@ -210,7 +218,6 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                                 _fileManager.WriteBlock(externNode.Address, block);
 
                             }
-                                // zapíšem tieto dáta do tohto preplňovacieho bloku
                         }
                         else
                         {
@@ -247,7 +254,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                             // zamžem voľný blok
                             _fileManager.RemoveBlock(externNode.Address);
                             externNode.Address = -1;
-                            // týmto cyklus skončil ale pokračuje sa od znovu s novímy dátami (musím vložiť aj poledné dáta   
+                            // týmto cyklus skončil ale pokračuje sa od znovu s novímy dátami (musím vložiť aj poledné dáta)   
                         }
                     }
                 }
@@ -319,7 +326,6 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                     // skontrolujem či je to to čo hľadám
                     if (block.GetRecord(i).CompareTo(key) == 0)
                     {
-                        // ak áno tak vrátim
                         returnData = block.GetRecord(i);
                         break;
                     }
@@ -338,7 +344,6 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                             // skontrolujem či je to to čo hľadám
                             if (block.GetRecord(i).CompareTo(key) == 0)
                             {
-                                // ak áno tak vrátim
                                 returnData = block.GetRecord(i);
                                 current = -1; // aby sa ukončil cyklus
                                 break;
@@ -594,6 +599,16 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
 
         if (lastNode.CountPreplnovaciBlock <= 0 && lastNode.CountPrimaryData < PrimaryFileBlockSize)
         {
+            // ak nemáme záznam tak môžeme vymazať blok
+            if (lastNode.CountPrimaryData <=0)
+            {
+                if (lastNode.Address >= 0)
+                {
+                    _fileManager.RemoveBlock(lastNode.Address);
+                    lastNode.Address = -1;
+                }
+            }
+            
             var parent = lastNode.Parent;
             while (parent is not null)
             {
