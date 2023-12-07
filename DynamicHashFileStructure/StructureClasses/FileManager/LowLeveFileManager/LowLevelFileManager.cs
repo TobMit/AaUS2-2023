@@ -26,8 +26,8 @@ public class LowLevelFileManager
             // ak neexsituje tak vytvorím a nastavím zakládnú veľkosť
             using (var fileStream = File.Create(_fileName))
             {
-                fileStream.SetLength(_blockSize);
-                BlockCount = 1;
+                fileStream.SetLength(0);
+                BlockCount = 0;
             }
         }
         // inak zistím koľko blokov sa tam nachádza

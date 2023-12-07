@@ -34,11 +34,21 @@ public class FileManager<TData> where TData : IRecord
         _fileName = fileName;
         Block<TData> firstBlock = new(blockFactor);
         _lowLevelFileManager = new(Block<TData>.GetSize(), _fileName);
-        _lowLevelFileManager.WriteDataToBlock(0, firstBlock.GetBytes());
-        _blockTotalCount = _lowLevelFileManager.BlockCount;
-        BlockUsedCount = 0;
-        _firstFreeBlock = 0;
-        _lastFreeBlock = 0;
+        if (_lowLevelFileManager.BlockCount == 0)
+        {
+            _lowLevelFileManager.AddBlock();
+            _lowLevelFileManager.WriteDataToBlock(0, firstBlock.GetBytes());
+            _blockTotalCount = _lowLevelFileManager.BlockCount;  
+            _firstFreeBlock = 0;
+            _lastFreeBlock = 0;
+        }
+        else
+        {
+            _blockTotalCount = _lowLevelFileManager.BlockCount;
+            // pri načítavaniu dát.bin kde už je niečo uložné
+            _firstFreeBlock = -1;
+            _lastFreeBlock = -1;
+        }
     }
     
     /// <summary>
@@ -403,7 +413,31 @@ public class FileManager<TData> where TData : IRecord
     {
         return _blockTotalCount;
     }
-    
-    
+
+    /// <summary>
+    /// Uloží potrebné iformácie do súboru
+    /// </summary>
+    public void Save()
+    {
+        // uložíme počet blokov txt súboru pomocou streamwritera
+        using (StreamWriter sw = new StreamWriter(_fileName.Substring(0, _fileName.Length - 4) + "_fileManager" + ".txt"))
+        {
+            sw.WriteLine(_blockTotalCount);
+            sw.WriteLine(BlockUsedCount);
+            sw.WriteLine(_firstFreeBlock);
+            sw.WriteLine(_lastFreeBlock);
+        }
+    }
+
+    public void Load()
+    {
+        using (StreamReader sr = new StreamReader(_fileName.Substring(0, _fileName.Length - 4) + "_fileManager" + ".txt"))
+        {
+            _blockTotalCount = int.Parse(sr.ReadLine()!);
+            BlockUsedCount = int.Parse(sr.ReadLine()!);
+            _firstFreeBlock = int.Parse(sr.ReadLine()!);
+            _lastFreeBlock = int.Parse(sr.ReadLine()!);
+        }
+    }
     
 }

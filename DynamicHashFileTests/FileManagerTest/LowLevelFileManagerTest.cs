@@ -34,8 +34,14 @@ public class LowLevelFileManagerTest
     public void ConstrustorTest()
     {
         
-        Assert.That(_manager.BlockCount, Is.EqualTo(1));
+        Assert.That(_manager.BlockCount, Is.EqualTo(0));
         // zatvorenie managera pomocou destruktora
+        _manager.CloseFile();
+        _manager = new(BlockSize, FileName);
+        Assert.That(_manager.BlockCount, Is.EqualTo(0));
+
+        _manager.AddBlock();
+        Assert.That(_manager.BlockCount, Is.EqualTo(1));
         _manager.CloseFile();
         _manager = new(BlockSize, FileName);
         Assert.That(_manager.BlockCount, Is.EqualTo(1));
@@ -110,7 +116,7 @@ public class LowLevelFileManagerTest
         byte[] code1 = Encoding.UTF8.GetBytes(Sprava1);
         byte[] code2 = Encoding.UTF8.GetBytes(Sprava2);
         byte[] code3 = Encoding.UTF8.GetBytes(Sprava3);
-
+        
         var returnValue = _manager.WriteDataToBlock(0, code1);
         Assert.True(returnValue);
         returnValue = _manager.WriteDataToBlock(1, code2);
