@@ -429,6 +429,9 @@ public class FileManager<TData> where TData : IRecord
         }
     }
 
+    /// <summary>
+    /// Načíta potrebné informácie zo súboru
+    /// </summary>
     public void Load()
     {
         using (StreamReader sr = new StreamReader(_fileName.Substring(0, _fileName.Length - 4) + "_fileManager" + ".txt"))

@@ -24,4 +24,13 @@ public class NodeExtern<TData> : Node<TData> where TData : IRecord
         CountPreplnovaciData = 0;
         CountPreplnovaciBlock = 0;
     }
+    
+    public NodeExtern(int address, NodeIntern<TData> pParent, int countPrimaryData, int countPreplnovaciData, int countPreplnovaciBlock)
+    {
+        Address = address;
+        Parent = pParent;
+        CountPrimaryData = countPrimaryData;
+        CountPreplnovaciData = countPreplnovaciData;
+        CountPreplnovaciBlock = countPreplnovaciBlock;
+    }
 }

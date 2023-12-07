@@ -16,34 +16,34 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
 
     private FileManager<TData> _fileManager;
     private FileManager<TData> _filePreplnovaciManager;
+    
+    private string _primaryFileName;
+    private string _preplnovakFileName;
 
-    public DynamicHashFile(string primaryFile, string preplnovakFile)
+    public DynamicHashFile(string primaryFileName, string preplnovakFileName)
     {
         _root = new(null);
-        _fileManager = new(PrimaryFileBlockSize, primaryFile);
-        _filePreplnovaciManager = new(PreplnovaciFileBlockSize, preplnovakFile);
+        _fileManager = new(PrimaryFileBlockSize, primaryFileName);
+        _filePreplnovaciManager = new(PreplnovaciFileBlockSize, preplnovakFileName);
         Count = 0;
-
-        InitTree();
+        
+        _primaryFileName = primaryFileName;
+        _preplnovakFileName = preplnovakFileName;
+        
     }
     public DynamicHashFile()
     {
         _root = new(null);
-        _fileManager = new(PrimaryFileBlockSize, "primaryData.bin");
-        _filePreplnovaciManager = new(PreplnovaciFileBlockSize, "secondaryData.bin");
+        
+        _primaryFileName = "primaryData.bin";
+        _preplnovakFileName = "secondaryData.bin";
+        
+        _fileManager = new(PrimaryFileBlockSize, _primaryFileName);
+        _filePreplnovaciManager = new(PreplnovaciFileBlockSize, _preplnovakFileName);
         Count = 0;
 
-        InitTree();
     }
 
-    private void InitTree()
-    {
-        //Block<TData> initBlock = new(PrimaryFileBlockSize);
-        //_root.LeftSon = new NodeExtern<TData>(0, _root);
-        //_root.RightSon = new NodeExtern<TData>(_fileManager.GetFreeBlock().First, _root);
-        //_fileManager.WriteBlock(0, initBlock);
-        //_fileManager.WriteBlock(1, initBlock);
-    }
 
     
     /// <summary>
@@ -982,4 +982,148 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
             Console.WriteLine(block.ToString());
         }
     }
+
+    
+    /// <summary>
+    /// Trieda pomocná pri ukladaní
+    /// </summary>
+    private class SaveClass
+    {
+        public Node<TData> node { get; set; }
+        public List<int> bitArray { get; set; }
+
+        public SaveClass(Node<TData> pNode, List<int> pBitArray)
+        {
+            node = pNode;
+            bitArray = pBitArray;
+        }
+    }
+    
+    /// <summary>
+    /// Uloží štruktúru stromu do súboru
+    /// </summary>
+    public void Save()
+    {
+        _fileManager.Save();
+        _filePreplnovaciManager.Save();
+
+        using (StreamWriter sw = new StreamWriter(_primaryFileName.Substring(0, _primaryFileName.Length - 4) + "_dataStructure" + ".txt"))
+        {
+            // zapíšem si celkový počet
+            sw.WriteLine(Count);
+            
+            Stack<SaveClass> stack = new();
+        
+            stack.Push(new(_root, new()));
+            
+            // do staku budem postupne vkladať jednotlivé nodes a budem im postupne vyšovať bity
+            while (stack.Count > 0)
+            {
+                var current = stack.Pop();
+                // ak je interný vkladám do staku jeho synov
+                if (current.node.GetType() == typeof(NodeIntern<TData>))
+                {
+                    var internNode = (NodeIntern<TData>) current.node;
+                    // musim kontrolovať aj null hodnoty
+                    if (internNode.LeftSon is not null)
+                    {
+                        var bitArrayLeft = new List<int>();
+                        bitArrayLeft.AddRange(current.bitArray);
+                        bitArrayLeft.Add(0);
+                        stack.Push(new(internNode.LeftSon, bitArrayLeft));
+                    }
+
+                    if (internNode.RightSon is not null)
+                    {
+                        var bitArrayRight = new List<int>();
+                        bitArrayRight.AddRange(current.bitArray);
+                        bitArrayRight.Add(1);
+                        stack.Push(new(internNode.RightSon, bitArrayRight));
+                    }
+                }
+                // ak je externý tak zapisujem dáta do súboru
+                else
+                {
+                    var externNode = (NodeExtern<TData>) current.node;
+                    sw.WriteLine($"{string.Join("", current.bitArray)};{externNode.Address};{externNode.CountPrimaryData};{externNode.CountPreplnovaciData};{externNode.CountPreplnovaciBlock}");
+                }
+            }
+        }
+
+    }
+
+    /// <summary>
+    /// Načíta strom zo súboru
+    /// </summary>
+    public void Load()
+    {
+        _root = new(null);;
+        _fileManager.Load();
+        _filePreplnovaciManager.Load();
+
+        using (StreamReader sr = new StreamReader(_primaryFileName.Substring(0, _primaryFileName.Length - 4) + "_dataStructure" + ".txt"))
+        {
+            // načitanie celkového počtu
+            Count = int.Parse(sr.ReadLine());
+            
+            // až teraz môžeme načítavať zbytok
+            while (!sr.EndOfStream)
+            {
+                var line = sr.ReadLine();
+                var split = line.Split(';');
+                if (split.Length != 5)
+                {
+                    throw new Exception("Chyba pri načítavaní súboru");
+                }
+                
+                var bitArray = new BitArray(split[0].Select(c => c == '1').ToArray());
+                var address = int.Parse(split[1]);
+                var countPrimaryData = int.Parse(split[2]);
+                var countPreplnovaciData = int.Parse(split[3]);
+                var countPreplnovaciBlock = int.Parse(split[4]);
+
+
+                NodeIntern<TData> current = _root;
+                for (int i = 0; i < bitArray.Count; i++)
+                {
+                    // skontrolujeme či je posledný, ak áno vkladam externý node
+                    bool last = i == bitArray.Count - 1;
+                    
+                    // ak je 0 tak vkladám do ľava inak do prava
+                    if (!bitArray[i])
+                    {
+                        if (!last)
+                        {
+                            if (current.LeftSon is null)
+                            {
+                                current.LeftSon = new NodeIntern<TData>(current);
+                            }
+                            current = (NodeIntern<TData>) current.LeftSon;
+                        }
+                        else
+                        {
+                            current.LeftSon = new NodeExtern<TData>(address, current, countPrimaryData, countPreplnovaciData, countPreplnovaciBlock);
+                        }
+                    }
+                    else
+                    {
+                        if (!last)
+                        {
+                            if (current.RightSon is null)
+                            {
+                                current.RightSon = new NodeIntern<TData>(current);
+                            }
+                            current = (NodeIntern<TData>) current.RightSon;
+                        }
+                        else
+                        {
+                            current.RightSon = new NodeExtern<TData>(address, current, countPrimaryData, countPreplnovaciData, countPreplnovaciBlock);
+                        }
+                    }
+                }
+            }
+        }
+        
+    }
+    
 }

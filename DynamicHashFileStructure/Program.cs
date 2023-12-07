@@ -42,8 +42,9 @@ public class Program
         public static byte[] GetBytesForHash(int key)
         {
             // aby som nemal konflikty pri hashovani
-            //return BitConverter.GetBytes(key % 7919);
-            return BitConverter.GetBytes(key % 19);
+            // return BitConverter.GetBytes(key % 7919);
+            return BitConverter.GetBytes(key % 503);
+            // return BitConverter.GetBytes(key % 19);
         }
 
         public int GetKey()
@@ -68,7 +69,7 @@ public class Program
     
     private static int latestLowest = int.MaxValue;
     private static int seed = 0;
-    private static int maxSeed = 40;
+    private static int maxSeed = 1;
     //private static int maxSeed = int.MaxValue;
     public static void Main(string[] args)
     {
@@ -276,11 +277,22 @@ public class Program
         }
         
         Console.WriteLine();
-        //dhf.PrintFile();
+        
+        // test ukladania a načítania
+        dhf.Save();
+        dhf.CloseFile();
+
+        dhf = new DynamicHashFile<int, TestClass>(primaryFile, preplnovakFile);
+        dhf.Load();
+
+        for (int i = 0; i < toDelete.Count; i++)
+        {
+            dhf.Find(toDelete[i].ID);
+        }
         
         dhf.CloseFile();
-        //File.Delete("primaryData.bin");
-        //File.Delete("secondaryData.bin");
+        
+        
         File.Delete(primaryFile);
         File.Delete(preplnovakFile);
         

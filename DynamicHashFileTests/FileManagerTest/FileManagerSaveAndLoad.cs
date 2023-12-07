@@ -2,7 +2,7 @@
 
 namespace DynamicHashFileTests.FileManagerTest;
 
-public class Saving
+public class FileManagerSaveAndLoad
 {
     private const string FileName = "testFileManager.bin";
     private FileManager<BlockTest.TestClass> _manager;
