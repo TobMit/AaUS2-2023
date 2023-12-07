@@ -90,7 +90,7 @@ public class FullSizeTest
     
     public void TestInstance(int Seed, bool fill)
     {
-        //Console.WriteLine($"SEED: {Seed}");
+        Console.WriteLine($"SEED: {Seed}");
         
         bool seedOk = true;
         

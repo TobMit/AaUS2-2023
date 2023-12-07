@@ -66,15 +66,15 @@ public class Program
     private static double FILL_PROBABILITY = 0.3;
     
     private static int latestLowest = int.MaxValue;
-    private static int seed = 1;
-    private static int maxSeed = 2;
+    private static int seed = 0;
+    private static int maxSeed = 10;
     //private static int maxSeed = int.MaxValue;
     public static void Main(string[] args)
     {
         for (int i = seed; i < maxSeed; i++)
         {
             latestLowest = TestInstance(i);
-                
+
             if (latestLowest <= 30)
             {
                 Console.WriteLine($"Nájdený SEED: {i}");
@@ -104,8 +104,8 @@ public class Program
         string primaryFile = $"primaryFile{Seed}.bin";
         string preplnovakFile = $"preplnovakFile{Seed}.bin";
         
-        File.Delete(primaryFile);
-        File.Delete(preplnovakFile);
+        //File.Delete(primaryFile);
+        //File.Delete(preplnovakFile);
 
         DynamicHashFile<int, TestClass> dhf = new(primaryFile, preplnovakFile);
         
@@ -118,22 +118,45 @@ public class Program
                 int index = rnd.Next(0, toInsert.Count);
                 var toInsertData = toInsert[index];
                 dhf.Insert( toInsertData.ID ,toInsertData);
+                var tmp = dhf.Find(toInsertData.ID);
                 toDelete.Add(toInsert[index]);
                 toInsert.RemoveAt(index);
+                if (tmp.CompareTo(toInsertData) != 0)
+                {
+                    Console.WriteLine("Error in startup fill");
+                    return 0;
+                }
             }
         }
+        //652228
         
+        //dhf.Find(652228);
+        Console.WriteLine("Prep done, starting test");
         for (int i = 0; i < MAX_TEST; i++)
         {
-            
+            //Console.WriteLine(i);
             if (rnd.NextDouble() < PROBABILIT_INSERT_DELETE)
             {
-                // insertujeme
-                int index = rnd.Next(0, toInsert.Count);
-                var toInsertData = toInsert[index];
-                dhf.Insert( toInsertData.ID ,toInsertData);
-                toDelete.Add(toInsert[index]);
-                toInsert.RemoveAt(index);
+                TestClass toInsertData = default;
+                try
+                {
+                    // insertujeme
+                    int index = rnd.Next(0, toInsert.Count);
+                    toInsertData = toInsert[index];
+                    dhf.Insert(toInsertData.ID, toInsertData);
+                    toDelete.Add(toInsert[index]);
+                    toInsert.RemoveAt(index);
+                }
+                catch (Exception e)
+                {
+                    seedOk = false;
+                    latestLowest = i;
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"Error in Insert at {i} in SEED: {Seed} \n {e.Message}");
+                    Console.ForegroundColor = ConsoleColor.White;
+
+                    return latestLowest;
+                }
 
 
                 //dhf.PrintFile();
@@ -161,6 +184,33 @@ public class Program
 
                     return latestLowest;
                 }
+                //
+                // try
+                // {
+                //     var findData652228 = dhf.Find(652228);
+                //     if (findData652228.ID != 652228)
+                //     {
+                //         seedOk = false;
+                //         latestLowest = i;
+                //         Console.ForegroundColor = ConsoleColor.Red;
+                //         Console.WriteLine($"Error in Insert Find 652228 at {i} in SEED: {Seed}");
+                //         Console.ForegroundColor = ConsoleColor.White;
+                //         return latestLowest;
+                //     }
+                //     else
+                //     {
+                //         Console.WriteLine($"Insert Find 652228 OK at {i} in SEED: {Seed}");
+                //     }
+                // }
+                // catch (Exception e)
+                // {
+                //     seedOk = false;
+                //     latestLowest = i;
+                //     Console.ForegroundColor = ConsoleColor.Red;
+                //     Console.WriteLine($"Error in Insert Find 652228 at {i} in SEED: {Seed}");
+                //     Console.ForegroundColor = ConsoleColor.White;
+                //     return latestLowest;
+                // }
             }
             else
             {
@@ -213,6 +263,33 @@ public class Program
                         {
                             seedOk = true;
                         }
+                        //
+                        // try
+                        // {
+                        //     var findData652228 = dhf.Find(652228);
+                        //     if (findData652228.ID != 652228)
+                        //     {
+                        //         seedOk = false;
+                        //         latestLowest = i;
+                        //         Console.ForegroundColor = ConsoleColor.Red;
+                        //         Console.WriteLine($"Error in Delete Find 652228 at {i} in SEED: {Seed}");
+                        //         Console.ForegroundColor = ConsoleColor.White;
+                        //         return latestLowest;
+                        //     }
+                        //     else
+                        //     {
+                        //         Console.WriteLine($"Delete Find 652228 OK at {i} in SEED: {Seed}");
+                        //     }
+                        // }
+                        // catch (Exception e)
+                        // {
+                        //     seedOk = false;
+                        //     latestLowest = i;
+                        //     Console.ForegroundColor = ConsoleColor.Red;
+                        //     Console.WriteLine($"Error in Delete Find 652228 at {i} in SEED: {Seed}");
+                        //     Console.ForegroundColor = ConsoleColor.White;
+                        //     return latestLowest;
+                        // }
                         
                     }
                     catch (Exception e)

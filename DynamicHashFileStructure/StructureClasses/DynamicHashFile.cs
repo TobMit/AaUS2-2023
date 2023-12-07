@@ -642,6 +642,11 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                         celovyPocet += ((NodeExtern<TData>) parent.LeftSon).CountPrimaryData + ((NodeExtern<TData>) parent.LeftSon).CountPreplnovaciData;
                         isLeftSonExtern = true;
                     }
+                    // ak to je interný node tak nemôžem pokračovať
+                    else
+                    {
+                        break;
+                    }
                 }
                 if (parent.RightSon is not null)
                 {
@@ -649,6 +654,11 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                     {
                         celovyPocet += ((NodeExtern<TData>) parent.RightSon).CountPrimaryData + ((NodeExtern<TData>) parent.RightSon).CountPreplnovaciData;
                         isRightSonExtern = true;
+                    }
+                    // ak to je interný node tak nemôžem pokračovať
+                    else
+                    {
+                        break;
                     }
                 }
                 
@@ -935,6 +945,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
     public void CloseFile()
     {
         _fileManager.CloseFile();
+        _filePreplnovaciManager.CloseFile();
     }
 
 
