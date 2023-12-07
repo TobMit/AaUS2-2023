@@ -121,7 +121,109 @@ public class FileManager<TData> where TData : IRecord
             throw new ArgumentOutOfRangeException(nameof(index),"ID bloku je mimo rozsah");
         }
         
-        //todo toto sa postupne tak ako sa maže a nie prechádzaníe
+        // ak je to posledný block
+        if (index == _blockTotalCount -1)
+        {
+            // ak je index posledný tak ho rovno zmažem a znížim počet všetkych blokov aj block used count
+            _lowLevelFileManager.DeleteLastBlock();
+            _blockTotalCount--;
+            BlockUsedCount--;
+            // current =  posledný block
+            var current = _blockTotalCount - 1;
+            // pokial current je rôzne od -1
+            while (current >= 0 && _blockTotalCount > 0)
+            {
+                //načítam si block
+                var block = (Block<TData>)Block<TData>.FromBytes(_lowLevelFileManager.ReadBlock(current), _blockFactor);
+                // ak je medzi uvoľnený block (čiže má 0 na valid records)
+                if (block.Count() > 0)
+                {
+                    current = -1;
+                    break;
+                }
+
+                if (block.NextFreeBlock == -1 && block.LastNextFreeBlock == -1)
+                {
+                    _lowLevelFileManager.DeleteLastBlock();
+                    _blockTotalCount--;
+                    _firstFreeBlock = -1;
+                    _lastFreeBlock = -1;
+                    break;
+                }
+                else if (current == _lastFreeBlock)
+                {
+                    // nový last free block je môj last free block (treba mu aj zmazať inštanciu na last free block
+                    var newLastFreeBlock = (Block<TData>)Block<TData>.FromBytes(_lowLevelFileManager.ReadBlock(block.LastNextFreeBlock), _blockFactor);
+                    newLastFreeBlock.NextFreeBlock = -1;
+                    _lastFreeBlock = block.LastNextFreeBlock;
+                    _lowLevelFileManager.WriteDataToBlock(block.LastNextFreeBlock, newLastFreeBlock.GetBytes());
+                    
+                    _lowLevelFileManager.DeleteLastBlock();
+                    _blockTotalCount--;
+                }
+                else if (current == _firstFreeBlock)
+                {
+                    // ak narazim na first free block tak nastavím first free block na next free block
+                    var newFirstFreeBlock = (Block<TData>)Block<TData>.FromBytes(_lowLevelFileManager.ReadBlock(block.NextFreeBlock), _blockFactor);
+                    newFirstFreeBlock.LastNextFreeBlock = -1;
+                    _firstFreeBlock = block.NextFreeBlock;
+                    _lowLevelFileManager.WriteDataToBlock(block.NextFreeBlock, newFirstFreeBlock.GetBytes());
+                    
+                    _lowLevelFileManager.DeleteLastBlock();
+                    _blockTotalCount--;
+                }
+                else
+                {
+                    var nextFreeBlock = (Block<TData>)Block<TData>.FromBytes(_lowLevelFileManager.ReadBlock(block.NextFreeBlock), _blockFactor);
+                    var lastNextFreeBlock = (Block<TData>)Block<TData>.FromBytes(_lowLevelFileManager.ReadBlock(block.LastNextFreeBlock), _blockFactor);
+                    
+                    // môjmu next free blocku  nastavím môj last free block
+                    nextFreeBlock.LastNextFreeBlock = block.LastNextFreeBlock;
+                    _lowLevelFileManager.WriteDataToBlock(block.NextFreeBlock, nextFreeBlock.GetBytes());
+                    // môjmu last free blocku nastavím môj next free block
+                    lastNextFreeBlock.NextFreeBlock = block.NextFreeBlock;
+                    _lowLevelFileManager.WriteDataToBlock(block.LastNextFreeBlock, lastNextFreeBlock.GetBytes());
+                    // odstránim posledný block
+                    
+                    _lowLevelFileManager.DeleteLastBlock();
+                    _blockTotalCount--;
+                }
+
+                current = _blockTotalCount - 1;
+            }
+        }
+        else if (_firstFreeBlock == -1 && _lastFreeBlock == -1)
+        {
+            _firstFreeBlock = index;
+            _lastFreeBlock = index;
+            var block = (Block<TData>)Block<TData>.FromBytes(_lowLevelFileManager.ReadBlock(index), _blockFactor);
+            block.ClearRecords(); // ak by z nejakého dôvodu boli ešte rekordy v bloku
+            block.ClearLinkReferences(); // aby sa zmazali všetky referencie
+            _lowLevelFileManager.WriteDataToBlock(index, block.GetBytes());
+            BlockUsedCount--;
+        } 
+        // ak index nie je posledný
+        else if (index != _blockTotalCount - 1)
+        {
+            var block = (Block<TData>)Block<TData>.FromBytes(_lowLevelFileManager.ReadBlock(index), _blockFactor);
+            block.ClearRecords(); // ak by z nejakého dôvodu boli ešte rekordy v bloku
+            block.ClearLinkReferences(); // aby sa zmazali všetky referencie
+
+            var tmpFirst = _firstFreeBlock;
+            var oldBlock = (Block<TData>)Block<TData>.FromBytes(_lowLevelFileManager.ReadBlock(tmpFirst), _blockFactor);
+            
+            oldBlock.LastNextFreeBlock = index;
+            _firstFreeBlock = index;
+            block.NextFreeBlock = tmpFirst;
+            block.LastNextFreeBlock = -1;
+            
+            // zapíšeme do súboru
+            _lowLevelFileManager.WriteDataToBlock(index, block.GetBytes());
+            _lowLevelFileManager.WriteDataToBlock(tmpFirst, oldBlock.GetBytes());
+            BlockUsedCount--;
+        }
+        
+        /*
         // skontrolujeme či toto nie je posledny blok v zozname
         if (index == _blockTotalCount - 1)
         {
@@ -260,6 +362,7 @@ public class FileManager<TData> where TData : IRecord
         {
             throw new Exception("FileManager, Remove block: Toto nemalo nastať");
         }
+        */
         
     }
     
