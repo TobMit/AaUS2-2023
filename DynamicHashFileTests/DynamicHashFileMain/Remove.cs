@@ -83,8 +83,8 @@ public class Remove
             _dynamicHashFile.Remove(GetFabricedKey(i));
         }
         Assert.That(_dynamicHashFile.Count, Is.EqualTo(3));
-        
         _dynamicHashFile.Remove(GetFabricedKey(9));
+        _dynamicHashFile.PrintFile();
         Assert.That(_dynamicHashFile.Count, Is.EqualTo(2));
         _dynamicHashFile.Remove(GetFabricedKey(10));
         Assert.That(_dynamicHashFile.Count, Is.EqualTo(1));

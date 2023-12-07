@@ -66,8 +66,8 @@ public class Program
     private static double FILL_PROBABILITY = 0.3;
     
     private static int latestLowest = int.MaxValue;
-    private static int seed = 0;
-    private static int maxSeed = 20;
+    private static int seed = 1;
+    private static int maxSeed = 2;
     //private static int maxSeed = int.MaxValue;
     public static void Main(string[] args)
     {
@@ -103,8 +103,13 @@ public class Program
 
         string primaryFile = $"primaryFile{Seed}.bin";
         string preplnovakFile = $"preplnovakFile{Seed}.bin";
+        
+        File.Delete(primaryFile);
+        File.Delete(preplnovakFile);
 
         DynamicHashFile<int, TestClass> dhf = new(primaryFile, preplnovakFile);
+        
+        //dhf.PrintFile();
 
         if (rnd.NextDouble() < FILL_PROBABILITY)
         {
@@ -120,45 +125,7 @@ public class Program
         
         for (int i = 0; i < MAX_TEST; i++)
         {
-            //Console.WriteLine(i);
-            // if (i == 1000)
-            // {
-                // Console.WriteLine("som tu");
-            // }
             
-            // if (i > 36724)
-            // {
-            //     try
-            //     {
-            //         var findData = dhf.Find(774964);
-            //         if (findData.CompareTo(findData) != 0)
-            //         {
-            //             seedOk = false;
-            //             latestLowest = i;
-            //             Console.ForegroundColor = ConsoleColor.Red;
-            //             Console.WriteLine($"--Zaznam sa nenasel na: {i}");
-            //             Console.ForegroundColor = ConsoleColor.White;
-            //             return latestLowest;
-            //         }
-            //     }
-            //     catch (Exception e)
-            //     {
-            //         seedOk = false;
-            //         latestLowest = i;
-            //         Console.ForegroundColor = ConsoleColor.Red;
-            //         Console.WriteLine($"--Error v hľadaní 774964, at: {i}\n {e.Message}");
-            //         Console.ForegroundColor = ConsoleColor.White;
-            //
-            //         return latestLowest;
-            //     }
-            // }
-            
-
-            // if (i == 47369)
-            // {
-            //     Console.WriteLine("tu som");
-            //     //dhf.Find(774964);
-            // }
             if (rnd.NextDouble() < PROBABILIT_INSERT_DELETE)
             {
                 // insertujeme
@@ -207,7 +174,10 @@ public class Program
                     TestClass toDeleteData = null;
                     try
                     {
-                        
+                        if (i == 36)
+                        {
+                            Console.WriteLine("tu som");
+                        }
                         int index = rnd.Next(0, toDelete.Count);
                         toDeleteData = toDelete[index];
                         var removed = dhf.Remove(toDeleteData.ID);

@@ -591,175 +591,343 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                 _fileManager.WriteBlock(tmpPair.First, tmpPair.Second);
             }
         }
-        // Zmenšovanie stromu ak nemá prepňovací blok
+
         if (lastNode.CountPreplnovaciBlock <= 0 && lastNode.CountPrimaryData < PrimaryFileBlockSize)
         {
-            // budem odstraňovať node dokiaľ nenarazím na nejaký z dátami
-            while (lastNode is not null)
+            var parent = lastNode.Parent;
+            while (parent is not null)
             {
-                if (lastNode.Parent.Parent is null)
+                // ak je parent root tak bloky už nemôžem spájať
+                if (parent.Parent is null)
                 {
-                    lastNode = null;
+                    // ak je niektorý z potomkov extern node a má adresu ktorá je väčšia ako 0 ale má 0 prvkov tak ho vymažem
+                    if (parent.LeftSon is not null)
+                    {
+                        if (parent.LeftSon.GetType() == typeof(NodeExtern<TData>))
+                        {
+                            var leftSon = (NodeExtern<TData>)parent.LeftSon;
+                            if (leftSon.Address >= 0 && leftSon.CountPrimaryData + leftSon.CountPreplnovaciData == 0)
+                            {
+                                _fileManager.RemoveBlock(leftSon.Address);
+                                leftSon.Address = -1;
+                                parent.LeftSon = null;
+                            }
+                        }
+                    }
+                    if (parent.RightSon is not null)
+                    {
+                        if (parent.RightSon.GetType() == typeof(NodeExtern<TData>))
+                        {
+                            var rightSon = (NodeExtern<TData>)parent.RightSon;
+                            if (rightSon.Address >= 0 && rightSon.CountPrimaryData + rightSon.CountPreplnovaciData == 0)
+                            {
+                                _fileManager.RemoveBlock(rightSon.Address);
+                                rightSon.Address = -1;
+                                parent.RightSon = null;
+                            }
+                        }
+                    }
                     break;
                 }
-
-                bool leftSon;
-                if (lastNode.Parent.LeftSon is null)
+                
+                // spocitam či viem spojiť
+                var celovyPocet = 0;
+                
+                bool isLeftSonExtern = false;
+                bool isRightSonExtern = false;
+                if (parent.LeftSon is not null)
                 {
-                    leftSon = false;
-                }
-                else
-                {
-                    leftSon = ReferenceEquals(lastNode, lastNode.Parent.LeftSon);   
-                }
-                if (leftSon)
-                {
-                    // zistím či má pravého syna
-                    if (lastNode.Parent.RightSon is null)
+                    if (parent.LeftSon.GetType() == typeof(NodeExtern<TData>))
                     {
-                        // tak vyhodím parenta preč
-                        var parent = lastNode.Parent.Parent;
-                        // musím zisťiť do ktorej vetvy sa pridať
-                        bool leftSon1 = ReferenceEquals(lastNode.Parent, parent.LeftSon);
-                        if (leftSon1)
+                        celovyPocet += ((NodeExtern<TData>) parent.LeftSon).CountPrimaryData + ((NodeExtern<TData>) parent.LeftSon).CountPreplnovaciData;
+                        isLeftSonExtern = true;
+                    }
+                }
+                if (parent.RightSon is not null)
+                {
+                    if (parent.RightSon.GetType() == typeof(NodeExtern<TData>))
+                    {
+                        celovyPocet += ((NodeExtern<TData>) parent.RightSon).CountPrimaryData + ((NodeExtern<TData>) parent.RightSon).CountPreplnovaciData;
+                        isRightSonExtern = true;
+                    }
+                }
+                
+                // ak je celkový počet menší ako je BF tak spojím
+                if (celovyPocet <= PrimaryFileBlockSize)
+                {
+                    List<TData> listData = new(celovyPocet);
+                    if (isLeftSonExtern)
+                    {
+                        var tmpAddress = ((NodeExtern<TData>)parent.LeftSon).Address;
+                        if (tmpAddress >= 0)
                         {
-                            parent.LeftSon = lastNode;
-                            lastNode.Parent = parent;
+                            var tmpBlock = _fileManager.GetBlock(tmpAddress);
+                            listData.AddRange(tmpBlock.GetArrayRecords());
+                            _fileManager.RemoveBlock(tmpAddress);
+                            ((NodeExtern<TData>)parent.LeftSon).Address = -1;
                         }
-                        else
+                    }
+                    if (isRightSonExtern)
+                    {
+                        var tmpAddress = ((NodeExtern<TData>)parent.RightSon).Address;
+                        if (tmpAddress >= 0)
                         {
-                            parent.RightSon = lastNode;
-                            lastNode.Parent = parent;
+                            var tmpBlock = _fileManager.GetBlock(tmpAddress);
+                            listData.AddRange(tmpBlock.GetArrayRecords());
+                            _fileManager.RemoveBlock(tmpAddress);
+                            ((NodeExtern<TData>)parent.RightSon).Address = -1;
                         }
-                        
+                    }
+                    
+                    // vytvorím nový blok a vložím do neho dáta
+                    var tmpPair = _fileManager.GetFreeBlock();
+                    for (int i = 0; i < listData.Count; i++)
+                    {
+                        tmpPair.Second.AddRecord(listData[i]);
+                    }
+                    _fileManager.WriteBlock(tmpPair.First, tmpPair.Second);
+                    
+                    // namiesto parenta vytovrím nový externýNode a nastavím mu adresu na túto novú adresu
+                    var parentParenta = parent.Parent;
+                    var tmpNode = new NodeExtern<TData>(tmpPair.First, parentParenta);
+                    tmpNode.CountPrimaryData = listData.Count;
+
+                    bool isLeftson = false;
+                    if (parentParenta.LeftSon is not null)
+                    {
+                        if (ReferenceEquals(parent, parentParenta.LeftSon))
+                        {
+                            isLeftson = true;
+                        }
+                    }
+                    
+                    if (isLeftson)
+                    {
+                        parentParenta.LeftSon = tmpNode;
                     }
                     else
                     {
-                        var novyPocet = lastNode.CountPrimaryData;
-                        // skontrolujeme či je syn externalNode
-                        if (lastNode.Parent.RightSon.GetType() == typeof(NodeExtern<TData>))
-                        {
-                            // ak áno tak skontrolujeme či sa vieme spojiť
-                            var son = (NodeExtern<TData>)lastNode.Parent.RightSon;
-                            novyPocet += son.CountPrimaryData;
-                            novyPocet += son.CountPreplnovaciData;
-
-                            if (novyPocet < PrimaryFileBlockSize && son.Address >= 0) //todo check if is correct behavior
-                            {
-                                // spájame sa 
-                                var lastNodeBlock = _fileManager.GetBlock(lastNode.Address);
-                                var sonBlock = _fileManager.GetBlock(son.Address);
-                                _fileManager.RemoveBlock(son.Address);
-                                for (int i = 0; i < sonBlock.Count(); i++)
-                                {
-                                    lastNodeBlock.AddRecord(sonBlock.GetRecord(i));
-                                    lastNode.CountPrimaryData++;
-                                }
-                                _fileManager.WriteBlock(lastNode.Address, lastNodeBlock);
-                                // tak vyhodím parenta preč
-                                var parent = lastNode.Parent.Parent;
-                                // musím zisťiť do ktorej vetvy sa pridať
-                                bool leftSon1 = ReferenceEquals(lastNode.Parent, parent.LeftSon);
-                                if (leftSon1)
-                                {
-                                    parent.LeftSon = lastNode;
-                                    lastNode.Parent = parent;
-                                }
-                                else
-                                {
-                                    parent.RightSon = lastNode;
-                                    lastNode.Parent = parent;
-                                }
-                            }
-                            else
-                            {
-                                // koniec
-                                lastNode = null;
-                            }
-                        }
-                        else
-                        {
-                            // inak končíme
-                            lastNode = null;
-                        }
-                        
+                        parentParenta.RightSon = tmpNode;
                     }
+
+                    parent = parentParenta;
                 }
+                // inak ukončujem cyklus
                 else
                 {
-                    if (lastNode.Parent.LeftSon is null)
-                    {
-                        // tak vyhodím parenta preč
-                        var parent = lastNode.Parent.Parent;
-                        // musím zisťiť do ktorej vetvy sa pridať
-                        bool leftSon1 = ReferenceEquals(lastNode.Parent, parent.LeftSon);
-                        if (leftSon1)
-                        {
-                            parent.LeftSon = lastNode;
-                            lastNode.Parent = parent;
-                        }
-                        else
-                        {
-                            parent.RightSon = lastNode;
-                            lastNode.Parent = parent;
-                        }
-                        
-                    }
-                    else
-                    {
-                        // vypočítame si rozdiel
-                        var novyPocet = lastNode.CountPrimaryData;
-                        // skontrolujeme či je syn externalNode
-                        if (lastNode.Parent.LeftSon.GetType() == typeof(NodeExtern<TData>))
-                        {
-                            // ak áno tak skontrolujeme či sa vieme spojiť
-                            var son = (NodeExtern<TData>)lastNode.Parent.LeftSon;
-                            novyPocet += son.CountPrimaryData;
-                            novyPocet += son.CountPreplnovaciData;
-
-                            if (novyPocet < PrimaryFileBlockSize && son.Address >= 0) //todo check if is correct behavior
-                            {
-                                // spájame sa 
-                                var lastNodeBlock = _fileManager.GetBlock(lastNode.Address);
-                                var sonBlock = _fileManager.GetBlock(son.Address);
-                                _fileManager.RemoveBlock(son.Address);
-                                for (int i = 0; i < sonBlock.Count(); i++)
-                                {
-                                    lastNodeBlock.AddRecord(sonBlock.GetRecord(i));
-                                    lastNode.CountPrimaryData++;
-                                }
-                                _fileManager.WriteBlock(lastNode.Address, lastNodeBlock);
-                                // tak vyhodím parenta preč
-                                var parent = lastNode.Parent.Parent;
-                                // musím zisťiť do ktorej vetvy sa pridať
-                                bool leftSon1 = ReferenceEquals(lastNode.Parent, parent.LeftSon);
-                                if (leftSon1)
-                                {
-                                    parent.LeftSon = lastNode;
-                                    lastNode.Parent = parent;
-                                }
-                                else
-                                {
-                                    parent.RightSon = lastNode;
-                                    lastNode.Parent = parent;
-                                }
-                            }
-                            else
-                            {
-                                // koniec
-                                lastNode = null;
-                            }
-                        }
-                        else
-                        {
-                            // inak končíme
-                            lastNode = null;
-                        }
-                        
-                    }
+                    parent = null;
                 }
             }
         }
+        
+        // Zmenšovanie stromu ak nemá prepňovací blok
+        // if (lastNode.CountPreplnovaciBlock <= 0 && lastNode.CountPrimaryData < PrimaryFileBlockSize)
+        // {
+        //     // budem odstraňovať node dokiaľ nenarazím na nejaký z dátami
+        //     while (lastNode is not null)
+        //     {
+        //         // aby mi neostávali práznde bloky s adresou na pázdny blok
+        //         if (lastNode.CountPrimaryData + lastNode.CountPreplnovaciData == 0)
+        //         {
+        //             _fileManager.RemoveBlock(lastNode.Address);
+        //             lastNode.Address = -1;
+        //         }
+        //         
+        //         if (lastNode.Parent.Parent is null)
+        //         {
+        //             lastNode = null;
+        //             break;
+        //         }
+        //
+        //         bool leftSon;
+        //         if (lastNode.Parent.LeftSon is null)
+        //         {
+        //             leftSon = false;
+        //         }
+        //         else
+        //         {
+        //             leftSon = ReferenceEquals(lastNode, lastNode.Parent.LeftSon);   
+        //         }
+        //         if (leftSon)
+        //         {
+        //             // zistím či má pravého syna
+        //             if (lastNode.Parent.RightSon is null)
+        //             {
+        //                 // tak vyhodím parenta preč
+        //                 var parent = lastNode.Parent.Parent;
+        //                 // musím zisťiť do ktorej vetvy sa pridať
+        //                 bool leftSon1 = ReferenceEquals(lastNode.Parent, parent.LeftSon);
+        //                 if (leftSon1)
+        //                 {
+        //                     parent.LeftSon = lastNode;
+        //                     lastNode.Parent = parent;
+        //                 }
+        //                 else
+        //                 {
+        //                     parent.RightSon = lastNode;
+        //                     lastNode.Parent = parent;
+        //                 }
+        //                 
+        //             }
+        //             else
+        //             {
+        //                 var novyPocet = lastNode.CountPrimaryData;
+        //                 // skontrolujeme či je syn externalNode
+        //                 if (lastNode.Parent.RightSon.GetType() == typeof(NodeExtern<TData>))
+        //                 {
+        //                     // ak áno tak skontrolujeme či sa vieme spojiť
+        //                     var son = (NodeExtern<TData>)lastNode.Parent.RightSon;
+        //                     novyPocet += son.CountPrimaryData;
+        //                     novyPocet += son.CountPreplnovaciData;
+        //
+        //                     if (novyPocet < PrimaryFileBlockSize && son.Address >= 0) //todo check if is correct behavior
+        //                     {
+        //                         // spájame sa 
+        //                         Block<TData> lastNodeBlock = default;
+        //                         // // kontrolujeme či máme nastavenú adresu
+        //                         if (lastNode.Address >= 0)
+        //                         {
+        //                             lastNodeBlock = _fileManager.GetBlock(lastNode.Address);
+        //                         }
+        //                         else
+        //                         {
+        //                             var tmpPair = _fileManager.GetFreeBlock();
+        //                             lastNode.Address = tmpPair.First;
+        //                             lastNodeBlock = tmpPair.Second;
+        //
+        //                         }
+        //
+        //                         if (son.Address >= 0)
+        //                         {
+        //                             var sonBlock = _fileManager.GetBlock(son.Address);
+        //                             _fileManager.RemoveBlock(son.Address);
+        //                             for (int i = 0; i < sonBlock.Count(); i++)
+        //                             {
+        //                                 lastNodeBlock.AddRecord(sonBlock.GetRecord(i));
+        //                                 lastNode.CountPrimaryData++;
+        //                             }
+        //                         }
+        //                         _fileManager.WriteBlock(lastNode.Address, lastNodeBlock);
+        //                         // tak vyhodím parenta preč
+        //                         var parent = lastNode.Parent.Parent;
+        //                         // musím zisťiť do ktorej vetvy sa pridať
+        //                         bool leftSon1 = ReferenceEquals(lastNode.Parent, parent.LeftSon);
+        //                         if (leftSon1)
+        //                         {
+        //                             parent.LeftSon = lastNode;
+        //                             lastNode.Parent = parent;
+        //                         }
+        //                         else
+        //                         {
+        //                             parent.RightSon = lastNode;
+        //                             lastNode.Parent = parent;
+        //                         }
+        //                     }
+        //                     else
+        //                     {
+        //                         // koniec
+        //                         lastNode = null;
+        //                     }
+        //                 }
+        //                 else
+        //                 {
+        //                     // inak končíme
+        //                     lastNode = null;
+        //                 }
+        //                 
+        //             }
+        //         }
+        //         else
+        //         {
+        //             if (lastNode.Parent.LeftSon is null)
+        //             {
+        //                 // tak vyhodím parenta preč
+        //                 var parent = lastNode.Parent.Parent;
+        //                 // musím zisťiť do ktorej vetvy sa pridať
+        //                 bool leftSon1 = ReferenceEquals(lastNode.Parent, parent.LeftSon);
+        //                 if (leftSon1)
+        //                 {
+        //                     parent.LeftSon = lastNode;
+        //                     lastNode.Parent = parent;
+        //                 }
+        //                 else
+        //                 {
+        //                     parent.RightSon = lastNode;
+        //                     lastNode.Parent = parent;
+        //                 }
+        //                 
+        //             }
+        //             else
+        //             {
+        //                 // vypočítame si rozdiel
+        //                 var novyPocet = lastNode.CountPrimaryData;
+        //                 // skontrolujeme či je syn externalNode
+        //                 if (lastNode.Parent.LeftSon.GetType() == typeof(NodeExtern<TData>))
+        //                 {
+        //                     // ak áno tak skontrolujeme či sa vieme spojiť
+        //                     var son = (NodeExtern<TData>)lastNode.Parent.LeftSon;
+        //                     novyPocet += son.CountPrimaryData;
+        //                     novyPocet += son.CountPreplnovaciData;
+        //
+        //                     if (novyPocet < PrimaryFileBlockSize && son.Address >= 0) //todo check if is correct behavior
+        //                     {
+        //                         // spájame sa 
+        //                         Block<TData> lastNodeBlock = default;
+        //                         // kontrolujeme či máme nastavenú adresu
+        //                         if (lastNode.Address >= 0)
+        //                         {
+        //                             lastNodeBlock = _fileManager.GetBlock(lastNode.Address);
+        //                         }
+        //                         else
+        //                         {
+        //                             var tmpPair = _fileManager.GetFreeBlock();
+        //                             lastNode.Address = tmpPair.First;
+        //                             lastNodeBlock = tmpPair.Second;
+        //
+        //                         }
+        //
+        //                         if (son.Address >= 0)
+        //                         {
+        //                             var sonBlock = _fileManager.GetBlock(son.Address);
+        //                             _fileManager.RemoveBlock(son.Address);
+        //                             for (int i = 0; i < sonBlock.Count(); i++)
+        //                             {
+        //                                 lastNodeBlock.AddRecord(sonBlock.GetRecord(i));
+        //                                 lastNode.CountPrimaryData++;
+        //                             }
+        //                         }
+        //                         _fileManager.WriteBlock(lastNode.Address, lastNodeBlock);
+        //                         // tak vyhodím parenta preč
+        //                         var parent = lastNode.Parent.Parent;
+        //                         // musím zisťiť do ktorej vetvy sa pridať
+        //                         bool leftSon1 = ReferenceEquals(lastNode.Parent, parent.LeftSon);
+        //                         if (leftSon1)
+        //                         {
+        //                             parent.LeftSon = lastNode;
+        //                             lastNode.Parent = parent;
+        //                         }
+        //                         else
+        //                         {
+        //                             parent.RightSon = lastNode;
+        //                             lastNode.Parent = parent;
+        //                         }
+        //                     }
+        //                     else
+        //                     {
+        //                         // koniec
+        //                         lastNode = null;
+        //                     }
+        //                 }
+        //                 else
+        //                 {
+        //                     // inak končíme
+        //                     lastNode = null;
+        //                 }
+        //                 
+        //             }
+        //         }
+        //     }
+        // }
         
         return returnData;
     }
