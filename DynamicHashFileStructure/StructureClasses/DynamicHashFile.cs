@@ -7,8 +7,8 @@ namespace DynamicHashFileStructure.StructureClasses;
 public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
 {
 
-    private const int PrimaryFileBlockSize = 3;
-    private const int PreplnovaciFileBlockSize = 3;
+    private const int PrimaryFileBlockSize = 5;
+    private const int PreplnovaciFileBlockSize = 8;
     
     public int Count { get; private set; }
     
@@ -150,7 +150,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                     else
                     {
                         // skontrolujem či som už mynul všetky bity
-                        if (index >= bitArray.Length)
+                        if (index >= bitArray.Length-1)
                         {
                             // ak áno tak vkladám do preplňovacieho bloku
                             

@@ -42,8 +42,8 @@ public class Program
         public static byte[] GetBytesForHash(int key)
         {
             // aby som nemal konflikty pri hashovani
-            return BitConverter.GetBytes(key % 7919);
-            //return BitConverter.GetBytes(key % 19);
+            //return BitConverter.GetBytes(key % 7919);
+            return BitConverter.GetBytes(key % 19);
         }
 
         public int GetKey()
@@ -59,26 +59,50 @@ public class Program
         }
     }
     
-    private static int MAX_UNITS = 1000000;
-    private static int MAX_TEST = 200000;
-    private static int STARTUP_FILL_COUNT = 12000;
+    private static bool PARALLEL = false;
+    private static int MAX_UNITS = 200000;
+    private static int MAX_TEST = 100000;
+    private static int STARTUP_FILL_COUNT = 10000;
     private static double PROBABILIT_INSERT_DELETE = 0.55;
     private static double FILL_PROBABILITY = 0.3;
     
     private static int latestLowest = int.MaxValue;
     private static int seed = 0;
-    private static int maxSeed = 10;
+    private static int maxSeed = 40;
     //private static int maxSeed = int.MaxValue;
     public static void Main(string[] args)
     {
-        for (int i = seed; i < maxSeed; i++)
+        if (PARALLEL)
         {
-            latestLowest = TestInstance(i);
-
-            if (latestLowest <= 30)
+            Parallel.For(seed, maxSeed, (iSeed) =>
             {
-                Console.WriteLine($"Nájdený SEED: {i}");
-                return;
+                try
+                {
+                    int result = TestInstance(iSeed);
+                    if (result < 30)
+                    {
+                        Console.WriteLine($"Nájdený SEED: {iSeed}");
+                        return;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"---------------------------Error v seede: {iSeed} \n {e.Message}");
+                    return;
+                }
+            });
+        }
+        else
+        {
+            for (int i = seed; i < maxSeed; i++)
+            {
+                latestLowest = TestInstance(i);
+
+                if (latestLowest <= 30)
+                {
+                    Console.WriteLine($"Nájdený SEED: {i}");
+                    return;
+                }
             }
         }
     }
