@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 using PDAApplication2.Core;
 using PDAApplication2.Core.DataManager.FileManager;
 using PDAApplication2.MVVM.Model;
@@ -128,6 +130,17 @@ namespace PDAApplication2.MVVM.ViewModel
             }
         }
 
+        private SolidColorBrush _color;
+
+        public SolidColorBrush MenuColor
+        {
+            get => _color;
+            set
+            {
+                _color = value;
+                OnPropertyChanged();
+            }
+        }
 
 
         public MainViewModel()
@@ -179,10 +192,12 @@ namespace PDAApplication2.MVVM.ViewModel
                 gps1 = new(dlg.x, dlg.y);
                 dlzka = dlg.dlzka;
                 sirka = dlg.sirka;
+                MenuColor = new(Color.FromRgb(129, 199, 131));
             }
 
             if (pocetParciel <= 0 || pocetNehnutelnosti <= 0 || dlzka <= 0 || sirka <= 0)
             {
+                MenuColor = new(Color.FromRgb(240, 240, 240));
                 return;
             }
 
@@ -206,6 +221,8 @@ namespace PDAApplication2.MVVM.ViewModel
                 new(gps1.X + sirka, gps1.Y + dlzka),
                 pocetNehnutelnosti,
                 pocetParciel);
+
+            MenuColor = new(Color.FromRgb(240, 240, 240));
 
             HealthJednotne = Math.Round(_quadTreeJednotne.Health * 100).ToString();
             HealthNehnutelnosti = Math.Round(_quadTreeNehnutelnost.Health*100).ToString();

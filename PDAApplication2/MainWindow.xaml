@@ -19,6 +19,7 @@
         <Menu Grid.Row="0">
             <MenuItem 
                 Header="Vygenerovať dáta"
+                Background="{Binding MenuColor}"
                 Command="{Binding GenerateDataCommand}"/>
             <MenuItem Header="Hľadať">
                 <MenuItem 
