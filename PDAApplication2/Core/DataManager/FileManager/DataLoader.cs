@@ -21,13 +21,13 @@ namespace PDAApplication2.Core.DataManager.FileManager
         /// <summary>
         /// Načíta data zo súboru
         /// </summary>
-        public QuadTree<int, ObjectModel>[] LoadData(QuadTree<int, ObjectModel> nehnutelnostiQuadTree,
-            QuadTree<int, ObjectModel> parcelyQuadTree,
-            QuadTree<int, ObjectModel> jednotneQuadTree,
-            ObservableCollection<ObjectModel> observableCollectionNehnutelnosti,
-            ObservableCollection<ObjectModel> observableCollectionParcely,
-            List<ObjectModel> nehnutelnostiList,
-            List<ObjectModel> parcelyList)
+        public QuadTree<int, ObjectModelQuad>[] LoadData(QuadTree<int, ObjectModelQuad> nehnutelnostiQuadTree,
+            QuadTree<int, ObjectModelQuad> parcelyQuadTree,
+            QuadTree<int, ObjectModelQuad> jednotneQuadTree,
+            ObservableCollection<ObjectModelQuad> observableCollectionNehnutelnosti,
+            ObservableCollection<ObjectModelQuad> observableCollectionParcely,
+            List<ObjectModelQuad> nehnutelnostiList,
+            List<ObjectModelQuad> parcelyList)
         {
             var openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Data (*.csv)|*.csv";
@@ -53,9 +53,9 @@ namespace PDAApplication2.Core.DataManager.FileManager
                         var sirka = Math.Abs(gps2.X - gps1.X);
                         var dlzka = Math.Abs(gps2.Y - gps1.Y);
 
-                        nehnutelnostiQuadTree = new QuadTree<int, ObjectModel>(gps1.X, gps1.Y, sirka, dlzka);
-                        parcelyQuadTree = new QuadTree<int, ObjectModel>(gps1.X, gps1.Y, sirka, dlzka);
-                        jednotneQuadTree = new QuadTree<int, ObjectModel>(gps1.X, gps1.Y, sirka, dlzka);
+                        nehnutelnostiQuadTree = new QuadTree<int, ObjectModelQuad>(gps1.X, gps1.Y, sirka, dlzka);
+                        parcelyQuadTree = new QuadTree<int, ObjectModelQuad>(gps1.X, gps1.Y, sirka, dlzka);
+                        jednotneQuadTree = new QuadTree<int, ObjectModelQuad>(gps1.X, gps1.Y, sirka, dlzka);
                     } 
                     else
                     {
@@ -70,7 +70,7 @@ namespace PDAApplication2.Core.DataManager.FileManager
                         GPS checkedGps2 = new();
                         Utils.CheckAndRecalculateGps(gps1, gps2, checkedGps1, checkedGps2);
 
-                        var objectModel = new ObjectModel(id, name, gps1, gps2, type);
+                        var objectModel = new ObjectModelQuad(id, gps1, gps2);
 
                         if (type == ObjectType.Nehnutelnost)
                         {
@@ -94,32 +94,12 @@ namespace PDAApplication2.Core.DataManager.FileManager
                         }
                     }
                 }
-                // data linkujem preto, lebo môže sa stať že nehnuteľnosti sú pomiešané s parcelami, takto by som nebol schopný získať všetky parcely pre nehnuteľnosť
-                // preto sa musia najskôr načítať a potom linkovať
-                LinkData(nehnutelnostiList, parcelyQuadTree);
             }
-            QuadTree<int, ObjectModel>[] tree = new QuadTree<int, ObjectModel>[3];
+            QuadTree<int, ObjectModelQuad>[] tree = new QuadTree<int, ObjectModelQuad>[3];
             tree[0] = nehnutelnostiQuadTree;
             tree[1] = parcelyQuadTree;
             tree[2] = jednotneQuadTree;
             return tree;
-        }
-
-        /// <summary>
-        /// Povytvára väzby medzi jednotlivými objektami
-        /// </summary>
-        private void LinkData(List<ObjectModel> nehnutelnostiList, QuadTree<int, ObjectModel> parcelyQuadTree)
-        {
-            foreach (var objectModel in nehnutelnostiList)
-            {
-                var tmpListParciel = parcelyQuadTree.FindIntervalOverlapping(objectModel.GpsBod1.X, objectModel.GpsBod1.Y,
-                    objectModel.GpsBod2.X, objectModel.GpsBod2.Y);
-                foreach (ObjectModel parcela in tmpListParciel)
-                {
-                    objectModel.ZoznamObjektov.Add(parcela);
-                    parcela.ZoznamObjektov.Add(objectModel);
-                }
-            }
         }
     }
 }

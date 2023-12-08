@@ -28,9 +28,6 @@
                 <MenuItem 
                     Header="Vyhľadanie parcely"
                     Command="{Binding FindParcelaCommand}"/>
-                <MenuItem
-                    Header="Vyhľadanie objektov"
-                    Command="{Binding FindObjectCommand}"/>
             </MenuItem>
             <MenuItem Header="Pridávanie objektov">
                 <MenuItem 
@@ -52,7 +49,6 @@
                 Header="Zobraziť všetko"
                 Command="{Binding ShowAllCommand}"/>
             <MenuItem Header="Zdravie">
-                <MenuItem Header="{Binding HealthJednotne}"/>
                 <MenuItem Header="{Binding HealthNehnutelnosti}"/>
                 <MenuItem Header="{Binding HealthParcela}"/>
                 <MenuItem Header="Spustiť optimalizáciu" Command="{Binding ForceOptimisationCommand}"/>

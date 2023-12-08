@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DynamicHashFileStructure.StructureClasses;
 using PDAApplication2.MVVM.Model;
 using Quadtree.StructureClasses;
 
@@ -11,19 +12,17 @@ namespace PDAApplication2.Core.DataManager
 {
     public static class DataGenerator
     {
-        public static void GenerateData(QuadTree<int, ObjectModel> nehnutelnostiQuadTree,
-            QuadTree<int, ObjectModel> parcelyQuadTree,
-            QuadTree<int, ObjectModel> jednotneQuadTree,
-            ObservableCollection<ObjectModel> observableCollectionNehnutelnosti,
-            ObservableCollection<ObjectModel> observableCollectionParcely,
-            List<ObjectModel> nehnutelnostiList,
-            List<ObjectModel> parcelyList,
+        public static void GenerateData(
+            QuadTree<int, ObjectModelQuad> nehnutelnostiQuadTree,
+            QuadTree<int, ObjectModelQuad> parcelyQuadTree,
+            DynamicHashFile<int, ObjectModelNehnutelnost> dhfNehutelnosti,
+            DynamicHashFile<int, ObjectModelParcela> dhfParcely,
             GPS gps1,
             GPS gps2,
             int pocetNehnutelnosti,
             int pocetParciel)
         {
-            Random rnd = new Random();
+            Random rnd = new Random(0);
 
             var sirka = Math.Abs(gps2.X - gps1.X);
             var vyska = Math.Abs(gps2.Y - gps1.Y);
@@ -43,16 +42,11 @@ namespace PDAApplication2.Core.DataManager
 
                 GPS tmpGps2 = new(tmpGps1.X + tmpSirka,'E', tmpGps1.Y + tmpViska, 'N');
 
-                ObjectModel tmpParcela = new(count, "Parcela: " + count, tmpGps1, tmpGps2, Core.ObjectType.Parcela);
+                ObjectModelQuad tmpParcela = new(count, tmpGps1, tmpGps2); //todo spraviť tak aby to išlo s constants
+                ObjectModelParcela tmpDHFParcela = new(count, "Parcela: ", tmpGps1, tmpGps2);
 
                 parcelyQuadTree.Insert(tmpGps1.X, tmpGps1.Y, tmpGps2.X, tmpGps2.Y, tmpParcela);
-                jednotneQuadTree.Insert(tmpGps1.X, tmpGps1.Y, tmpGps2.X, tmpGps2.Y, tmpParcela);
-
-                parcelyList.Add(tmpParcela);
-                if (i <= Constants.MAX_SIZE_TO_SHOW)
-                {
-                    observableCollectionParcely.Add(tmpParcela);
-                }
+                dhfParcely.Insert(tmpDHFParcela.GetKey(), tmpDHFParcela);
 
                 count++;
             }
@@ -62,6 +56,7 @@ namespace PDAApplication2.Core.DataManager
             // a zase parcelu pridáme do nehnuteľnosti
             // na záver vložíme nehnuteľnosť do quad tree
 
+            //todo toto ešte nemám dokončené
             for (int i = 0; i < pocetNehnutelnosti; i++)
             {
                 GPS tmpGps1 = new(NextDouble(gps1.X + 1, gps2.X - 3, rnd), 'W',

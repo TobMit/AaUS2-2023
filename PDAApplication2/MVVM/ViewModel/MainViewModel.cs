@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using DynamicHashFileStructure.StructureClasses;
 using PDAApplication2.Core;
 using PDAApplication2.Core.DataManager.FileManager;
 using PDAApplication2.MVVM.Model;
@@ -17,22 +19,27 @@ namespace PDAApplication2.MVVM.ViewModel
 {
     class MainViewModel : ObservableObjects
     {
-        private QuadTree<int,ObjectModel> _quadTreeNehnutelnost;
-        private QuadTree<int,ObjectModel> _quadTreeParcela;
-        private QuadTree<int,ObjectModel> _quadTreeJednotne;
+        private QuadTree<int,ObjectModelQuad> _quadTreeNehnutelnost;
+        private QuadTree<int, ObjectModelQuad> _quadTreeParcela;
 
-        private List<ObjectModel> _allNehnutelnosti;
-        private List<ObjectModel> _allParcelas;
+        private string _primaryFileNameNehnutelnost = "primariFileNehnutelnost.bin";
+        private string _preplnovakFileNameNehnutelnost = "preplnovakFileNameNehnutelnost.bin";
+        private DynamicHashFile<int, ObjectModelNehnutelnost> _dynamicHashFileNehnutelnost;
+        private string _primaryFileNameParcela = "primariFileParcela.bin";
+        private string _preplnovakFileNameParcela = "preplnovakFileNameParcela.bin";
+        private DynamicHashFile<int, ObjectModelParcela> _dynamicHashFileParcela;
+
+        //private List<ObjectModel> _allNehnutelnosti;
+        //private List<ObjectModel> _allParcelas;
 
         public RelayCommand GenerateDataCommand { get; set; }
         public RelayCommand FindBuildingsCommand { get; set; }
         public RelayCommand FindParcelaCommand { get; set; }
-        public RelayCommand FindObjectCommand { get; set; }
         public RelayCommand AddBuildingCommand { get; set; }
         public RelayCommand AddParcelaCommand { get; set; }
         public RelayCommand EditCommand { get; set; }
         public RelayCommand DeleteCommand { get; set; }
-        public RelayCommand ShowAllCommand { get; set; }
+        //public RelayCommand ShowAllCommand { get; set; }
         public RelayCommand SaveDataCommand { get; set; }
         public RelayCommand LoadDataCommand { get; set; }
         public RelayCommand ForceOptimisationCommand { get; set; }
@@ -115,20 +122,6 @@ namespace PDAApplication2.MVVM.ViewModel
             }
         }
 
-        private string _healthJednotne;
-
-        public string HealthJednotne
-        {
-            get
-            {
-                return "Zdravie stromu zjednotených dát: " + _healthJednotne + "%";
-            }
-            set
-            {
-                _healthJednotne = value;
-                OnPropertyChanged();
-            }
-        }
 
         private SolidColorBrush _color;
 
@@ -146,8 +139,8 @@ namespace PDAApplication2.MVVM.ViewModel
         public MainViewModel()
         {
             InitializeButtons();
-            _allNehnutelnosti = new();
-            _allParcelas = new();
+            //_allNehnutelnosti = new();
+            //_allParcelas = new();
             SplitViewShow = Visibility.Visible;
             SingleViewShow = Visibility.Hidden;
         }
@@ -157,7 +150,6 @@ namespace PDAApplication2.MVVM.ViewModel
             GenerateDataCommand = new RelayCommand(o => { GenerateData(); });
             FindBuildingsCommand = new RelayCommand(o => { FindBuildings(); });
             FindParcelaCommand = new RelayCommand(o => { FindParcela(); });
-            FindObjectCommand = new RelayCommand(o => { FindObject(); });
             AddBuildingCommand = new RelayCommand(o => { AddBuilding(); });
             AddParcelaCommand = new RelayCommand(o => { AddParcela(); });
             EditCommand = new RelayCommand(o =>
@@ -170,7 +162,7 @@ namespace PDAApplication2.MVVM.ViewModel
                 var tmp = (ObjectModel)o;
                 DeleteObject(tmp);
             });
-            ShowAllCommand = new RelayCommand(o => { ShowAll(); });
+            //ShowAllCommand = new RelayCommand(o => { ShowAll(); });
             SaveDataCommand = new RelayCommand(o => { SaveData(); });
             LoadDataCommand = new RelayCommand(o => { LoadData(); });
             ForceOptimisationCommand = new RelayCommand(o => { ForceOptimisation(); });
@@ -178,6 +170,7 @@ namespace PDAApplication2.MVVM.ViewModel
 
         private void GenerateData()
         {
+            MenuColor = new(Color.FromRgb(129, 199, 131));
             var dlg = new DataGeneratorDialog();
             dlg.ShowDialog();
             int pocetNehnutelnosti = 0;
@@ -192,7 +185,6 @@ namespace PDAApplication2.MVVM.ViewModel
                 gps1 = new(dlg.x, dlg.y);
                 dlzka = dlg.dlzka;
                 sirka = dlg.sirka;
-                MenuColor = new(Color.FromRgb(129, 199, 131));
             }
 
             if (pocetParciel <= 0 || pocetNehnutelnosti <= 0 || dlzka <= 0 || sirka <= 0)
@@ -201,15 +193,25 @@ namespace PDAApplication2.MVVM.ViewModel
                 return;
             }
 
-            _quadTreeNehnutelnost = new QuadTree<int, ObjectModel>(gps1.X, gps1.Y, sirka, dlzka);
-            _quadTreeParcela = new QuadTree<int, ObjectModel>(gps1.X, gps1.Y, sirka, dlzka);
-            _quadTreeJednotne = new QuadTree<int, ObjectModel>(gps1.X, gps1.Y, sirka, dlzka);
+            _quadTreeNehnutelnost = new QuadTree<int, ObjectModelQuad>(gps1.X, gps1.Y, sirka, dlzka);
+            _quadTreeParcela = new QuadTree<int, ObjectModelQuad>(gps1.X, gps1.Y, sirka, dlzka);
+
+            // musíme zmazať predchadzajúce súbori aby sa zabránilo vpisovaniu do existujúcich súborov
+            File.Delete(_primaryFileNameNehnutelnost);
+            File.Delete(_preplnovakFileNameNehnutelnost);
+            _dynamicHashFileNehnutelnost =
+                new DynamicHashFile<int, ObjectModelNehnutelnost>(_primaryFileNameNehnutelnost,
+                    _preplnovakFileNameNehnutelnost);
+            File.Delete(_primaryFileNameParcela);
+            File.Delete(_preplnovakFileNameParcela);
+            _dynamicHashFileParcela =
+                new DynamicHashFile<int, ObjectModelParcela>(_primaryFileNameParcela, _preplnovakFileNameNehnutelnost);
 
             ListParcela = new ();
             ListNehnutelnost = new ();
-            _allNehnutelnosti = new(pocetNehnutelnosti);
-            _allParcelas = new(pocetParciel);
-
+            //_allNehnutelnosti = new(pocetNehnutelnosti);
+            //_allParcelas = new(pocetParciel);
+            /*
             Core.DataManager.DataGenerator.GenerateData(_quadTreeNehnutelnost,
                 _quadTreeParcela,
                 _quadTreeJednotne,
@@ -221,10 +223,9 @@ namespace PDAApplication2.MVVM.ViewModel
                 new(gps1.X + sirka, gps1.Y + dlzka),
                 pocetNehnutelnosti,
                 pocetParciel);
-
+            */
             MenuColor = new(Color.FromRgb(240, 240, 240));
 
-            HealthJednotne = Math.Round(_quadTreeJednotne.Health * 100).ToString();
             HealthNehnutelnosti = Math.Round(_quadTreeNehnutelnost.Health*100).ToString();
             HealthParcela = Math.Round(_quadTreeParcela.Health * 100).ToString();
 
@@ -232,7 +233,8 @@ namespace PDAApplication2.MVVM.ViewModel
 
         private void FindBuildings()
         {
-            if (_quadTreeNehnutelnost is null)
+            
+            if (_quadTreeNehnutelnost is null || _dynamicHashFileNehnutelnost is null)
             {
                 return;
             }
@@ -252,14 +254,16 @@ namespace PDAApplication2.MVVM.ViewModel
             {
                 return;
             }
+            /*
             ChangeView(true);
             ListNehnutelnost = new ObservableCollection<ObjectModel>(_quadTreeNehnutelnost.FindIntervalOverlapping(gps1.X, gps1.Y, gps2.X, gps2.Y));
             ListParcela = new();
+            */
         }
 
         private void FindParcela()
         {
-            if (_quadTreeNehnutelnost is null)
+            if (_quadTreeParcela is null || _quadTreeParcela is null)
             {
                 return;
             }
@@ -274,7 +278,7 @@ namespace PDAApplication2.MVVM.ViewModel
                 gps2 = new(dlg.x, dlg.y);
                 cancel = false;
             }
-
+            /*
             if (cancel)
             {
                 return;
@@ -282,47 +286,13 @@ namespace PDAApplication2.MVVM.ViewModel
             ChangeView(true);
             ListParcela = new ObservableCollection<ObjectModel>(_quadTreeParcela.FindIntervalOverlapping(gps1.X, gps1.Y, gps2.X, gps2.Y));
             ListNehnutelnost = new();
+            */
         }
 
-        private void FindObject()
-        {
-            if (_quadTreeNehnutelnost is null || _quadTreeParcela is null || _quadTreeJednotne is null)
-            {
-                return;
-            }
-            var dlg = new FindObjects("Vyhľadanie objektov");
-            dlg.ShowDialog();
-            GPS dlgGps1 = new GPS();
-            GPS dlgGps2 = new GPS();
-            bool cancel = true;
-            if (dlg.DialogResult == true)
-            {
-                dlgGps1 = new(dlg.x, dlg.xOz, dlg.y, dlg.yOz);
-                dlgGps2 = new(dlg.x2, dlg.x2Oz, dlg.y2, dlg.y2Oz);
-                cancel = false;
-            }
-
-            if (cancel)
-            {
-                return;
-            }
-
-            GPS checkedGps1 = new GPS();
-            GPS checkedGps2 = new GPS();
-
-            if (!Core.Utils.CheckAndRecalculateGps(dlgGps1, dlgGps2, checkedGps1, checkedGps2))
-            {
-                MessageBox.Show("Zle zadaný vstup!", "Chyba vstupu", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-            ChangeView(false);
-
-            ListParcela = new ObservableCollection<ObjectModel>(_quadTreeJednotne.FindIntervalOverlapping(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y));
-        }
 
         private void AddBuilding()
         {
-            if (_quadTreeNehnutelnost is null || _quadTreeJednotne is null)
+            if (_quadTreeNehnutelnost is null || _dynamicHashFileNehnutelnost is null )
             {
                 return;
             }
@@ -346,7 +316,7 @@ namespace PDAApplication2.MVVM.ViewModel
             {
                 return;
             }
-
+            /*
             GPS checkedGps1 = new GPS();
             GPS checkedGps2 = new GPS();
 
@@ -374,16 +344,15 @@ namespace PDAApplication2.MVVM.ViewModel
                 parcela.ZoznamObjektov.Add(tmpNehnutelnost);
             }
             _quadTreeNehnutelnost.Insert(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, tmpNehnutelnost);
-            _quadTreeJednotne.Insert(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, tmpNehnutelnost);
-            _allNehnutelnosti.Add(tmpNehnutelnost);
+            //_allNehnutelnosti.Add(tmpNehnutelnost);
 
             HealthNehnutelnosti = Math.Round(_quadTreeNehnutelnost.Health * 100).ToString();
-            HealthJednotne = Math.Round(_quadTreeJednotne.Health * 100).ToString();
+            */
         }
 
         private void AddParcela()
         {
-            if (_quadTreeParcela is null || _quadTreeJednotne is null)
+            if (_quadTreeParcela is null || _dynamicHashFileParcela is null)
             {
                 return;
             }
@@ -407,7 +376,7 @@ namespace PDAApplication2.MVVM.ViewModel
             {
                 return;
             }
-
+            /*
             GPS checkedGps1 = new GPS();
             GPS checkedGps2 = new GPS();
 
@@ -431,11 +400,10 @@ namespace PDAApplication2.MVVM.ViewModel
                 parcela.ZoznamObjektov.Add(tmpNehnutelnost);
             }
             _quadTreeParcela.Insert(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, tmpNehnutelnost);
-            _quadTreeJednotne.Insert(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, tmpNehnutelnost);
-            _allParcelas.Add(tmpNehnutelnost);
+            //_allParcelas.Add(tmpNehnutelnost);
 
             HealthParcela = Math.Round(_quadTreeParcela.Health * 100).ToString();
-            HealthJednotne = Math.Round(_quadTreeJednotne.Health * 100).ToString();
+            */
         }
 
         private void EditObject(ObjectModel objectModel)
@@ -491,12 +459,12 @@ namespace PDAApplication2.MVVM.ViewModel
 
             // kontrolujem či sa môžu zmeniť súradnice
 
-            if (!_quadTreeJednotne.QuadTreeCanContain(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y))
+            if (!_quadTreeNehnutelnost.QuadTreeCanContain(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y))
             {
                 MessageBox.Show("Nie je možné zmeniť súradnice, zlý rozsah.", "Chyba vstupu", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            
+            /*
             // musím zmazať zo všetkých parciel záznam na tento objekt
             foreach (ObjectModel parcela in objectModel.ZoznamObjektov)
             {
@@ -539,8 +507,6 @@ namespace PDAApplication2.MVVM.ViewModel
                 ListParcela =
                     new(_allParcelas.GetRange(0, _allParcelas.Count > Constants.MAX_SIZE_TO_SHOW ? Constants.MAX_SIZE_TO_SHOW : _allParcelas.Count)); // zobrazíme len prvých 500 (aby UI išlo normálne a nesekalo sa)
             }
-            _quadTreeJednotne.Edit(origanalCheckedGps1.X, origanalCheckedGps1.Y, origanalCheckedGps2.X, origanalCheckedGps2.Y,
-                checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, objectModel.IdObjektu);
 
             // nahrám nové súradnice
             objectModel.GpsBod1 = dlgGps1;
@@ -548,12 +514,13 @@ namespace PDAApplication2.MVVM.ViewModel
             
             HealthParcela = Math.Round(_quadTreeParcela.Health * 100).ToString();
             HealthNehnutelnosti = Math.Round(_quadTreeNehnutelnost.Health * 100).ToString();
-            HealthJednotne = Math.Round(_quadTreeJednotne.Health * 100).ToString();
             ChangeView(true);
+            */
         }
 
         private void DeleteObject(ObjectModel objectModel)
         {
+            /*
             // musím zmazať zo všetkých parciel záznam na tento objekt
             foreach (ObjectModel parcela in objectModel.ZoznamObjektov)
             {
@@ -576,7 +543,6 @@ namespace PDAApplication2.MVVM.ViewModel
                 _quadTreeParcela.Delete(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, objectModel.IdObjektu);
             }
 
-            _quadTreeJednotne.Delete(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, objectModel.IdObjektu);
             objectModel.ZoznamObjektov.Clear();
 
             if (objectModel.ObjectType == ObjectType.Nehnutelnost)
@@ -593,26 +559,31 @@ namespace PDAApplication2.MVVM.ViewModel
             }
 
             ChangeView(true);
+            */
         }
 
-
+        /*
         private void ShowAll()
         {
             ChangeView(true);
             ListNehnutelnost = new ObservableCollection<ObjectModel>(_allNehnutelnosti);
             ListParcela = new ObservableCollection<ObjectModel>(_allParcelas);
         }
+        */
 
         private void SaveData()
         {
-            if (_quadTreeNehnutelnost is null || _quadTreeParcela is null || _quadTreeJednotne is null)
+            if (_quadTreeNehnutelnost is null || _quadTreeParcela is null)
             {
                 return;
             }
-            DataSaver<ObjectModel> saver = new();
-            saver.AddLine(_quadTreeJednotne.OriginalPointDownLeft.X + ";" + _quadTreeJednotne.OriginalPointDownLeft.Y + ";" + _quadTreeJednotne.OriginalPointUpRight.X + ";" + _quadTreeJednotne.OriginalPointUpRight.Y + "\n");
-            saver.PrepareForSave(_quadTreeJednotne.ToList());
+            /*
+            //todo prerobiť aby podporoval ukladanie oboch súborov
+            DataSaver<ObjectModelQuad> saver = new();
+            saver.AddLine(_quadTreeNehnutelnost.OriginalPointDownLeft.X + ";" + _quadTreeNehnutelnost.OriginalPointDownLeft.Y + ";" + _quadTreeNehnutelnost.OriginalPointUpRight.X + ";" + _quadTreeNehnutelnost.OriginalPointUpRight.Y + "\n");
+            saver.PrepareForSave(_quadTreeJednotne.ToList()); // tudo stačí spojiť oba stromi do jedného listu a tak potom ukladať
             saver.SaveData();
+            */
         }
 
         private void LoadData()
@@ -621,10 +592,10 @@ namespace PDAApplication2.MVVM.ViewModel
 
             ListParcela = new();
             ListNehnutelnost = new();
-            _allNehnutelnosti = new();
-            _allParcelas = new();
+            //_allNehnutelnosti = new();
+            //_allParcelas = new();
 
-
+            /*
             var tmp = loader.LoadData(_quadTreeNehnutelnost,
                 _quadTreeParcela,
                 _quadTreeJednotne,
@@ -634,27 +605,25 @@ namespace PDAApplication2.MVVM.ViewModel
                 _allParcelas);
             _quadTreeNehnutelnost = tmp[0];
             _quadTreeParcela = tmp[1];
-            _quadTreeJednotne = tmp[2];
 
-            HealthJednotne = Math.Round(_quadTreeJednotne.Health * 100).ToString();
             HealthNehnutelnosti = Math.Round(_quadTreeNehnutelnost.Health * 100).ToString();
             HealthParcela = Math.Round(_quadTreeParcela.Health * 100).ToString();
+            */
         }
 
         private void ForceOptimisation()
         {
-            if (_quadTreeNehnutelnost is null || _quadTreeParcela is null || _quadTreeJednotne is null)
+            if (_quadTreeNehnutelnost is null || _quadTreeParcela is null)
             {
                 return;
             }
-            _quadTreeJednotne.Optimalise(true);
             _quadTreeNehnutelnost.Optimalise(true);
             _quadTreeParcela.Optimalise(true);
         }
 
 
         /// <summary>
-        /// Zmení zobrazenie split na single a naopak
+        /// Zmení zobrazenie split na single a naopak, ak true tak split
         /// </summary>
         /// <param name="splitView">Ak je true tak sa zobrazí split, aj je false tak sa zobrazí single</param>
         private void ChangeView(bool splitView)
