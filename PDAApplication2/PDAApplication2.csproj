@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DynamicHashFileStructure\DynamicHashFileStructure.csproj" />
+    <ProjectReference Include="..\Quadtree\Quadtree.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="MVVM\View\DataGeneratorDialog.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+</Project>

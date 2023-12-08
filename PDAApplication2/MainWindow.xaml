@@ -1,0 +1,118 @@
+﻿<Window x:Class="PDAApplication2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PDAApplication2"
+        xmlns:viewModel="clr-namespace:PDAApplication2.MVVM.ViewModel"
+        mc:Ignorable="d"
+        Title="PDA Application2" Height="600" Width="900">
+    <Window.DataContext>
+        <viewModel:MainViewModel />
+    </Window.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.04*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Menu Grid.Row="0">
+            <MenuItem 
+                Header="Vygenerovať dáta"
+                Command="{Binding GenerateDataCommand}"/>
+            <MenuItem Header="Hľadať">
+                <MenuItem 
+                    Header="Vyhľadanie nehnuteľnosti"
+                    Command="{Binding FindBuildingsCommand}"/>
+                <MenuItem 
+                    Header="Vyhľadanie parcely"
+                    Command="{Binding FindParcelaCommand}"/>
+                <MenuItem
+                    Header="Vyhľadanie objektov"
+                    Command="{Binding FindObjectCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Pridávanie objektov">
+                <MenuItem 
+                    Header="Pridanie nehnuteľnosti"
+                    Command="{Binding AddBuildingCommand}"/>
+                <MenuItem 
+                    Header="Pridanie parcely"
+                    Command="{Binding AddParcelaCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Súbor">
+                <MenuItem 
+                    Header="Uložiť dáta"
+                    Command="{Binding SaveDataCommand}"/>
+                <MenuItem
+                    Header="Načítať dáta"
+                    Command="{Binding LoadDataCommand}"/>
+            </MenuItem>
+            <MenuItem
+                Header="Zobraziť všetko"
+                Command="{Binding ShowAllCommand}"/>
+            <MenuItem Header="Zdravie">
+                <MenuItem Header="{Binding HealthJednotne}"/>
+                <MenuItem Header="{Binding HealthNehnutelnosti}"/>
+                <MenuItem Header="{Binding HealthParcela}"/>
+                <MenuItem Header="Spustiť optimalizáciu" Command="{Binding ForceOptimisationCommand}"/>
+            </MenuItem>
+        </Menu>
+
+        <Grid Grid.Row="1" Visibility="{Binding SplitViewShow}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0"
+                    BorderThickness="0,0,0.5,0"
+                    BorderBrush="Black">
+                <TreeView>
+                    <ListView
+                        ItemsSource="{Binding ListNehnutelnost}"
+                        ItemContainerStyle="{StaticResource ObjectTheme}"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        KeyboardNavigation.ControlTabNavigation="none"
+                        FocusVisualStyle="{x:Null}"
+                        BorderThickness="0"
+                        x:Name="ListViewNehnutelnost"/>
+                </TreeView>
+
+            </Border>
+            <Border Grid.Column="1"
+                    BorderThickness="0.5,0,0,0"
+                    BorderBrush="Black">
+                <TreeView>
+                    <ListView
+                        ItemsSource="{Binding ListParcela}"
+                        ItemContainerStyle="{StaticResource ObjectTheme}"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        KeyboardNavigation.ControlTabNavigation="none"
+                        FocusVisualStyle="{x:Null}"
+                        BorderThickness="0"
+                        x:Name="ListViewParcela"/>
+                </TreeView>
+
+            </Border>
+        </Grid>
+
+        <Grid Grid.Row="1" Visibility="{Binding SingleViewShow}">
+            <TreeView>
+                <ListView
+                    ItemsSource="{Binding ListParcela}"
+                    ItemContainerStyle="{StaticResource ObjectTheme}"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    KeyboardNavigation.ControlTabNavigation="none"
+                    FocusVisualStyle="{x:Null}"
+                    BorderThickness="0"
+                    x:Name="ListViewAll"/>
+            </TreeView>
+        </Grid>
+
+
+
+    </Grid>
+</Window>
