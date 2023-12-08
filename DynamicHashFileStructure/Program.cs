@@ -61,6 +61,7 @@ public class Program
     }
     
     private static bool PARALLEL = false;
+    private static bool SAVETEST = true;
     private static int MAX_UNITS = 200000;
     private static int MAX_TEST = 100000;
     private static int STARTUP_FILL_COUNT = 10000;
@@ -276,18 +277,25 @@ public class Program
             //Console.WriteLine("-----------------------------------");
         }
         
-        Console.WriteLine();
         
         // test ukladania a načítania
-        dhf.Save();
-        dhf.CloseFile();
 
-        dhf = new DynamicHashFile<int, TestClass>(primaryFile, preplnovakFile);
-        dhf.Load();
-
-        for (int i = 0; i < toDelete.Count; i++)
+        if (SAVETEST)
         {
-            dhf.Find(toDelete[i].ID);
+            Console.WriteLine("Ukladam strom");
+            dhf.Save();
+            dhf.CloseFile();
+
+            dhf = new DynamicHashFile<int, TestClass>(primaryFile, preplnovakFile);
+        
+            Console.WriteLine("Načítavam strom zo súboru");
+            dhf.Load();
+
+            Console.WriteLine("Kontrolujem celistvosť dát");
+            for (int i = 0; i < toDelete.Count; i++)
+            {
+                dhf.Find(toDelete[i].ID);
+            }
         }
         
         dhf.CloseFile();
@@ -300,6 +308,7 @@ public class Program
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("SEED OK: " + Seed);
+            Console.WriteLine();
             Console.ForegroundColor = ConsoleColor.White;
         }
         return int.MaxValue;
