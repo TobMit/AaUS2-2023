@@ -78,22 +78,43 @@ namespace PDAApplication2.Core.DataManager
                 ObjectModel tmpNehnutelnost = new(count, "Nehnuteľnosť: " + count, tmpGps1, tmpGps2, Core.ObjectType.Nehnutelnost);
                 var tmpListParciel = parcelyQuadTree.FindIntervalOverlapping(tmpNehnutelnost.GpsBod1.X, tmpNehnutelnost.GpsBod1.Y,
                     tmpNehnutelnost.GpsBod2.X, tmpNehnutelnost.GpsBod2.Y);
-                foreach (ObjectModel parcela in tmpListParciel)
+                
+                bool isOk = tmpListParciel.Count <= Constants.MAX_COUNT_PARCELS_IN_NEHNUTELNOST;
+                if (isOk)
                 {
-                    tmpNehnutelnost.ZoznamObjektov.Add(parcela);
-                    parcela.ZoznamObjektov.Add(tmpNehnutelnost);
+                    foreach (ObjectModel parcela in tmpListParciel)
+                    {
+                        if (parcela.ZoznamObjektov.Count >= Constants.MAX_COUNT_NEHNUTELNOST_IN_PARCEL)
+                        {
+                            isOk = false;
+                            break;
+                        }
+                    }
                 }
 
-                nehnutelnostiQuadTree.Insert(tmpGps1.X, tmpGps1.Y, tmpGps2.X, tmpGps2.Y, tmpNehnutelnost);
-                jednotneQuadTree.Insert(tmpGps1.X, tmpGps1.Y, tmpGps2.X, tmpGps2.Y, tmpNehnutelnost);
-
-                nehnutelnostiList.Add(tmpNehnutelnost);
-                if (i <= Constants.MAX_SIZE_TO_SHOW)
+                if (isOk)
                 {
-                    observableCollectionNehnutelnosti.Add(tmpNehnutelnost);
-                }
+                    foreach (ObjectModel parcela in tmpListParciel)
+                    {
+                        tmpNehnutelnost.ZoznamObjektov.Add(parcela);
+                        parcela.ZoznamObjektov.Add(tmpNehnutelnost);
+                    }
 
-                count++;
+                    nehnutelnostiQuadTree.Insert(tmpGps1.X, tmpGps1.Y, tmpGps2.X, tmpGps2.Y, tmpNehnutelnost);
+                    jednotneQuadTree.Insert(tmpGps1.X, tmpGps1.Y, tmpGps2.X, tmpGps2.Y, tmpNehnutelnost);
+
+                    nehnutelnostiList.Add(tmpNehnutelnost);
+                    if (i <= Constants.MAX_SIZE_TO_SHOW)
+                    {
+                        observableCollectionNehnutelnosti.Add(tmpNehnutelnost);
+                    }
+                    
+                    count++;
+                }
+                else
+                {
+                    i--;
+                }
             }
 
         }

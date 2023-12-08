@@ -16,5 +16,8 @@ namespace PDAApplication2.Core
     {
         public static double MAX_SIZE_OF_OBJCET_PERCENTAGE = 0.15;
         public static int MAX_SIZE_TO_SHOW = 500;
+        
+        public static int MAX_COUNT_PARCELS_IN_NEHNUTELNOST = 6;
+        public static int MAX_COUNT_NEHNUTELNOST_IN_PARCEL = 5;
     }
 }
