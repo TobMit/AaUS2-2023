@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
+using DynamicHashFileStructure.StructureClasses;
 using PDAApplication2.Interface;
 
 namespace PDAApplication2.MVVM.Model
 {
-    public class GPS: ISavable, IEquatable<GPS>
+    public class GPS: ISavable, IEquatable<GPS>, IRecordData<int>
     {
         public char SirkaX { get; set; }
         public double X { get; set; }
@@ -88,6 +89,59 @@ namespace PDAApplication2.MVVM.Model
         public static bool operator !=(GPS? gps1, GPS? gps2)
         {
             return !(gps1 == gps2);
+        }
+        
+        public static int GetSize()
+        {
+            return sizeof(char) + sizeof(double) + sizeof(char) + sizeof(double);
+        }
+
+        public byte[] GetBytes()
+        {
+            List<Byte> bytes = new();
+            bytes.AddRange(BitConverter.GetBytes(SirkaX));
+            bytes.AddRange(BitConverter.GetBytes(X));
+            bytes.AddRange(BitConverter.GetBytes(DlzkaY));
+            bytes.AddRange(BitConverter.GetBytes(Y));
+            return bytes.ToArray();
+        }
+
+        public static object FromBytes(byte[] bytes)
+        {
+            GPS gps = new();
+            int offset = 0;
+            gps.SirkaX = BitConverter.ToChar(bytes, offset);
+            offset += sizeof(char);
+            gps.X = BitConverter.ToDouble(bytes, offset);
+            offset += sizeof(double);
+            gps.DlzkaY = BitConverter.ToChar(bytes, offset);
+            offset += sizeof(char);
+            gps.Y = BitConverter.ToDouble(bytes, offset);
+            return gps;
+        }
+
+        //nebudeme potrebovať je to iba z interface
+        public int CompareTo(int other)
+        {
+            throw new NotImplementedException();
+        }
+        
+        // ani toto nebudeme potrebovať
+        public int CompareTo(object? obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        // ani toto nebude treba
+        public static byte[] GetBytesForHash(int key)
+        {
+            throw new NotImplementedException();
+        }
+
+        // ani toto nebude treba
+        public int GetKey()
+        {
+            throw new NotImplementedException();
         }
     }
 }

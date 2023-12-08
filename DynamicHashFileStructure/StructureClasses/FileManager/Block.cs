@@ -151,9 +151,9 @@ public class Block<TData> : IRecord where TData : IRecord
         for (int i = 0; i < BlockFactor; i++)
         {
             // skopírujem iba potrebnú časť z bitového poľa
-            byte[] recordBytes = new byte[TData.GetSize()];
-            Array.Copy(bytes, offset, recordBytes, 0, TData.GetSize());
-            records[i] = (TData)TData.FromBytes(recordBytes);
+            //byte[] recordBytes = new byte[TData.GetSize()];
+            //Array.Copy(bytes, offset, recordBytes, 0, TData.GetSize());
+            records[i] = (TData)TData.FromBytes(bytes[offset..(offset + TData.GetSize())]); // range metóda
             offset += TData.GetSize();
         }
 
