@@ -12,13 +12,6 @@
         ShowInTaskbar="False"
         WindowStartupLocation="CenterOwner">
     <StackPanel Orientation="Vertical">
-        <Label Name="LabelID">Súpisné číslo</Label>
-        <TextBox
-            Text="100"
-            Name="idCislo"
-            Margin="5,0,5,0"
-            TextAlignment="Right"
-            PreviewTextInput="UIElement_OnPreviewTextInput" />
         <Label>Popis</Label>
         <TextBox
             Text="Nehnuteľnosť"

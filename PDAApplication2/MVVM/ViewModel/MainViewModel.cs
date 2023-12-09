@@ -362,14 +362,12 @@ namespace PDAApplication2.MVVM.ViewModel
             GPS dlgGps1 = new GPS();
             GPS dlgGps2 = new GPS();
             string popis = "";
-            int idCislo = 0;
             bool cancel = true;
             if (dlg.DialogResult == true)
             {
                 dlgGps1 = new(dlg.x, dlg.xOz, dlg.y, dlg.yOz);
                 dlgGps2 = new(dlg.x2, dlg.x2Oz, dlg.y2, dlg.y2Oz);
                 popis = dlg.popis;
-                idCislo = dlg.IdCislo;
                 cancel = false;
             }
 
@@ -377,7 +375,7 @@ namespace PDAApplication2.MVVM.ViewModel
             {
                 return;
             }
-            /*
+            
             GPS checkedGps1 = new GPS();
             GPS checkedGps2 = new GPS();
 
@@ -394,21 +392,50 @@ namespace PDAApplication2.MVVM.ViewModel
                 return;
             }
             // musím nájsť všetky parcely, ktoré obsahujú túto nehnuteľnosť
+            // skontrolovač či môžeme vkladať
             // pridať tam tú nehnuteľnosť
             // pridať nehnuteľnosť do zoznamu všetkých nehnuteľností a všetky parcely do nehnuteľnosti
-            // pridať nehnuteľnosť do quad tree
-            ObjectModel tmpNehnutelnost = new(idCislo, popis, dlgGps1, dlgGps2, Core.ObjectType.Nehnutelnost);
+            // pridať nehnuteľnosť do quad tree a do dynamic hash file
+            ObjectModelNehnutelnost tmpNehnutelnost = new(Constants.IdObjektu, popis, dlgGps1, dlgGps2);
+            ObjectModelQuad tmpQuad = new(Constants.IdObjektu, dlgGps1, dlgGps2);
+            Constants.IdObjektu++;
             var tmpListParciel = _quadTreeParcela.FindIntervalOverlapping(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y);
-            foreach (ObjectModel parcela in tmpListParciel)
+
+            bool isOk = tmpListParciel.Count <= Constants.MAX_COUNT_PARCELS_IN_NEHNUTELNOST;
+            if (isOk)
             {
-                tmpNehnutelnost.ZoznamObjektov.Add(parcela);
-                parcela.ZoznamObjektov.Add(tmpNehnutelnost);
+                // musím si pred tým skontrolovať či mám dostatok miesta v parcelách
+                foreach (ObjectModelQuad parcela in tmpListParciel)
+                {
+                    var tmpParcela = (ObjectModelParcela)_dynamicHashFileParcela.Find(parcela.IdObjektu);
+                    if (tmpParcela.ZoznamObjektov.Count >= Constants.MAX_COUNT_NEHNUTELNOST_IN_PARCEL)
+                    {
+                        isOk = false;
+                        break;
+                    }
+                }
             }
-            _quadTreeNehnutelnost.Insert(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, tmpNehnutelnost);
+
+            if (isOk)
+            {
+                foreach (ObjectModelQuad parcela in tmpListParciel)
+                {
+                    var tmpParcela = (ObjectModelParcela)_dynamicHashFileParcela.Remove(parcela.IdObjektu);
+                    tmpNehnutelnost.ZoznamObjektov.Add(parcela.IdObjektu);
+                    tmpParcela.ZoznamObjektov.Add(tmpNehnutelnost.IdObjektu);
+                    _dynamicHashFileParcela.Insert(tmpParcela.GetKey(), tmpParcela);
+                }
+                _quadTreeNehnutelnost.Insert(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, tmpQuad);
+                _dynamicHashFileNehnutelnost.Insert(tmpNehnutelnost.GetKey(), tmpNehnutelnost);
+            }
+            else
+            {
+                MessageBox.Show("Presiahnutý počet zaznamov", "Chyba vstupu", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
             //_allNehnutelnosti.Add(tmpNehnutelnost);
 
             HealthNehnutelnosti = Math.Round(_quadTreeNehnutelnost.Health * 100).ToString();
-            */
         }
 
         private void AddParcela()
@@ -422,14 +449,12 @@ namespace PDAApplication2.MVVM.ViewModel
             GPS dlgGps1 = new GPS();
             GPS dlgGps2 = new GPS();
             string popis = "";
-            int idCislo = 0;
             bool cancel = true;
             if (dlg.DialogResult == true)
             {
                 dlgGps1 = new(dlg.x, dlg.xOz, dlg.y, dlg.yOz);
                 dlgGps2 = new(dlg.x2, dlg.x2Oz, dlg.y2, dlg.y2Oz);
                 popis = dlg.popis;
-                idCislo = dlg.IdCislo;
                 cancel = false;
             }
 
@@ -437,7 +462,7 @@ namespace PDAApplication2.MVVM.ViewModel
             {
                 return;
             }
-            /*
+            
             GPS checkedGps1 = new GPS();
             GPS checkedGps2 = new GPS();
 
@@ -453,18 +478,46 @@ namespace PDAApplication2.MVVM.ViewModel
                 MessageBox.Show("Nie je možné pridať nehnuteľnosť do stromu", "Chyba vstupu", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            ObjectModel tmpNehnutelnost = new(idCislo, popis, dlgGps1, dlgGps2, Core.ObjectType.Parcela);
-            var tmpListParciel = _quadTreeNehnutelnost.FindIntervalOverlapping(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y);
-            foreach (ObjectModel parcela in tmpListParciel)
+            ObjectModelParcela tmpParcela = new(Constants.IdObjektu, popis, dlgGps1, dlgGps2);
+            ObjectModelQuad tmpQuad = new(Constants.IdObjektu, dlgGps1, dlgGps2);
+            Constants.IdObjektu++;
+            var tmpListNehnutelnosti = _quadTreeNehnutelnost.FindIntervalOverlapping(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y);
+
+            bool isOk = tmpListNehnutelnosti.Count <= Constants.MAX_COUNT_NEHNUTELNOST_IN_PARCEL;
+            if (isOk)
             {
-                tmpNehnutelnost.ZoznamObjektov.Add(parcela);
-                parcela.ZoznamObjektov.Add(tmpNehnutelnost);
+                // musím si pred tým skontrolovať či mám dostatok miesta v nehnutelnostiach
+                foreach (ObjectModelQuad nehnutelnost in tmpListNehnutelnosti)
+                {
+                    var tmpNehnutelnost = (ObjectModelNehnutelnost)_dynamicHashFileNehnutelnost.Find(nehnutelnost.IdObjektu);
+                    if (tmpNehnutelnost.ZoznamObjektov.Count >= Constants.MAX_COUNT_PARCELS_IN_NEHNUTELNOST)
+                    {
+                        isOk = false;
+                        break;
+                    }
+                }
             }
-            _quadTreeParcela.Insert(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, tmpNehnutelnost);
-            //_allParcelas.Add(tmpNehnutelnost);
+
+            if (isOk)
+            {
+                foreach (ObjectModelQuad nehnutelnost in tmpListNehnutelnosti)
+                {
+                    var tmpNehnutelnost = (ObjectModelNehnutelnost)_dynamicHashFileNehnutelnost.Remove(nehnutelnost.IdObjektu);
+                    tmpNehnutelnost.ZoznamObjektov.Add(tmpParcela.IdObjektu);
+                    tmpParcela.ZoznamObjektov.Add(tmpNehnutelnost.IdObjektu);
+                    _dynamicHashFileNehnutelnost.Insert(tmpNehnutelnost.GetKey(), tmpNehnutelnost);
+                }
+                _quadTreeParcela.Insert(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, tmpQuad);
+                _dynamicHashFileParcela.Insert(tmpParcela.GetKey(), tmpParcela);
+            }
+            else
+            {
+                MessageBox.Show("Presiahnutý počet zaznamov", "Chyba vstupu", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
 
             HealthParcela = Math.Round(_quadTreeParcela.Health * 100).ToString();
-            */
+            
         }
 
         private void EditObject(ObjectModel objectModel)

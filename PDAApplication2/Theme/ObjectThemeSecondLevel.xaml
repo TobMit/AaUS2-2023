@@ -51,7 +51,7 @@
                                     <TreeViewItem Header="{Binding GpsBod2.XVypis }"/>
                                     <TreeViewItem Header="{Binding GpsBod2.YVypis }"/>
                                 </TreeViewItem>
-                                <TreeViewItem Header="ID nehnuteľností, ktorých sa tam nachádza">
+                                <TreeViewItem Header="ID nehnuteľností, ktoré sa na nej nachádzajú">
                                     <ListView
                                         ItemsSource="{Binding ZoznamObjektov}"
                                         ItemContainerStyle="{StaticResource ObjectThemeList}"
