@@ -9,6 +9,7 @@ using DynamicHashFileStructure.StructureClasses;
 using Microsoft.VisualBasic.CompilerServices;
 using PDAApplication2.Core;
 using PDAApplication2.Interface;
+using ObjectType = PDAApplication2.Core.ObjectType;
 
 namespace PDAApplication2.MVVM.Model
 {
@@ -50,6 +51,28 @@ namespace PDAApplication2.MVVM.Model
             GpsBod1 = pGpsBod1;
             GpsBod2 = pGpsBod2;
             ObjectType = type;
+        }
+
+        public override string ToString()
+        {
+            var ObjectTypeString = ObjectType == ObjectType.Nehnutelnost ? "Nehnutelnost" : "Parcela";
+
+            StringBuilder sb = new();
+            sb.AppendLine($"Id: {IdObjektu}");
+            sb.AppendLine($"\tPopis: {Popis}");
+            sb.AppendLine($"\t GPS1: {GpsBod1}");
+            sb.AppendLine($"\t GPS2: {GpsBod2}");
+            sb.AppendLine($"\tTyp Objektu: {ObjectTypeString}");
+            
+            StringBuilder zoznam = new();
+            foreach (var obj in ZoznamObjektov)
+            {
+                zoznam.Append(obj + ", ");
+            }
+            sb.AppendLine($"\tZoznam adries: {zoznam.ToString()}");
+
+
+            return sb.ToString();
         }
     }
 }

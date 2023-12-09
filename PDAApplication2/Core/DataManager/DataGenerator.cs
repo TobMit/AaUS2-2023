@@ -55,7 +55,7 @@ namespace PDAApplication2.Core.DataManager
             // potom pridáme túto parcelu do zoznamu pre nehnuteľnosť
             // a zase parcelu pridáme do nehnuteľnosti
             // na záver vložíme nehnuteľnosť do quad tree
-
+            
             //todo toto ešte nemám dokončené
             for (int i = 0; i < pocetNehnutelnosti; i++)
             {
@@ -70,16 +70,20 @@ namespace PDAApplication2.Core.DataManager
 
                 GPS tmpGps2 = new(tmpGps1.X + tmpSirka, 'E', tmpGps1.Y + tmpViska, 'N');
 
-                ObjectModel tmpNehnutelnost = new(count, "Nehnuteľnosť: " + count, tmpGps1, tmpGps2, Core.ObjectType.Nehnutelnost);
+                ObjectModelQuad tmpNehnutelnost = new(count, tmpGps1, tmpGps2);
+                ObjectModelNehnutelnost tmpDHFNehnutelnost = new(count, "Nehnuteľnosť: " + count, tmpGps1, tmpGps2);
+
                 var tmpListParciel = parcelyQuadTree.FindIntervalOverlapping(tmpNehnutelnost.GpsBod1.X, tmpNehnutelnost.GpsBod1.Y,
                     tmpNehnutelnost.GpsBod2.X, tmpNehnutelnost.GpsBod2.Y);
                 
                 bool isOk = tmpListParciel.Count <= Constants.MAX_COUNT_PARCELS_IN_NEHNUTELNOST;
                 if (isOk)
                 {
-                    foreach (ObjectModel parcela in tmpListParciel)
+                    // musím si pred tým skontrolovať či mám dostatok miesta v parcelách
+                    foreach (ObjectModelQuad parcela in tmpListParciel)
                     {
-                        if (parcela.ZoznamObjektov.Count >= Constants.MAX_COUNT_NEHNUTELNOST_IN_PARCEL)
+                        var tmpParcela = (ObjectModelParcela) dhfParcely.Find(parcela.IdObjektu);
+                        if (tmpParcela.ZoznamObjektov.Count >= Constants.MAX_COUNT_NEHNUTELNOST_IN_PARCEL)
                         {
                             isOk = false;
                             break;
@@ -89,20 +93,17 @@ namespace PDAApplication2.Core.DataManager
 
                 if (isOk)
                 {
-                    foreach (ObjectModel parcela in tmpListParciel)
+                    foreach (ObjectModelQuad parcela in tmpListParciel)
                     {
-                        tmpNehnutelnost.ZoznamObjektov.Add(parcela);
-                        parcela.ZoznamObjektov.Add(tmpNehnutelnost);
+                        var tmpParcela = (ObjectModelParcela) dhfParcely.Remove(parcela.IdObjektu);
+                        tmpDHFNehnutelnost.ZoznamObjektov.Add(parcela.IdObjektu);
+                        tmpParcela.ZoznamObjektov.Add(tmpNehnutelnost.IdObjektu);
+                        dhfParcely.Insert(tmpParcela.GetKey(), tmpParcela);
                     }
 
                     nehnutelnostiQuadTree.Insert(tmpGps1.X, tmpGps1.Y, tmpGps2.X, tmpGps2.Y, tmpNehnutelnost);
-                    jednotneQuadTree.Insert(tmpGps1.X, tmpGps1.Y, tmpGps2.X, tmpGps2.Y, tmpNehnutelnost);
+                    dhfNehutelnosti.Insert(tmpDHFNehnutelnost.GetKey(), tmpDHFNehnutelnost);
 
-                    nehnutelnostiList.Add(tmpNehnutelnost);
-                    if (i <= Constants.MAX_SIZE_TO_SHOW)
-                    {
-                        observableCollectionNehnutelnosti.Add(tmpNehnutelnost);
-                    }
                     
                     count++;
                 }
@@ -111,7 +112,6 @@ namespace PDAApplication2.Core.DataManager
                     i--;
                 }
             }
-
         }
 
         private static double NextDouble(double min, double max, Random rnd, int pocDesMiest = 6)

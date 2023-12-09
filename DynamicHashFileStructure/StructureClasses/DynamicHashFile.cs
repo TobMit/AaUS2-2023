@@ -7,8 +7,8 @@ namespace DynamicHashFileStructure.StructureClasses;
 public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
 {
 
-    private const int PrimaryFileBlockSize = 5;
-    private const int PreplnovaciFileBlockSize = 8;
+    private const int PrimaryFileBlockSize = 3;
+    private const int PreplnovaciFileBlockSize = 3;
     
     public int Count { get; private set; }
     

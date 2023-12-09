@@ -143,5 +143,10 @@ namespace PDAApplication2.MVVM.Model
         {
             throw new NotImplementedException();
         }
+
+        public override string ToString()
+        {
+            return $"{XVypis}, {YVypis}";
+        }
     }
 }

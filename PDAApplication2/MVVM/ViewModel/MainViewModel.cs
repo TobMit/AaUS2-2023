@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Media;
 using DynamicHashFileStructure.StructureClasses;
 using PDAApplication2.Core;
@@ -22,12 +23,12 @@ namespace PDAApplication2.MVVM.ViewModel
         private QuadTree<int,ObjectModelQuad> _quadTreeNehnutelnost;
         private QuadTree<int, ObjectModelQuad> _quadTreeParcela;
 
-        private string _primaryFileNameNehnutelnost = "primariFileNehnutelnost.bin";
-        private string _preplnovakFileNameNehnutelnost = "preplnovakFileNameNehnutelnost.bin";
-        private DynamicHashFile<int, ObjectModelNehnutelnost> _dynamicHashFileNehnutelnost;
         private string _primaryFileNameParcela = "primariFileParcela.bin";
         private string _preplnovakFileNameParcela = "preplnovakFileNameParcela.bin";
         private DynamicHashFile<int, ObjectModelParcela> _dynamicHashFileParcela;
+        private string _primaryFileNameNehnutelnost = "primariFileNehnutelnost.bin";
+        private string _preplnovakFileNameNehnutelnost = "preplnovakFileNameNehnutelnost.bin";
+        private DynamicHashFile<int, ObjectModelNehnutelnost> _dynamicHashFileNehnutelnost;
 
         //private List<ObjectModel> _allNehnutelnosti;
         //private List<ObjectModel> _allParcelas;
@@ -197,35 +198,46 @@ namespace PDAApplication2.MVVM.ViewModel
             _quadTreeParcela = new QuadTree<int, ObjectModelQuad>(gps1.X, gps1.Y, sirka, dlzka);
 
             // musíme zmazať predchadzajúce súbori aby sa zabránilo vpisovaniu do existujúcich súborov
+            File.Delete(_primaryFileNameParcela);
+            File.Delete(_preplnovakFileNameParcela);
+            _dynamicHashFileParcela =
+                new DynamicHashFile<int, ObjectModelParcela>(_primaryFileNameParcela, _preplnovakFileNameParcela);
+            
             File.Delete(_primaryFileNameNehnutelnost);
             File.Delete(_preplnovakFileNameNehnutelnost);
             _dynamicHashFileNehnutelnost =
                 new DynamicHashFile<int, ObjectModelNehnutelnost>(_primaryFileNameNehnutelnost,
                     _preplnovakFileNameNehnutelnost);
-            File.Delete(_primaryFileNameParcela);
-            File.Delete(_preplnovakFileNameParcela);
-            _dynamicHashFileParcela =
-                new DynamicHashFile<int, ObjectModelParcela>(_primaryFileNameParcela, _preplnovakFileNameNehnutelnost);
 
             ListParcela = new ();
             ListNehnutelnost = new ();
             //_allNehnutelnosti = new(pocetNehnutelnosti);
             //_allParcelas = new(pocetParciel);
+
             /*
+            Block<ObjectModelParcela> bock = new(5);
+            ObjectModelParcela tmpParcela = new(0, "Parcela: ", gps1, new(gps1.X + sirka, gps1.Y + dlzka)); 
+            bock.AddRecord(tmpParcela);
+            bock.AddRecord(tmpParcela);
+            var bytes = bock.GetBytes();
+            var tmpBlock = (Block<ObjectModelParcela>)Block<ObjectModelParcela>.FromBytes(bytes,5);
+            Console.WriteLine(tmpBlock);*/
+            
+            
             Core.DataManager.DataGenerator.GenerateData(_quadTreeNehnutelnost,
                 _quadTreeParcela,
-                _quadTreeJednotne,
-                ListNehnutelnost,
-                ListParcela,
-                _allNehnutelnosti,
-                _allParcelas,
+                _dynamicHashFileNehnutelnost,
+                _dynamicHashFileParcela,
                 gps1,
                 new(gps1.X + sirka, gps1.Y + dlzka),
                 pocetNehnutelnosti,
                 pocetParciel);
-            */
+            
             MenuColor = new(Color.FromRgb(240, 240, 240));
-
+            
+            _dynamicHashFileNehnutelnost.PrintFile();
+            _dynamicHashFileParcela.PrintFile();
+            
             HealthNehnutelnosti = Math.Round(_quadTreeNehnutelnost.Health*100).ToString();
             HealthParcela = Math.Round(_quadTreeParcela.Health * 100).ToString();
 
@@ -234,7 +246,7 @@ namespace PDAApplication2.MVVM.ViewModel
         private void FindBuildings()
         {
             
-            if (_quadTreeNehnutelnost is null || _dynamicHashFileNehnutelnost is null)
+            //if (_quadTreeNehnutelnost is null || _dynamicHashFileNehnutelnost is null)
             {
                 return;
             }

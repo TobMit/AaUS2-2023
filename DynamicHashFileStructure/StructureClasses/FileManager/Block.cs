@@ -64,7 +64,7 @@ public class Block<TData> : IRecord where TData : IRecord
     public Block(int blockFactor)
     {
         _blockFactor = blockFactor;
-        _records = new TData[BlockFactor];
+        _records = new TData[blockFactor];
         _validRecords = 0;
         NextFreeBlock = -1;
         LastNextFreeBlock = -1;
@@ -176,9 +176,9 @@ public class Block<TData> : IRecord where TData : IRecord
         for (int i = 0; i < blockFactor; i++)
         {
             // skopírujem iba potrebnú časť z bitového poľa
-            byte[] recordBytes = new byte[TData.GetSize()];
-            Array.Copy(bytes, offset, recordBytes, 0, TData.GetSize());
-            records[i] = (TData)TData.FromBytes(recordBytes);
+            //byte[] recordBytes = new byte[TData.GetSize()];
+            //Array.Copy(bytes, offset, recordBytes, 0, TData.GetSize());
+            records[i] = (TData)TData.FromBytes(bytes[offset..(offset + TData.GetSize())]); // range metóda
             offset += TData.GetSize();
         }
 
@@ -188,15 +188,15 @@ public class Block<TData> : IRecord where TData : IRecord
     public override string ToString()
     {
         StringBuilder sb = new StringBuilder();
-        sb.Append($"Next free block: {NextFreeBlock}\n");
-        sb.Append($"Last free block: {LastNextFreeBlock}\n");
-        sb.Append($"Block factor: {_blockFactor}\n");
-        sb.Append($"Valid records: {_validRecords}\n");
-        sb.Append($"Next data block: {NextDataBlock}\n");
-        sb.Append("Records:\n");
+        sb.AppendLine($"Next free block: {NextFreeBlock}");
+        sb.AppendLine($"Last free block: {LastNextFreeBlock}");
+        sb.AppendLine($"Block factor: {_blockFactor}");
+        sb.AppendLine($"Valid records: {_validRecords}");
+        sb.AppendLine($"Next data block: {NextDataBlock}");
+        sb.AppendLine("Records:");
         for (int i = 0; i < _validRecords; i++)
         {
-            sb.Append($"{_records[i].ToString()}\n");
+            sb.AppendLine($"\t{_records[i].ToString()}");
         }
 
         return sb.ToString();
