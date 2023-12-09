@@ -19,5 +19,6 @@ namespace PDAApplication2.Core
         
         public static int MAX_COUNT_PARCELS_IN_NEHNUTELNOST = 6;
         public static int MAX_COUNT_NEHNUTELNOST_IN_PARCEL = 5;
+        public static int IdObjektu = 0;
     }
 }
