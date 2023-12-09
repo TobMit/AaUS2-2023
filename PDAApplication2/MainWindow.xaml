@@ -45,9 +45,14 @@
                     Header="Načítať dáta"
                     Command="{Binding LoadDataCommand}"/>
             </MenuItem>
-            <MenuItem
-                Header="Zobraziť všetko"
-                Command="{Binding ShowAllCommand}"/>
+            <MenuItem Header="Zobraziť vypis štruktúri">
+                <MenuItem 
+                    Header="Nehnutelnosti"
+                    Command="{Binding ShowFileNehnutelnostiCommand}"/>
+                <MenuItem
+                    Header="Parcely"
+                    Command="{Binding ShowFileParcelyCommand}"/>
+            </MenuItem>
             <MenuItem Header="Zdravie">
                 <MenuItem Header="{Binding HealthNehnutelnosti}"/>
                 <MenuItem Header="{Binding HealthParcela}"/>

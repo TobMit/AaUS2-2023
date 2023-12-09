@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Text;
 using DynamicHashFileStructure.StructureClasses.HelperClasses;
 using DynamicHashFileStructure.StructureClasses.Nodes;
 
@@ -981,6 +982,42 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
             var block = _filePreplnovaciManager.GetBlock(i);
             Console.WriteLine(block.ToString());
         }
+    }
+
+
+    /// <summary>
+    /// Sekvenčný výpis pre primary file
+    /// </summary>
+    public string GetPrimaryFileSequece()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.AppendLine("------------  PRIMARY FILE ------------");
+        for (int i = 0; i < _fileManager.GetBlockCount(); i++)
+        {
+            sb.AppendLine($"Block {i}");
+            var block = _fileManager.GetBlock(i);
+            sb.AppendLine(block.ToString());
+        }
+
+        return sb.ToString();
+    }
+
+
+    /// <summary>
+    /// Sekvenčný výpis pre primary file
+    /// </summary>
+    public string GetPreplnovaciFileSequece()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.AppendLine("------------  PREPLNOVACI FILE ------------");
+        for (int i = 0; i < _filePreplnovaciManager.GetBlockCount(); i++)
+        {
+            sb.AppendLine($"Block {i}");
+            var block = _filePreplnovaciManager.GetBlock(i);
+            sb.AppendLine(block.ToString());
+        }
+
+        return sb.ToString();
     }
 
     

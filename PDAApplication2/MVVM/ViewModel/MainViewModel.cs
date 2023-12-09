@@ -42,7 +42,8 @@ namespace PDAApplication2.MVVM.ViewModel
         public RelayCommand EditParcelaCommand { get; set; }
         public RelayCommand DeleteNehnutelnostCommand { get; set; }
         public RelayCommand DeleteParcelaCommand { get; set; }
-        //public RelayCommand ShowAllCommand { get; set; }
+        public RelayCommand ShowFileNehnutelnostiCommand { get; set; }
+        public RelayCommand ShowFileParcelyCommand { get; set; }
         public RelayCommand SaveDataCommand { get; set; }
         public RelayCommand LoadDataCommand { get; set; }
         public RelayCommand ForceOptimisationCommand { get; set; }
@@ -175,7 +176,8 @@ namespace PDAApplication2.MVVM.ViewModel
                 var tmp = (ObjectModel)o;
                 DeleteParcela(tmp);
             });
-            //ShowAllCommand = new RelayCommand(o => { ShowAll(); });
+            ShowFileNehnutelnostiCommand = new RelayCommand(o => { ShowFileNehnutelnosti(); });
+            ShowFileParcelyCommand = new RelayCommand(o => { ShowFileParcely(); });
             SaveDataCommand = new RelayCommand(o => { SaveData(); });
             LoadDataCommand = new RelayCommand(o => { LoadData(); });
             ForceOptimisationCommand = new RelayCommand(o => { ForceOptimisation(); });
@@ -884,6 +886,26 @@ namespace PDAApplication2.MVVM.ViewModel
             }
             _quadTreeNehnutelnost.Optimalise(true);
             _quadTreeParcela.Optimalise(true);
+        }
+
+        private void ShowFileNehnutelnosti()
+        {
+            if (_dynamicHashFileNehnutelnost is not null)
+            {
+                var dlg = new SequeFilePrint("Nehnutelnosti", _dynamicHashFileNehnutelnost.GetPrimaryFileSequece(),
+                    _dynamicHashFileNehnutelnost.GetPreplnovaciFileSequece());
+                dlg.Show();
+            }
+        }
+
+        private void ShowFileParcely()
+        {
+            if (_dynamicHashFileParcela is not null)
+            {
+                var dlg = new SequeFilePrint("Nehnutelnosti", _dynamicHashFileParcela.GetPrimaryFileSequece(),
+                    _dynamicHashFileParcela.GetPreplnovaciFileSequece());
+                dlg.Show();
+            }
         }
 
 
