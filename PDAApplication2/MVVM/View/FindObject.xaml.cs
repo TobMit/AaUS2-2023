@@ -10,28 +10,20 @@ public partial class FindObject : Window
     public FindObject(string pTitle)
     {
         InitializeComponent();
-        x = 0;
-        y = 0;
+        ID = 0;
         this.Title = pTitle;
     }
     
-    public double x { get; set; }
-    public double y { get; set; }
+    public int ID { get; set; }
     
     private void OkButton_OnClick(object sender, RoutedEventArgs e)
     {
-        x = double.Parse(xPoint.Text);
-        y = double.Parse(yPoint.Text);
+        ID = int.Parse(xPoint.Text);
         DialogResult = true;
     }
     private void XPoint_OnPreviewTextInput(object sender, TextCompositionEventArgs e)
     {
-        Core.Utils.DoublePreviewCheck(sender, e);
+        Core.Utils.NumaberPreviewCheck(sender, e);
     }
 
-
-    private void YPoint_OnPreviewTextInput(object sender, TextCompositionEventArgs e)
-    {
-        Core.Utils.DoublePreviewCheck(sender, e);
-    }
 }

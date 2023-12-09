@@ -1,6 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Style TargetType="ListViewItem" x:Key="ObjectTheme">
+    <Style TargetType="ListViewItem" x:Key="ObjectThemeSecondLevel">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListViewItem">
@@ -19,27 +19,14 @@
                             <TreeViewItem Header="{Binding GpsBod2.XVypis }"/>
                             <TreeViewItem Header="{Binding GpsBod2.YVypis }"/>
                         </TreeViewItem>
-                        <TreeViewItem Header="Parcely, na ktorých sa nachádza">
+                        <TreeViewItem Header="ID parciel, na ktorých sa nachádza">
                             <ListView
                                 ItemsSource="{Binding ZoznamObjektov}"
-                                ItemContainerStyle="{StaticResource ObjectTheme}"
+                                ItemContainerStyle="{StaticResource ObjectThemeList}"
                                 HorizontalAlignment="Stretch"
                                 VerticalAlignment="Stretch"
                                 BorderThickness="0"/>
                         </TreeViewItem>
-                        <StackPanel Orientation="Horizontal">
-                            <Button
-                                Command="{Binding Path=DataContext.EditCommand, ElementName=ListViewNehnutelnost}"
-                                CommandParameter="{Binding}">
-                                Edit
-                            </Button>
-                            <Button
-                                Margin="4,0,0,0"
-                                Command="{Binding Path=DataContext.DeleteCommand, ElementName=ListViewNehnutelnost}"
-                                CommandParameter="{Binding}">
-                                Delete
-                            </Button>
-                        </StackPanel>
                     </TreeViewItem>
                 </ControlTemplate>
             </Setter.Value>
@@ -64,27 +51,14 @@
                                     <TreeViewItem Header="{Binding GpsBod2.XVypis }"/>
                                     <TreeViewItem Header="{Binding GpsBod2.YVypis }"/>
                                 </TreeViewItem>
-                                <TreeViewItem Header="Nehnuteľnosti, ktoré sa tam nachádzajú">
+                                <TreeViewItem Header="ID nehnuteľností, ktorých sa tam nachádza">
                                     <ListView
                                         ItemsSource="{Binding ZoznamObjektov}"
-                                        ItemContainerStyle="{StaticResource ObjectTheme}"
+                                        ItemContainerStyle="{StaticResource ObjectThemeList}"
                                         HorizontalAlignment="Stretch"
                                         VerticalAlignment="Stretch"
                                         BorderThickness="0"/>
                                 </TreeViewItem>
-                                <StackPanel Orientation="Horizontal">
-                                    <Button
-                                        Command="{Binding Path=DataContext.EditCommand, ElementName=ListViewParcela}"
-                                        CommandParameter="{Binding}">
-                                        Edit
-                                    </Button>
-                                    <Button
-                                        Margin="4,0,0,0"
-                                        Command="{Binding Path=DataContext.DeleteCommand, ElementName=ListViewParcela}"
-                                        CommandParameter="{Binding}">
-                                        Delete
-                                    </Button>
-                                </StackPanel>
                             </TreeViewItem>
                         </ControlTemplate>
                     </Setter.Value>
@@ -92,5 +66,4 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    
 </ResourceDictionary>

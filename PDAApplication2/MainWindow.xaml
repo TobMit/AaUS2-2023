@@ -67,7 +67,7 @@
                 <TreeView>
                     <ListView
                         ItemsSource="{Binding ListNehnutelnost}"
-                        ItemContainerStyle="{StaticResource ObjectTheme}"
+                        ItemContainerStyle="{StaticResource ObjectThemeFirstLevel}"
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
                         KeyboardNavigation.ControlTabNavigation="none"
@@ -83,7 +83,7 @@
                 <TreeView>
                     <ListView
                         ItemsSource="{Binding ListParcela}"
-                        ItemContainerStyle="{StaticResource ObjectTheme}"
+                        ItemContainerStyle="{StaticResource ObjectThemeFirstLevel}"
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
                         KeyboardNavigation.ControlTabNavigation="none"
@@ -99,7 +99,7 @@
             <TreeView>
                 <ListView
                     ItemsSource="{Binding ListParcela}"
-                    ItemContainerStyle="{StaticResource ObjectTheme}"
+                    ItemContainerStyle="{StaticResource ObjectThemeFirstLevel}"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
                     KeyboardNavigation.ControlTabNavigation="none"

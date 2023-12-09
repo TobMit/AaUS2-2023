@@ -21,6 +21,8 @@ namespace PDAApplication2.MVVM.Model
         public GPS GpsBod1 { get; set; }
         public GPS GpsBod2 { get; set; }
         public List<int> ZoznamObjektov { get; set; }
+        
+        public List<ObjectModel> ZoznamObjektovGUI { get; set; }
 
         public Core.ObjectType ObjectType { get; protected set; }
 
@@ -38,6 +40,7 @@ namespace PDAApplication2.MVVM.Model
             IdObjektu = idObjektu;
             Popis = pPopis;
             ZoznamObjektov = pZoznamObjektov;
+            ZoznamObjektovGUI = new();
             GpsBod1 = pGpsBod1;
             GpsBod2 = pGpsBod2;
             ObjectType = type;
@@ -48,6 +51,7 @@ namespace PDAApplication2.MVVM.Model
             IdObjektu = idObjektu;
             Popis = pPopis;
             ZoznamObjektov = new();
+            ZoznamObjektovGUI = new();
             GpsBod1 = pGpsBod1;
             GpsBod2 = pGpsBod2;
             ObjectType = type;

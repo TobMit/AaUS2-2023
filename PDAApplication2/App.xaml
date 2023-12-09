@@ -6,8 +6,9 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Theme/ObjectTheme.xaml"/>
-                <ResourceDictionary Source="Theme/ObjectTheme.xaml"/>
+                <ResourceDictionary Source="Theme/ObjectThemeList.xaml"/>
+                <ResourceDictionary Source="Theme/ObjectThemeSecondLevel.xaml"/>
+                <ResourceDictionary Source="Theme/ObjectThemeFirstLevel.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

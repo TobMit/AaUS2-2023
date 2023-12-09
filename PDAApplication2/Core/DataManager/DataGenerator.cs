@@ -43,7 +43,7 @@ namespace PDAApplication2.Core.DataManager
                 GPS tmpGps2 = new(tmpGps1.X + tmpSirka,'E', tmpGps1.Y + tmpViska, 'N');
 
                 ObjectModelQuad tmpParcela = new(Constants.IdObjektu, tmpGps1, tmpGps2);
-                ObjectModelParcela tmpDHFParcela = new(Constants.IdObjektu, "Parcela: ", tmpGps1, tmpGps2);
+                ObjectModelParcela tmpDHFParcela = new(Constants.IdObjektu, "Parcela: " + Constants.IdObjektu, tmpGps1, tmpGps2);
 
                 parcelyQuadTree.Insert(tmpGps1.X, tmpGps1.Y, tmpGps2.X, tmpGps2.Y, tmpParcela);
                 dhfParcely.Insert(tmpDHFParcela.GetKey(), tmpDHFParcela);
@@ -70,7 +70,7 @@ namespace PDAApplication2.Core.DataManager
                 GPS tmpGps2 = new(tmpGps1.X + tmpSirka, 'E', tmpGps1.Y + tmpViska, 'N');
 
                 ObjectModelQuad tmpNehnutelnost = new(Constants.IdObjektu, tmpGps1, tmpGps2);
-                ObjectModelNehnutelnost tmpDHFNehnutelnost = new(Constants.IdObjektu, "Nehnuteľnosť: " + count, tmpGps1, tmpGps2);
+                ObjectModelNehnutelnost tmpDHFNehnutelnost = new(Constants.IdObjektu, "Nehnut: " + Constants.IdObjektu, tmpGps1, tmpGps2);
 
                 var tmpListParciel = parcelyQuadTree.FindIntervalOverlapping(tmpNehnutelnost.GpsBod1.X, tmpNehnutelnost.GpsBod1.Y,
                     tmpNehnutelnost.GpsBod2.X, tmpNehnutelnost.GpsBod2.Y);

@@ -197,6 +197,17 @@ namespace PDAApplication2.MVVM.ViewModel
             _quadTreeNehnutelnost = new QuadTree<int, ObjectModelQuad>(gps1.X, gps1.Y, sirka, dlzka);
             _quadTreeParcela = new QuadTree<int, ObjectModelQuad>(gps1.X, gps1.Y, sirka, dlzka);
 
+            if (_dynamicHashFileParcela is not null)
+            {
+                _dynamicHashFileParcela.CloseFile();
+            }
+
+            if (_dynamicHashFileNehnutelnost is not null)
+            {
+                _dynamicHashFileNehnutelnost.CloseFile();
+            }
+
+
             // musíme zmazať predchadzajúce súbori aby sa zabránilo vpisovaniu do existujúcich súborov
             File.Delete(_primaryFileNameParcela);
             File.Delete(_preplnovakFileNameParcela);
@@ -214,16 +225,8 @@ namespace PDAApplication2.MVVM.ViewModel
             //_allNehnutelnosti = new(pocetNehnutelnosti);
             //_allParcelas = new(pocetParciel);
 
-            /*
-            Block<ObjectModelParcela> bock = new(5);
-            ObjectModelParcela tmpParcela = new(0, "Parcela: ", gps1, new(gps1.X + sirka, gps1.Y + dlzka)); 
-            bock.AddRecord(tmpParcela);
-            bock.AddRecord(tmpParcela);
-            var bytes = bock.GetBytes();
-            var tmpBlock = (Block<ObjectModelParcela>)Block<ObjectModelParcela>.FromBytes(bytes,5);
-            Console.WriteLine(tmpBlock);*/
-            
-            
+            Constants.IdObjektu = 0;
+
             Core.DataManager.DataGenerator.GenerateData(_quadTreeNehnutelnost,
                 _quadTreeParcela,
                 _dynamicHashFileNehnutelnost,
@@ -235,8 +238,8 @@ namespace PDAApplication2.MVVM.ViewModel
             
             MenuColor = new(Color.FromRgb(240, 240, 240));
             
-            _dynamicHashFileNehnutelnost.PrintFile();
-            _dynamicHashFileParcela.PrintFile();
+            //_dynamicHashFileNehnutelnost.PrintFile();
+            //_dynamicHashFileParcela.PrintFile();
             
             HealthNehnutelnosti = Math.Round(_quadTreeNehnutelnost.Health*100).ToString();
             HealthParcela = Math.Round(_quadTreeParcela.Health * 100).ToString();
@@ -246,19 +249,17 @@ namespace PDAApplication2.MVVM.ViewModel
         private void FindBuildings()
         {
             
-            //if (_quadTreeNehnutelnost is null || _dynamicHashFileNehnutelnost is null)
+            if (_quadTreeNehnutelnost is null || _dynamicHashFileNehnutelnost is null)
             {
                 return;
             }
             var dlg = new FindObject("Vyhľadanie budovy");
             dlg.ShowDialog();
-            GPS gps1 = new GPS();
-            GPS gps2 = new GPS();
+            int id = 0;
             bool cancel = true;
             if (dlg.DialogResult == true)
             {
-                gps1 = new(dlg.x, dlg.y);
-                gps2 = new(dlg.x, dlg.y);
+                id = dlg.ID;
                 cancel = false;
             }
 
@@ -266,39 +267,87 @@ namespace PDAApplication2.MVVM.ViewModel
             {
                 return;
             }
-            /*
+
+            ObjectModelNehnutelnost? mainNehnutelnost = null;
             ChangeView(true);
-            ListNehnutelnost = new ObservableCollection<ObjectModel>(_quadTreeNehnutelnost.FindIntervalOverlapping(gps1.X, gps1.Y, gps2.X, gps2.Y));
-            ListParcela = new();
-            */
+            try
+            {
+                mainNehnutelnost = _dynamicHashFileNehnutelnost.Find(id);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Nesprávne ID nehnuteľnosti", "Nesprávne ID", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (mainNehnutelnost is null)
+            {
+                MessageBox.Show("Nesprávne ID nehnuteľnosti", "Nesprávne ID", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            foreach (int tmpID in mainNehnutelnost.ZoznamObjektov)
+            {
+                var tmp = _dynamicHashFileParcela.Find(tmpID);
+                if (tmp is not null)
+                {
+                    mainNehnutelnost.ZoznamObjektovGUI.Add(tmp);
+                }
+            }
+
+            ListNehnutelnost = new ObservableCollection<ObjectModel>();
+            ListNehnutelnost.Add(mainNehnutelnost);
         }
 
         private void FindParcela()
         {
-            if (_quadTreeParcela is null || _quadTreeParcela is null)
+            if (_quadTreeParcela is null || _dynamicHashFileParcela is null)
             {
                 return;
             }
             var dlg = new FindObject("Vyhľadanie parcely");
             dlg.ShowDialog();
-            GPS gps1 = new GPS();
-            GPS gps2 = new GPS();
+            int id = 0;
             bool cancel = true;
             if (dlg.DialogResult == true)
             {
-                gps1 = new(dlg.x, dlg.y);
-                gps2 = new(dlg.x, dlg.y);
+                id = dlg.ID;
                 cancel = false;
             }
-            /*
             if (cancel)
             {
                 return;
             }
+
+            ObjectModelParcela? mainParcela = null;
             ChangeView(true);
-            ListParcela = new ObservableCollection<ObjectModel>(_quadTreeParcela.FindIntervalOverlapping(gps1.X, gps1.Y, gps2.X, gps2.Y));
-            ListNehnutelnost = new();
-            */
+            try
+            {
+                mainParcela = _dynamicHashFileParcela.Find(id);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Nesprávne ID parcely", "Nesprávne ID", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (mainParcela is null)
+            {
+                MessageBox.Show("Nesprávne ID parcely", "Nesprávne ID", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            foreach (int tmpID in mainParcela.ZoznamObjektov)
+            {
+                var tmp = _dynamicHashFileNehnutelnost.Find(tmpID);
+                if (tmp is not null)
+                {
+                    mainParcela.ZoznamObjektovGUI.Add(tmp);
+                }
+            }
+
+            ListParcela = new ObservableCollection<ObjectModel>();
+            ListParcela.Add(mainParcela);
         }
 
 
