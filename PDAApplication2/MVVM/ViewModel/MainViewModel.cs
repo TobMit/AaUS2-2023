@@ -39,7 +39,8 @@ namespace PDAApplication2.MVVM.ViewModel
         public RelayCommand AddBuildingCommand { get; set; }
         public RelayCommand AddParcelaCommand { get; set; }
         public RelayCommand EditCommand { get; set; }
-        public RelayCommand DeleteCommand { get; set; }
+        public RelayCommand DeleteNehnutelnostCommand { get; set; }
+        public RelayCommand DeleteParcelatCommand { get; set; }
         //public RelayCommand ShowAllCommand { get; set; }
         public RelayCommand SaveDataCommand { get; set; }
         public RelayCommand LoadDataCommand { get; set; }
@@ -158,12 +159,17 @@ namespace PDAApplication2.MVVM.ViewModel
                 var tmp = (ObjectModel)o;
                 EditObject(tmp);
             });
-            DeleteCommand = new RelayCommand(o =>
+            DeleteNehnutelnostCommand = new RelayCommand(o =>
             {
                 var tmp = (ObjectModel)o;
-                DeleteObject(tmp);
+                DeleteNehnutelnost(tmp);
             });
-            //ShowAllCommand = new RelayCommand(o => { ShowAll(); });
+            DeleteParcelatCommand = new RelayCommand(o =>
+            {
+                var tmp = (ObjectModel)o;
+                DeleteParcela(tmp);
+            });
+            //ShowAllCommand = new RelayCommand(o => { ShowAll(); });118 120 144 184 -> 14
             SaveDataCommand = new RelayCommand(o => { SaveData(); });
             LoadDataCommand = new RelayCommand(o => { LoadData(); });
             ForceOptimisationCommand = new RelayCommand(o => { ForceOptimisation(); });
@@ -632,58 +638,56 @@ namespace PDAApplication2.MVVM.ViewModel
             */
         }
 
-        private void DeleteObject(ObjectModel objectModel)
+        private void DeleteNehnutelnost(ObjectModel objectModel)
         {
-            /*
+            
             // musím zmazať zo všetkých parciel záznam na tento objekt
-            foreach (ObjectModel parcela in objectModel.ZoznamObjektov)
+
+            var tmpObject = _dynamicHashFileNehnutelnost.Remove(objectModel.IdObjektu);
+
+            foreach (int tmpID in objectModel.ZoznamObjektov)
             {
-                parcela.ZoznamObjektov.Remove(objectModel);
+                var tmpParcela = _dynamicHashFileParcela.Remove(tmpID);
+                tmpParcela.ZoznamObjektov.Remove(objectModel.IdObjektu);
+                _dynamicHashFileParcela.Insert(tmpParcela.IdObjektu, tmpParcela);
             }
 
             GPS checkedGps1 = new GPS();
             GPS checkedGps2 = new GPS();
 
             Core.Utils.CheckAndRecalculateGps(objectModel.GpsBod1, objectModel.GpsBod2, checkedGps1, checkedGps2);
-
-            // vymažem sa z oboch stromov
-            if (objectModel.ObjectType == ObjectType.Nehnutelnost)
-            {
-                _quadTreeNehnutelnost.Delete(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y,
-                    objectModel.IdObjektu);
-            }
-            else
-            {
-                _quadTreeParcela.Delete(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, objectModel.IdObjektu);
-            }
-
-            objectModel.ZoznamObjektov.Clear();
-
-            if (objectModel.ObjectType == ObjectType.Nehnutelnost)
-            {
-                _allNehnutelnosti = new(_quadTreeNehnutelnost.ToList());
-                ListNehnutelnost =
-                    new(_allNehnutelnosti.GetRange(0, _allNehnutelnosti.Count > Constants.MAX_SIZE_TO_SHOW ? Constants.MAX_SIZE_TO_SHOW : _allNehnutelnosti.Count)); // zobrazíme len prvých 500 (aby UI išlo normálne a nesekalo sa)
-            }
-            else
-            {
-                _allParcelas = new(_quadTreeParcela.ToList());
-                ListParcela =
-                    new(_allParcelas.GetRange(0, _allParcelas.Count > Constants.MAX_SIZE_TO_SHOW ? Constants.MAX_SIZE_TO_SHOW : _allParcelas.Count)); // zobrazíme len prvých 500 (aby UI išlo normálne a nesekalo sa)
-            }
-
+            _quadTreeNehnutelnost.Delete(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y,
+                objectModel.IdObjektu);
+            ListNehnutelnost = new();
             ChangeView(true);
-            */
+            
         }
 
-        /*
-        private void ShowAll()
+        private void DeleteParcela(ObjectModel objectModel)
         {
+
+            // musím zmazať zo všetkých parciel záznam na tento objekt
+
+            var tmpObject = _dynamicHashFileParcela.Remove(objectModel.IdObjektu);
+
+            foreach (int tmpID in objectModel.ZoznamObjektov)
+            {
+                var tmpParcela = _dynamicHashFileNehnutelnost.Remove(tmpID);
+                tmpParcela.ZoznamObjektov.Remove(objectModel.IdObjektu);
+                _dynamicHashFileNehnutelnost.Insert(tmpParcela.IdObjektu, tmpParcela);
+            }
+
+            GPS checkedGps1 = new GPS();
+            GPS checkedGps2 = new GPS();
+
+            Core.Utils.CheckAndRecalculateGps(objectModel.GpsBod1, objectModel.GpsBod2, checkedGps1, checkedGps2);
+            _quadTreeParcela.Delete(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y,
+                objectModel.IdObjektu);
+            ListParcela = new();
             ChangeView(true);
-            ListNehnutelnost = new ObservableCollection<ObjectModel>(_allNehnutelnosti);
-            ListParcela = new ObservableCollection<ObjectModel>(_allParcelas);
+
         }
-        */
+
 
         private void SaveData()
         {

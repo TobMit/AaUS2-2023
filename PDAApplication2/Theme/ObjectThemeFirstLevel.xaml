@@ -35,7 +35,7 @@
                             </Button>
                             <Button
                                 Margin="4,0,0,0"
-                                Command="{Binding Path=DataContext.DeleteCommand, ElementName=ListViewNehnutelnost}"
+                                Command="{Binding Path=DataContext.DeleteNehnutelnostCommand, ElementName=ListViewNehnutelnost}"
                                 CommandParameter="{Binding}">
                                 Delete
                             </Button>
@@ -80,7 +80,7 @@
                                     </Button>
                                     <Button
                                         Margin="4,0,0,0"
-                                        Command="{Binding Path=DataContext.DeleteCommand, ElementName=ListViewParcela}"
+                                        Command="{Binding Path=DataContext.DeleteParcelatCommand, ElementName=ListViewParcela}"
                                         CommandParameter="{Binding}">
                                         Delete
                                     </Button>
