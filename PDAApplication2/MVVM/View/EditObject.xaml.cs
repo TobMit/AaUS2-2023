@@ -15,16 +15,13 @@ public partial class EditObject : Window
         if (model.ObjectType == Core.ObjectType.Nehnutelnost)
         {
             this.Title = "Editácia nehnuteľnosti";
-            this.LabelID.Content = "Súpisné číslo";
         }
         else
         {
             this.Title = "Editácia parcely";
-            this.LabelID.Content = "Číslo parcely";
         }
 
         this.Popis.Text = model.Popis;
-        this.idCislo.Text = model.IdObjektu.ToString();
         this.xPoint.Text = model.GpsBod1.X.ToString();
         this.yPoint.Text = model.GpsBod1.Y.ToString();
         this.x2Point.Text = model.GpsBod2.X.ToString();
@@ -44,7 +41,6 @@ public partial class EditObject : Window
     public double y2 { get; set; }
     public char y2Oz { get; set; }
     public string popis { get; set; }
-    public int IdCislo { get; set; }
     
     private void OkButton_OnClick(object sender, RoutedEventArgs e)
     {
@@ -59,7 +55,6 @@ public partial class EditObject : Window
             x2 = double.Parse(x2Point.Text);
             y2 = double.Parse(y2Point.Text);
             popis = Popis.Text;
-            IdCislo = int.Parse(idCislo.Text);
 
             DialogResult = true;
         }

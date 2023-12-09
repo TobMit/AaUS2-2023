@@ -29,7 +29,7 @@
                         </TreeViewItem>
                         <StackPanel Orientation="Horizontal">
                             <Button
-                                Command="{Binding Path=DataContext.EditCommand, ElementName=ListViewNehnutelnost}"
+                                Command="{Binding Path=DataContext.EditNehnutelnostiCommand, ElementName=ListViewNehnutelnost}"
                                 CommandParameter="{Binding}">
                                 Edit
                             </Button>
@@ -74,13 +74,13 @@
                                 </TreeViewItem>
                                 <StackPanel Orientation="Horizontal">
                                     <Button
-                                        Command="{Binding Path=DataContext.EditCommand, ElementName=ListViewParcela}"
+                                        Command="{Binding Path=DataContext.EditParcelaCommand, ElementName=ListViewParcela}"
                                         CommandParameter="{Binding}">
                                         Edit
                                     </Button>
                                     <Button
                                         Margin="4,0,0,0"
-                                        Command="{Binding Path=DataContext.DeleteParcelatCommand, ElementName=ListViewParcela}"
+                                        Command="{Binding Path=DataContext.DeleteParcelaCommand, ElementName=ListViewParcela}"
                                         CommandParameter="{Binding}">
                                         Delete
                                     </Button>

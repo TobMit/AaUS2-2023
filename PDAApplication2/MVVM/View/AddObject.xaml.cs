@@ -14,7 +14,7 @@ public partial class AddObject : Window
         if (type == Core.ObjectType.Nehnutelnost)
         {
             this.Title = "Pridanie nehnuteľnosti";
-            this.Popis.Text = "Nehnuteľnosť";
+            this.Popis.Text = "Nehnut";
         }
         else
         {
