@@ -41,21 +41,11 @@ namespace PDAApplication2.Core.DataManager.FileManager
         /// <summary>
         /// Uloží dáta do súboru asynchronne 
         /// </summary>
-        public async void SaveData()
+        public async void SaveData(string file)
         {
-            // modal window for save
-            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
-            saveFileDialog1.FileName = "Data.csv";
-            saveFileDialog1.Filter = "Data (*.csv)|*.csv";
-            saveFileDialog1.Title = "Save to a file";
-            
-
-            if (saveFileDialog1.ShowDialog() == true)
+            using (StreamWriter outputFile = new StreamWriter(file))
             {
-                using (StreamWriter outputFile = new StreamWriter(saveFileDialog1.FileName))
-                {
-                    await outputFile.WriteAsync(builder.ToString());
-                }
+                await outputFile.WriteAsync(builder.ToString());
             }
         }
 

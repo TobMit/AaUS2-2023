@@ -826,42 +826,54 @@ namespace PDAApplication2.MVVM.ViewModel
 
         private void SaveData()
         {
-            if (_quadTreeNehnutelnost is null || _quadTreeParcela is null)
+            if (_quadTreeNehnutelnost is null || _quadTreeParcela is null || _dynamicHashFileNehnutelnost is null || _dynamicHashFileParcela is null)
             {
                 return;
             }
-            /*
-            //todo prerobiť aby podporoval ukladanie oboch súborov
-            DataSaver<ObjectModelQuad> saver = new();
-            saver.AddLine(_quadTreeNehnutelnost.OriginalPointDownLeft.X + ";" + _quadTreeNehnutelnost.OriginalPointDownLeft.Y + ";" + _quadTreeNehnutelnost.OriginalPointUpRight.X + ";" + _quadTreeNehnutelnost.OriginalPointUpRight.Y + "\n");
-            saver.PrepareForSave(_quadTreeJednotne.ToList()); // tudo stačí spojiť oba stromi do jedného listu a tak potom ukladať
-            saver.SaveData();
-            */
+
+            _dynamicHashFileNehnutelnost.Save();
+            _dynamicHashFileParcela.Save();
+
+
+            DataSaver<ObjectModelQuad> saverNehnutelnosti = new();
+            saverNehnutelnosti.AddLine(_quadTreeNehnutelnost.OriginalPointDownLeft.X + ";" + _quadTreeNehnutelnost.OriginalPointDownLeft.Y + ";" + _quadTreeNehnutelnost.OriginalPointUpRight.X + ";" + _quadTreeNehnutelnost.OriginalPointUpRight.Y + "\n");
+            saverNehnutelnosti.PrepareForSave(_quadTreeNehnutelnost.ToList());
+            saverNehnutelnosti.SaveData("quadDataNehnutelnosti.csv");
+
+            DataSaver<ObjectModelQuad> saverParcely = new();
+            saverParcely.AddLine(_quadTreeParcela.OriginalPointDownLeft.X + ";" + _quadTreeParcela.OriginalPointDownLeft.Y + ";" + _quadTreeParcela.OriginalPointUpRight.X + ";" + _quadTreeParcela.OriginalPointUpRight.Y + "\n");
+            saverParcely.PrepareForSave(_quadTreeParcela.ToList());
+            saverParcely.SaveData("quadDataParcely.csv");
+
         }
 
         private void LoadData()
         {
+            if (_dynamicHashFileNehnutelnost is not null && _dynamicHashFileParcela is not null)
+            {
+                _dynamicHashFileNehnutelnost.CloseFile();
+                _dynamicHashFileParcela.CloseFile();
+            }
+
+            _dynamicHashFileNehnutelnost = new(_primaryFileNameNehnutelnost, _preplnovakFileNameNehnutelnost);
+            _dynamicHashFileParcela = new(_primaryFileNameParcela, _preplnovakFileNameParcela);
+
             DataLoader loader = new();
+            var nehnutelnosti = loader.LoadData("quadDataNehnutelnosti.csv");
+            var parcely = loader.LoadData("quadDataParcely.csv");
+            if (nehnutelnosti is not null && parcely is not null)
+            {
+                _quadTreeNehnutelnost = nehnutelnosti;
+                _quadTreeParcela = parcely;
+                _dynamicHashFileNehnutelnost.Load();
+                _dynamicHashFileParcela.Load();
+            }
 
             ListParcela = new();
             ListNehnutelnost = new();
-            //_allNehnutelnosti = new();
-            //_allParcelas = new();
-
-            /*
-            var tmp = loader.LoadData(_quadTreeNehnutelnost,
-                _quadTreeParcela,
-                _quadTreeJednotne,
-                ListNehnutelnost,
-                ListParcela,
-                _allNehnutelnosti,
-                _allParcelas);
-            _quadTreeNehnutelnost = tmp[0];
-            _quadTreeParcela = tmp[1];
 
             HealthNehnutelnosti = Math.Round(_quadTreeNehnutelnost.Health * 100).ToString();
             HealthParcela = Math.Round(_quadTreeParcela.Health * 100).ToString();
-            */
         }
 
         private void ForceOptimisation()
