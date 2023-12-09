@@ -30,12 +30,14 @@ namespace PDAApplication2.MVVM.Model
 
         public string Popis { get; set; }
 
+        public int SupisneCislo { get; set; }
+
         public string Title
         {
             get { return (ObjectType == Core.ObjectType.Nehnutelnost ? "Nehnuteľnosť: " : "Parcela: ") + IdObjektu; }
         }
 
-        public ObjectModel(int idObjektu, string pPopis, GPS pGpsBod1, GPS pGpsBod2, Core.ObjectType type, List<int> pZoznamObjektov)
+        public ObjectModel(int idObjektu, string pPopis, GPS pGpsBod1, GPS pGpsBod2, Core.ObjectType type, int pSupisneCislo, List<int> pZoznamObjektov)
         {
             IdObjektu = idObjektu;
             Popis = pPopis;
@@ -44,9 +46,10 @@ namespace PDAApplication2.MVVM.Model
             GpsBod1 = pGpsBod1;
             GpsBod2 = pGpsBod2;
             ObjectType = type;
+            SupisneCislo = pSupisneCislo;
         }
         
-        public ObjectModel(int idObjektu, string pPopis, GPS pGpsBod1, GPS pGpsBod2, Core.ObjectType type)
+        public ObjectModel(int idObjektu, string pPopis, GPS pGpsBod1, GPS pGpsBod2, Core.ObjectType type, int pSupisneCislo)
         {
             IdObjektu = idObjektu;
             Popis = pPopis;
@@ -55,6 +58,7 @@ namespace PDAApplication2.MVVM.Model
             GpsBod1 = pGpsBod1;
             GpsBod2 = pGpsBod2;
             ObjectType = type;
+            SupisneCislo = pSupisneCislo;
         }
 
         public override string ToString()
@@ -63,6 +67,10 @@ namespace PDAApplication2.MVVM.Model
 
             StringBuilder sb = new();
             sb.AppendLine($"Id: {IdObjektu}");
+            if (ObjectType == ObjectType.Nehnutelnost)
+            {
+                sb.AppendLine($"\tSupisne cislo: {SupisneCislo}");
+            }
             sb.AppendLine($"\tPopis: {Popis}");
             sb.AppendLine($"\t GPS1: {GpsBod1}");
             sb.AppendLine($"\t GPS2: {GpsBod2}");

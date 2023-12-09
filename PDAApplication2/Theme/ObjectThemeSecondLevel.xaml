@@ -5,8 +5,11 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ListViewItem">
                     <TreeViewItem Header="{Binding Title}">
-                        <TreeViewItem Header="Súpisné číslo">
+                        <TreeViewItem Header="ID číslo">
                             <TreeViewItem Header="{Binding IdObjektu}"/>
+                        </TreeViewItem>
+                        <TreeViewItem Header="Súpisné číslo">
+                            <TreeViewItem Header="{Binding SupisneCislo}"/>
                         </TreeViewItem>
                         <TreeViewItem Header="Popis nehnuteľností">
                             <TreeViewItem Header="{Binding Popis}"/>
@@ -37,7 +40,7 @@
                     <Setter.Value>
                         <ControlTemplate TargetType="ListViewItem">
                             <TreeViewItem Header="{Binding Title}">
-                                <TreeViewItem Header="Číslo Parcely">
+                                <TreeViewItem Header="ID cislo">
                                     <TreeViewItem Header="{Binding IdObjektu}"/>
                                 </TreeViewItem>
                                 <TreeViewItem Header="Popis parcely">

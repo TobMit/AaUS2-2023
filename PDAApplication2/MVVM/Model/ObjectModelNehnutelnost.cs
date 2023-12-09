@@ -10,13 +10,13 @@ public class ObjectModelNehnutelnost : ObjectModel, IRecordData<int>
 {
     private const int MAX_SIZE_POPIS = 15;
 
-    public ObjectModelNehnutelnost(int idObjektu, string pPopis, GPS pGpsBod1, GPS pGpsBod2, List<int> pZoznamObjektov) : base(idObjektu, pPopis,
-        pGpsBod1, pGpsBod2, ObjectType.Nehnutelnost, pZoznamObjektov)
+    public ObjectModelNehnutelnost(int idObjektu, string pPopis, GPS pGpsBod1, GPS pGpsBod2, int pSupisneCislo, List<int> pZoznamObjektov) : base(idObjektu, pPopis,
+        pGpsBod1, pGpsBod2, ObjectType.Nehnutelnost, pSupisneCislo, pZoznamObjektov)
     {
     }
     
-    public ObjectModelNehnutelnost(int idObjektu, string pPopis, GPS pGpsBod1, GPS pGpsBod2) : base(idObjektu, pPopis,
-        pGpsBod1, pGpsBod2, ObjectType.Nehnutelnost)
+    public ObjectModelNehnutelnost(int idObjektu, string pPopis, GPS pGpsBod1, GPS pGpsBod2, int pSupisneCislo) : base(idObjektu, pPopis,
+        pGpsBod1, pGpsBod2, ObjectType.Nehnutelnost, pSupisneCislo)
     {
     }
 
@@ -33,6 +33,7 @@ public class ObjectModelNehnutelnost : ObjectModel, IRecordData<int>
             good &= IdObjektu == other.IdObjektu;
             good &= Popis == other.Popis;
             good &= ObjectType == other.ObjectType;
+            good &= SupisneCislo == other.SupisneCislo;
             if (!good)
             {
                 return -1;
@@ -55,14 +56,15 @@ public class ObjectModelNehnutelnost : ObjectModel, IRecordData<int>
 
     public static int GetSize()
     {
-        //        ID       +     GPS1    +       GPS2    +  pocetObjekotv  +                     Pole add objektov               + pocetPlatnychZnakov    + Popis;
-        return sizeof(int) + GPS.GetSize() + GPS.GetSize() + sizeof(int)  + (Constants.MAX_COUNT_PARCELS_IN_NEHNUTELNOST * sizeof(int)) + sizeof(int) + MAX_SIZE_POPIS;
+        //        ID       +     GPS1    +       GPS2    +  pocetObjekotv  +                     Pole add objektov               + pocetPlatnychZnakov    + Popis      +    supisneCislo
+        return sizeof(int) + GPS.GetSize() + GPS.GetSize() + sizeof(int)  + (Constants.MAX_COUNT_PARCELS_IN_NEHNUTELNOST * sizeof(int)) + sizeof(int) + MAX_SIZE_POPIS  + sizeof(int);
     }
 
     public byte[] GetBytes()
     {
         List<byte> bytes = new();
         bytes.AddRange(BitConverter.GetBytes(IdObjektu));
+        bytes.AddRange(BitConverter.GetBytes(SupisneCislo));
         bytes.AddRange(GpsBod1.GetBytes());
         bytes.AddRange(GpsBod2.GetBytes());
         bytes.AddRange(BitConverter.GetBytes(ZoznamObjektov.Count));
@@ -88,6 +90,8 @@ public class ObjectModelNehnutelnost : ObjectModel, IRecordData<int>
         var offset = 0;
         int idObjektu = BitConverter.ToInt32(bytes, offset);
         offset += sizeof(int);
+        int supisneCislo = BitConverter.ToInt32(bytes, offset);
+        offset += sizeof(int);
         GPS gps1 = (GPS)GPS.FromBytes(bytes[offset..(offset + GPS.GetSize())]);
         offset += GPS.GetSize();
         GPS gps2 = (GPS)GPS.FromBytes(bytes[offset..(offset + GPS.GetSize())]);
@@ -110,7 +114,7 @@ public class ObjectModelNehnutelnost : ObjectModel, IRecordData<int>
         string popis = Encoding.ASCII.GetString(bytes, offset, MAX_SIZE_POPIS);
         popis = popis.Substring(0, pocetPlatnychZnakov);
         
-        return new ObjectModelNehnutelnost(idObjektu, popis, gps1, gps2, zoznamObjektov);
+        return new ObjectModelNehnutelnost(idObjektu, popis, gps1, gps2, supisneCislo,  zoznamObjektov);
     }
 
     public static byte[] GetBytesForHash(int key)

@@ -11,12 +11,12 @@ public class ObjectModelParcela : ObjectModel, IRecordData<int>
     private const int MAX_SIZE_POPIS = 11;
     
     public ObjectModelParcela(int idObjektu, string pPopis, GPS pGpsBod1, GPS pGpsBod2,
-        List<int> pZoznamObjektov) : base(idObjektu, pPopis, pGpsBod1, pGpsBod2, ObjectType.Parcela, pZoznamObjektov)
+        List<int> pZoznamObjektov) : base(idObjektu, pPopis, pGpsBod1, pGpsBod2, ObjectType.Parcela, -1, pZoznamObjektov)
     {
     }
 
     public ObjectModelParcela(int idObjektu, string pPopis, GPS pGpsBod1, GPS pGpsBod2) : base(
-        idObjektu, pPopis, pGpsBod1, pGpsBod2, ObjectType.Parcela)
+        idObjektu, pPopis, pGpsBod1, pGpsBod2, ObjectType.Parcela, -1)
     {
     }
     

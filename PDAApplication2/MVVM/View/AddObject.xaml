@@ -87,7 +87,13 @@
                 Name="y2Point"
                 PreviewTextInput="YPoint_OnPreviewTextInput" />
         </StackPanel>
-        
+        <Label Name="SupCisloLabel">Súpisné číslo</Label>
+        <TextBox
+            Text="0"
+            Margin="5,0,5,0"
+            TextAlignment="Left"
+            Name="SupCislo"
+            PreviewTextInput="UIElement_OnPreviewTextInput"/>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5" >
             <Button Height="25" Width="70" Name="okButton" Click="OkButton_OnClick" IsDefault="True">OK</Button>

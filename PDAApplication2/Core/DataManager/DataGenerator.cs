@@ -70,7 +70,7 @@ namespace PDAApplication2.Core.DataManager
                 GPS tmpGps2 = new(tmpGps1.X + tmpSirka, 'E', tmpGps1.Y + tmpViska, 'N');
 
                 ObjectModelQuad tmpNehnutelnost = new(Constants.IdObjektu, tmpGps1, tmpGps2);
-                ObjectModelNehnutelnost tmpDHFNehnutelnost = new(Constants.IdObjektu, "Nehnut: " + Constants.IdObjektu, tmpGps1, tmpGps2);
+                ObjectModelNehnutelnost tmpDHFNehnutelnost = new(Constants.IdObjektu, "Nehnut: " + Constants.IdObjektu, tmpGps1, tmpGps2, Constants.IdObjektu);
 
                 var tmpListParciel = parcelyQuadTree.FindIntervalOverlapping(tmpNehnutelnost.GpsBod1.X, tmpNehnutelnost.GpsBod1.Y,
                     tmpNehnutelnost.GpsBod2.X, tmpNehnutelnost.GpsBod2.Y);

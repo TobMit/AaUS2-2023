@@ -376,12 +376,14 @@ namespace PDAApplication2.MVVM.ViewModel
             GPS dlgGps1 = new GPS();
             GPS dlgGps2 = new GPS();
             string popis = "";
+            int supisneCislo = 0;
             bool cancel = true;
             if (dlg.DialogResult == true)
             {
                 dlgGps1 = new(dlg.x, dlg.xOz, dlg.y, dlg.yOz);
                 dlgGps2 = new(dlg.x2, dlg.x2Oz, dlg.y2, dlg.y2Oz);
                 popis = dlg.popis;
+                supisneCislo = dlg.SupisneCislo;
                 cancel = false;
             }
 
@@ -410,7 +412,7 @@ namespace PDAApplication2.MVVM.ViewModel
             // pridať tam tú nehnuteľnosť
             // pridať nehnuteľnosť do zoznamu všetkých nehnuteľností a všetky parcely do nehnuteľnosti
             // pridať nehnuteľnosť do quad tree a do dynamic hash file
-            ObjectModelNehnutelnost tmpNehnutelnost = new(Constants.IdObjektu, popis, dlgGps1, dlgGps2);
+            ObjectModelNehnutelnost tmpNehnutelnost = new(Constants.IdObjektu, popis, dlgGps1, dlgGps2, supisneCislo);
             ObjectModelQuad tmpQuad = new(Constants.IdObjektu, dlgGps1, dlgGps2);
             Constants.IdObjektu++;
             var tmpListParciel = _quadTreeParcela.FindIntervalOverlapping(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y);
@@ -543,6 +545,7 @@ namespace PDAApplication2.MVVM.ViewModel
             int originalID = objectModel.IdObjektu;
             GPS dlgGps1 = new GPS();
             GPS dlgGps2 = new GPS();
+            int supisneCislo = 0;
             string popis = "";
             bool cancel = true;
             if (dlg.DialogResult == true)
@@ -550,6 +553,7 @@ namespace PDAApplication2.MVVM.ViewModel
                 dlgGps1 = new(dlg.x, dlg.xOz, dlg.y, dlg.yOz);
                 dlgGps2 = new(dlg.x2, dlg.x2Oz, dlg.y2, dlg.y2Oz);
                 popis = dlg.popis;
+                supisneCislo = dlg.SupisneCislo;
                 cancel = false;
             }
 
@@ -566,6 +570,7 @@ namespace PDAApplication2.MVVM.ViewModel
             {
                 var toUpdateNehnutelnost = _dynamicHashFileNehnutelnost.Remove(objectModel.IdObjektu);
                 toUpdateNehnutelnost.Popis = popis;
+                toUpdateNehnutelnost.SupisneCislo = supisneCislo;
                 _dynamicHashFileNehnutelnost.Insert(toUpdateNehnutelnost.GetKey(), toUpdateNehnutelnost);
                 return;
             }
@@ -632,7 +637,7 @@ namespace PDAApplication2.MVVM.ViewModel
                 _quadTreeNehnutelnost.Edit(origanalCheckedGps1.X, origanalCheckedGps1.Y, origanalCheckedGps2.X, origanalCheckedGps2.Y,
                     checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, objectModel.IdObjektu);
 
-                ObjectModelNehnutelnost updatedNehnutelnost = new(originalID, popis, dlgGps1, dlgGps2);
+                ObjectModelNehnutelnost updatedNehnutelnost = new(originalID, popis, dlgGps1, dlgGps2, supisneCislo);
                 tmpListParciel = _quadTreeParcela.FindIntervalOverlapping(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y);
                 foreach (ObjectModelQuad parcela in tmpListParciel)
                 {

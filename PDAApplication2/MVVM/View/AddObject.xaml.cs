@@ -20,6 +20,8 @@ public partial class AddObject : Window
         {
             this.Title = "Pridanie parcely";
             this.Popis.Text = "Parcela";
+            this.SupCislo.Visibility = Visibility.Hidden;
+            this.SupCisloLabel.Visibility = Visibility.Hidden;
         }
     }
 
@@ -32,7 +34,8 @@ public partial class AddObject : Window
     public double y2 { get; set; }
     public char y2Oz { get; set; }
     public string popis { get; set; }
-    
+    public int SupisneCislo { get; set; }
+
     private void OkButton_OnClick(object sender, RoutedEventArgs e)
     {
         try
@@ -45,6 +48,7 @@ public partial class AddObject : Window
             y = double.Parse(yPoint.Text);
             x2 = double.Parse(x2Point.Text);
             y2 = double.Parse(y2Point.Text);
+            SupisneCislo = int.Parse(SupCislo.Text);
             popis = Popis.Text;
 
             DialogResult = true;

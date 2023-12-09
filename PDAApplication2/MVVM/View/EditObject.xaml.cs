@@ -19,6 +19,8 @@ public partial class EditObject : Window
         else
         {
             this.Title = "Editácia parcely";
+            this.SupCislo.Visibility = Visibility.Hidden;
+            this.SupCisloLabel.Visibility = Visibility.Hidden;
         }
 
         this.Popis.Text = model.Popis;
@@ -30,6 +32,7 @@ public partial class EditObject : Window
         this.yOznacenie.Text = model.GpsBod1.DlzkaY.ToString();
         this.x2Oznacenie.Text = model.GpsBod2.SirkaX.ToString();
         this.y2Oznacenie.Text = model.GpsBod2.DlzkaY.ToString();
+        this.SupCislo.Text = model.SupisneCislo.ToString();
     }
 
     public double x { get; set; }
@@ -41,7 +44,8 @@ public partial class EditObject : Window
     public double y2 { get; set; }
     public char y2Oz { get; set; }
     public string popis { get; set; }
-    
+    public int SupisneCislo { get; set; }
+
     private void OkButton_OnClick(object sender, RoutedEventArgs e)
     {
         try
@@ -54,6 +58,7 @@ public partial class EditObject : Window
             y = double.Parse(yPoint.Text);
             x2 = double.Parse(x2Point.Text);
             y2 = double.Parse(y2Point.Text);
+            SupisneCislo = int.Parse(SupCislo.Text);
             popis = Popis.Text;
 
             DialogResult = true;
