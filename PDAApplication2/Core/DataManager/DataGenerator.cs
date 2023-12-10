@@ -34,7 +34,7 @@ namespace PDAApplication2.Core.DataManager
                 GPS tmpGps1 = new(NextDouble(gps1.X + 1, gps2.X - 3, rnd), 'W',
                     NextDouble(gps1.Y + 1, gps2.Y - 3, rnd), 'S');
 
-                // Druhú pozíciu gps vypočítame tak že k prvej pozícií pripočítame náhodnú širku a výšku
+                // Druhú pozíciu gps vypočítame tak že k prvej pozícií pripočítame náhodnú šírku a výšku
                 // šírku a výšku vypočítame ako náhodné číslo medzi 1 pozíciou a minimom medzi (celková šírka /2, a šírka k druhému bodu)
                 // toto nam zabráni generovanie objektov menších ako 50% celkovej plochy a tým pádom aj lepšie rozloženie v strome
                 var tmpSirka = NextDouble(0, Math.Min(sirka * Constants.MAX_SIZE_OF_OBJCET_PERCENTAGE, gps2.X - 1 - tmpGps1.X), rnd);
@@ -61,7 +61,7 @@ namespace PDAApplication2.Core.DataManager
                 GPS tmpGps1 = new(NextDouble(gps1.X + 1, gps2.X - 3, rnd), 'W',
                     NextDouble(gps1.Y + 1, gps2.Y - 3, rnd), 'S');
 
-                // Druhú pozíciu gps vypočítame tak že k prvej pozícií pripočítame náhodnú širku a výšku
+                // Druhú pozíciu gps vypočítame tak že k prvej pozícií pripočítame náhodnú šírku a výšku
                 // šírku a výšku vypočítame ako náhodné číslo medzi 1 pozíciou a minimom medzi (celková šírka /2, a šírka k druhému bodu)
                 // toto nam zaručí generovanie objektov menších ako 50% celkovej plochy a tým pádom aj lepšie rozloženie v strome
                 var tmpSirka = NextDouble(0, Math.Min(sirka * Constants.MAX_SIZE_OF_OBJCET_PERCENTAGE, gps2.X - 1 - tmpGps1.X), rnd);

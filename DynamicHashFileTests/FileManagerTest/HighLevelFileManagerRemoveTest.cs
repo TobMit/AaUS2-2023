@@ -59,7 +59,7 @@ public class HighLevelFileManagerRemoveTest
         Assert.That(_manager.BlockUsedCount, Is.EqualTo(10));
         Assert.That(_manager.GetBlockCount(), Is.EqualTo(10));
 
-        // ešte nechceme aby sa zmala koniec, čo by spustilo cyklus na zmazanie súborov
+        // ešte nechceme aby sa zmazal koniec, čo by spustilo cyklus na zmazanie súborov
         for (int i = 0; i < 9; i++)
         {
             _manager.RemoveBlock(i);
@@ -70,7 +70,7 @@ public class HighLevelFileManagerRemoveTest
     }
 
     /// <summary>
-    /// Kontrolujem či mám spravne nalinkované dáta
+    /// Kontrolujem či mám správne nalinkované dáta
     /// </summary>
     [Test]
     [Order(2)]
@@ -124,7 +124,7 @@ public class HighLevelFileManagerRemoveTest
     }
 
     /// <summary>
-    /// Kontrolujem či mám spravne nalinkované dáta
+    /// Kontrolujem či mám správne nalinkované dáta
     /// </summary>
     [Test]
     [Order(4)]
@@ -239,7 +239,7 @@ public class HighLevelFileManagerRemoveTest
     }
     
     /// <summary>
-    /// V tomto teste vymažeme nepretržite celé pole keď odstránime koniec ale je na konci posledny free block
+    /// V tomto teste vymažeme nepretržite celé pole keď odstránime koniec ale je na konci posledný free block
     /// </summary>
     [Test]
     [Order(6)]
@@ -261,7 +261,7 @@ public class HighLevelFileManagerRemoveTest
     }
     
     /// <summary>
-    /// V tomto overíme či keď sa zmazáva konice sa správne cyklus zastaví a aj nastavia linkovacie hodnoty
+    /// V tomto overíme či keď sa zmazáva koniec sa správne cyklus zastaví a aj nastavia linkovacie hodnoty
     /// </summary>
     [Test]
     [Order(7)]
@@ -319,7 +319,7 @@ public class HighLevelFileManagerRemoveTest
         _manager.RemoveBlock(9);
         Assert.That(_manager.BlockUsedCount, Is.EqualTo(3));
         Assert.That(_manager.GetBlockCount(), Is.EqualTo(8));
-        // blok je neporuseny
+        // blok je neporušený
         var tmpBlock = _manager.GetBlock(7);
         Assert.NotNull(tmpBlock);
         Assert.That(tmpBlock.Count(), Is.EqualTo(1));
@@ -335,7 +335,7 @@ public class HighLevelFileManagerRemoveTest
     }
 
     /// <summary>
-    /// Pre pre zýskavanie voľnych blokov je pripravený úsek ktorý je neprerušovaný
+    /// Pre pre získavanie voľných blokov je pripravený úsek ktorý je neprerušovaný
     /// </summary>
     [Test]
     [Order(9)]
@@ -366,7 +366,7 @@ public class HighLevelFileManagerRemoveTest
     }
     
     /// <summary>
-    /// Pre pre zýskavanie voľnych blokov je prerušovaný úsek, musí sa skákať
+    /// Pre pre získavanie voľných blokov je prerušovaný úsek, musí sa skákať
     /// </summary>
     [Test]
     [Order(10)]
@@ -422,7 +422,7 @@ public class HighLevelFileManagerRemoveTest
     }
     
     /// <summary>
-    /// Pre pre zýskavanie voľnych blokov je prerušovaný úsek, musí sa skákať
+    /// Pre pre získavanie voľných blokov je prerušovaný úsek, musí sa skákať
     /// </summary>
     [Test]
     [Order(11)]

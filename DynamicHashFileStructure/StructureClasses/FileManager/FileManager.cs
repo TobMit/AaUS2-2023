@@ -20,9 +20,9 @@ public class FileManager<TData> where TData : IRecord
     private readonly int _blockFactor;
 
     /// <summary>
-    /// Spráca súboru, riadi sparovanie volnych blokov, vytváranie nových blokov a podobne
+    /// Správca súboru, riadi spravovanie voľných blokov, vytváranie nových blokov a podobne
     /// </summary>
-    /// <param name="blockFactor">Počet zázanomov v bloku</param>
+    /// <param name="blockFactor">Počet záznamov v bloku</param>
     /// <param name="fileName">Adresa a cesta k súboru</param>
     public FileManager(int blockFactor, string fileName)
     {
@@ -45,7 +45,7 @@ public class FileManager<TData> where TData : IRecord
         else
         {
             _blockTotalCount = _lowLevelFileManager.BlockCount;
-            // pri načítavaniu dát.bin kde už je niečo uložné
+            // pri načítavaniu dát.bin kde už je niečo uložene
             _firstFreeBlock = -1;
             _lastFreeBlock = -1;
         }
@@ -95,10 +95,10 @@ public class FileManager<TData> where TData : IRecord
         else
         {
             returnPair = new(_firstFreeBlock, (Block<TData>)Block<TData>.FromBytes(_lowLevelFileManager.ReadBlock(_firstFreeBlock), _blockFactor));
-            // zmeníme na daľší blok z reťazenia (môže byť aj -1)
+            // zmeníme na ďalší blok z reťazenia (môže byť aj -1)
             _firstFreeBlock = returnPair.Second.NextFreeBlock;
             
-            // ak je prvý voľný blok -1 (čiže nie je žiaden volný blok) tak musíme zmeniť aj index polsedného voľného bloku
+            // ak je prvý voľný blok -1 (čiže nie je žiaden volný blok) tak musíme zmeniť aj index posledného voľného bloku
             if (_firstFreeBlock <= -1)
             {
                 _lastFreeBlock = -1;
@@ -134,13 +134,13 @@ public class FileManager<TData> where TData : IRecord
         // ak je to posledný block
         if (index == _blockTotalCount -1)
         {
-            // ak je index posledný tak ho rovno zmažem a znížim počet všetkych blokov aj block used count
+            // ak je index posledný tak ho rovno zmažem a znížim počet všetkých blokov aj block used count
             _lowLevelFileManager.DeleteLastBlock();
             _blockTotalCount--;
             BlockUsedCount--;
             // current =  posledný block
             var current = _blockTotalCount - 1;
-            // pokial current je rôzne od -1
+            // pokiaľ current je rôzne od -1
             while (current >= 0 && _blockTotalCount > 0)
             {
                 //načítam si block
@@ -173,7 +173,7 @@ public class FileManager<TData> where TData : IRecord
                 }
                 else if (current == _firstFreeBlock)
                 {
-                    // ak narazim na first free block tak nastavím first free block na next free block
+                    // ak narazím na first free block tak nastavím first free block na next free block
                     var newFirstFreeBlock = (Block<TData>)Block<TData>.FromBytes(_lowLevelFileManager.ReadBlock(block.NextFreeBlock), _blockFactor);
                     newFirstFreeBlock.LastNextFreeBlock = -1;
                     _firstFreeBlock = block.NextFreeBlock;
@@ -187,10 +187,10 @@ public class FileManager<TData> where TData : IRecord
                     var nextFreeBlock = (Block<TData>)Block<TData>.FromBytes(_lowLevelFileManager.ReadBlock(block.NextFreeBlock), _blockFactor);
                     var lastNextFreeBlock = (Block<TData>)Block<TData>.FromBytes(_lowLevelFileManager.ReadBlock(block.LastNextFreeBlock), _blockFactor);
                     
-                    // môjmu next free blocku  nastavím môj last free block
+                    // môjmu next free bloku  nastavím môj last free block
                     nextFreeBlock.LastNextFreeBlock = block.LastNextFreeBlock;
                     _lowLevelFileManager.WriteDataToBlock(block.NextFreeBlock, nextFreeBlock.GetBytes());
-                    // môjmu last free blocku nastavím môj next free block
+                    // môjmu last free bloku nastavím môj next free block
                     lastNextFreeBlock.NextFreeBlock = block.NextFreeBlock;
                     _lowLevelFileManager.WriteDataToBlock(block.LastNextFreeBlock, lastNextFreeBlock.GetBytes());
                     // odstránim posledný block
@@ -232,154 +232,12 @@ public class FileManager<TData> where TData : IRecord
             _lowLevelFileManager.WriteDataToBlock(tmpFirst, oldBlock.GetBytes());
             BlockUsedCount--;
         }
-        
-        /*
-        // skontrolujeme či toto nie je posledny blok v zozname
-        if (index == _blockTotalCount - 1)
-        {
-            BlockUsedCount--;
-            int current = index;
-            // v cykle spravíme, current nastavíme na adresu toho posledného bloku
-            while (current != -1) // ak je current -1 tak končíme
-            {
-                // zýskame ho zo súboru
-                var block = (Block<TData>)Block<TData>.FromBytes(_lowLevelFileManager.ReadBlock(current), _blockFactor);
-                // posledný index zmažeme
-                _lowLevelFileManager.DeleteLastBlock();
-                // current nastavíme last free block zo zýkaného bloku, pri prvom mazaní z konca keď blok nemá nastavené linkovacie hodnoty, tak má tam -1 všade čo je vlastne chyba a preto musíme overovať voči _lastFreeBlock
-                if (current - 1 == (block.LastNextFreeBlock != -1 ? block.LastNextFreeBlock : _lastFreeBlock))
-                {
-                    // nahrá sa hodnota z bloku len v tedy ak je rozdielana -1 (tento prípad nastáva prvý krát keď sa maže s konca, linkovacie hodnoty ešte niesú nastavené)
-                    if (block.LastNextFreeBlock != -1)
-                    {
-                        current = block.LastNextFreeBlock;   
-                    }
-                    else
-                    {
-                        current = _lastFreeBlock;
-                    }
-                }
-                // ak nie je
-                else
-                {
-                    // tak nebudeme pokračovať v cykle
-                    current = -1;
-                    // ak má informáciu o predchádzajúcom voľnom bloku
-                    if (block.LastNextFreeBlock != -1)
-                    {
-                        // načítame ten blok ktorý je pred ním a zmeníme mu adresu next free na -1
-                        var prevBlock = (Block<TData>)Block<TData>.FromBytes(_lowLevelFileManager.ReadBlock(block.LastNextFreeBlock), _blockFactor);
-                        prevBlock.NextFreeBlock = -1;
-                        _lowLevelFileManager.WriteDataToBlock(block.LastNextFreeBlock, prevBlock.GetBytes());
-                    }
-                    // ak nemá tak nič nenastavujeme
-                }
-                
-                // nastavíme _lastBlock na hodnotu z nacitaného bloku ak pred tým nebola -1
-                if (block.LastNextFreeBlock != -1)
-                {
-                    _lastFreeBlock = block.LastNextFreeBlock;
-                }
-                
-                // ak je last next free blcok z bloku -1 tak nastavíme aj prvý na -1 čo znamená že je 
-                if (current == -1)
-                {
-                    _firstFreeBlock = -1;
-                    _lastFreeBlock = -1;
-                }
-
-                _blockTotalCount--;
-            }
-        }
-        // ak nie je žiaden blok volny (last aj next je -1) tak sa tento vymazaný nastavý ako prvý a aj posledný
-        else if (_firstFreeBlock == -1 && _lastFreeBlock == -1)
-        {
-            _firstFreeBlock = index;
-            _lastFreeBlock = index;
-            BlockUsedCount--;
-        }
-        // ak je index tohto vymazaného bloku menší ako index prvého voľného bloku
-        else if (index < _firstFreeBlock)
-        {
-            // načítame si prvý voľný block a zmenime mu hodnotu last free block na index tohoto vymazaného bloku
-            var block = (Block<TData>)Block<TData>.FromBytes(_lowLevelFileManager.ReadBlock(_firstFreeBlock), _blockFactor);
-            block.LastNextFreeBlock = index;
-            _lowLevelFileManager.WriteDataToBlock(_firstFreeBlock, block.GetBytes());
-            
-            // nastavíme prvý voľný blok na index tohoto vymazaného bloku
-            var lastFirstFreeBlock = _firstFreeBlock;
-            _firstFreeBlock = index;
-            
-            // na záver načítam vymazávaný blok a nastavíme mu lastFree blok na -1 a next free block na hodnotu predhcázajúceho free blocku
-            var removedBlock = (Block<TData>)Block<TData>.FromBytes(_lowLevelFileManager.ReadBlock(index), _blockFactor);
-            removedBlock.LastNextFreeBlock = -1;
-            removedBlock.NextFreeBlock = lastFirstFreeBlock;
-            _lowLevelFileManager.WriteDataToBlock(index, removedBlock.GetBytes());
-            BlockUsedCount--;
-        }
-        // ak je index väčší ako prvý ale menši ako posledný
-        else if (_firstFreeBlock < index && index < _lastFreeBlock)
-        {
-            // vložíme ho medzi ne a tak že budeme postupne prechádzať od prvého bloku až kým nenarazíme na blok ktorý má next free block väčší index ako tento vymazávaný
-            // tam ho vložíme
-
-            int current = _firstFreeBlock;
-            int lastCurrent = -1;
-            Block<TData>? block = null;
-            while (current < index)
-            {
-                block = (Block<TData>)Block<TData>.FromBytes(_lowLevelFileManager.ReadBlock(current), _blockFactor);
-                lastCurrent = current;
-                current = block.NextFreeBlock;
-            }
-            // teraz v premennej block nachádza block ktorý je pred tým ktorý mažeme
-            // nastavíme mu next free block na index tohoto vymazaného bloku
-            block.NextFreeBlock = index;
-            _lowLevelFileManager.WriteDataToBlock(lastCurrent, block.GetBytes());
-            
-            // v premennej current máme hodnotu indexu bloku ktorý je za tým ktorý mažeme
-            // načítame si tento blok a nastavíme mu last free block na index tohoto vymazaného bloku
-            block = (Block<TData>)Block<TData>.FromBytes(_lowLevelFileManager.ReadBlock(current), _blockFactor);
-            block.LastNextFreeBlock = index;
-            _lowLevelFileManager.WriteDataToBlock(current, block.GetBytes());
-            
-            // teraz už len nastavíme vymazavaný block
-            block = (Block<TData>)Block<TData>.FromBytes(_lowLevelFileManager.ReadBlock(index), _blockFactor);
-            block.LastNextFreeBlock = lastCurrent;
-            block.NextFreeBlock = current;
-            _lowLevelFileManager.WriteDataToBlock(index, block.GetBytes());
-            
-            BlockUsedCount--;
-        }
-        else if (_lastFreeBlock < index)
-        {
-            // načítam last free block a nastavím mu next free block na index tohoto vymazaného bloku
-            var block = (Block<TData>)Block<TData>.FromBytes(_lowLevelFileManager.ReadBlock(_lastFreeBlock), _blockFactor);
-            block.NextFreeBlock = index;
-            block.ClearRecords();
-            _lowLevelFileManager.WriteDataToBlock(_lastFreeBlock, block.GetBytes());
-            
-            // načítam vymazávaný blok a nastavím mu lastFreeBlock na posledný _lastFreeBock a next je -1
-            block = (Block<TData>)Block<TData>.FromBytes(_lowLevelFileManager.ReadBlock(index), _blockFactor);
-            block.LastNextFreeBlock = _lastFreeBlock;
-            block.NextFreeBlock = -1;
-            _lowLevelFileManager.WriteDataToBlock(index, block.GetBytes());
-            _lastFreeBlock = index;
-            
-            BlockUsedCount--;
-        }
-        else
-        {
-            throw new Exception("FileManager, Remove block: Toto nemalo nastať");
-        }
-        */
-        
     }
     
     /// <summary>
     /// Zapíše do konkrétneho bloku
     /// </summary>
-    /// <param name="id">id bloku do kotrého chceme zapisovať</param>
+    /// <param name="id">id bloku do ktorého chceme zapisovať</param>
     /// <param name="block">blok dát</param>
     public void WriteBlock(int id, Block<TData> block)
     {
@@ -415,7 +273,7 @@ public class FileManager<TData> where TData : IRecord
     }
 
     /// <summary>
-    /// Uloží potrebné iformácie do súboru
+    /// Uloží potrebné informácie do súboru
     /// </summary>
     public void Save()
     {

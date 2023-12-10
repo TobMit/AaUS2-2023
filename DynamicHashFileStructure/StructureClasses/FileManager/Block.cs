@@ -23,7 +23,7 @@ public class Block<TData> : IRecord where TData : IRecord
     /// Konštruktor triedy Block, ktorý vytvorí blok s jedným recordom
     /// </summary>
     /// <param name="blockFactor">blokovací faktor</param>
-    /// <param name="data">Data ktoré sa tam vložia</param>
+    /// <param name="data">Dáta ktoré sa tam vložia</param>
     /// <remarks>Blokovací faktor musí byť nastavený pred tým</remarks>
     public Block(int blockFactor, TData data)
     {
@@ -74,7 +74,7 @@ public class Block<TData> : IRecord where TData : IRecord
     public static int GetSize()
     {
         // toto tu je pre to, lebo vieme zavolať túto funkciu ešte pred inicializovaného blokovacieho faktoru,
-        // čo by nám sôsobilo nesprávny výpočt veľkosti
+        // čo by nám spôsobilo nesprávny výpočt veľkosti
         if (BlockFactor <= 0)
         {
             throw new OverflowException("Block faktor nie je nastavený!");
@@ -88,7 +88,7 @@ public class Block<TData> : IRecord where TData : IRecord
     /// Vypočíta veľkosť bloku na základe blokovacieho faktoru
     /// </summary>
     /// <param name="blockFactor">blokovací faktor</param>
-    /// <returns>veľosť bloku</returns>
+    /// <returns>veľkosť bloku</returns>
     public static int GetSize(int blockFactor)
     {
         //   počt záznamov +          početPlatnýchZáznamov + nextFreeBlock + lastNextBlock + nextDataBlock
@@ -98,7 +98,7 @@ public class Block<TData> : IRecord where TData : IRecord
     public byte[] GetBytes()
     {
         // toto tu je pre to, lebo vieme zavolať túto funkciu ešte pred inicializovaného blokovacieho faktoru,
-        // čo by nám sôsobilo nesprávny výpočt veľkosti
+        // čo by nám spôsobilo nesprávny výpočt veľkosti
         if (BlockFactor <= 0)
         {
             throw new OverflowException("Block faktor nie je nastavený!");
@@ -130,7 +130,7 @@ public class Block<TData> : IRecord where TData : IRecord
     public static object FromBytes(byte[] bytes)
     {
         // toto tu je pre to, lebo vieme zavolať túto funkciu ešte pred inicializovaného blokovacieho faktoru,
-        // čo by nám sôsobilo nesprávny výpočt veľkosti
+        // čo by nám spôsobilo nesprávny výpočt veľkosti
         if (BlockFactor <= 0)
         {
             throw new OverflowException("Block faktor nie je nastavený!");
@@ -151,8 +151,6 @@ public class Block<TData> : IRecord where TData : IRecord
         for (int i = 0; i < BlockFactor; i++)
         {
             // skopírujem iba potrebnú časť z bitového poľa
-            //byte[] recordBytes = new byte[TData.GetSize()];
-            //Array.Copy(bytes, offset, recordBytes, 0, TData.GetSize());
             records[i] = (TData)TData.FromBytes(bytes[offset..(offset + TData.GetSize())]); // range metóda
             offset += TData.GetSize();
         }
@@ -176,8 +174,6 @@ public class Block<TData> : IRecord where TData : IRecord
         for (int i = 0; i < blockFactor; i++)
         {
             // skopírujem iba potrebnú časť z bitového poľa
-            //byte[] recordBytes = new byte[TData.GetSize()];
-            //Array.Copy(bytes, offset, recordBytes, 0, TData.GetSize());
             records[i] = (TData)TData.FromBytes(bytes[offset..(offset + TData.GetSize())]); // range metóda
             offset += TData.GetSize();
         }
@@ -267,7 +263,7 @@ public class Block<TData> : IRecord where TData : IRecord
     }
 
     /// <summary>
-    /// Zmaže record z bolku dát a vrátiho, taktiež resunie posledný record na jeho miesto a zmenší počet validných recordov
+    /// Zmaže record z bloku dát a vráti ho, taktiež presunie posledný record na jeho miesto a zmenší počet validných recordov
     /// čím zabránime zbytočnému prechádzaniu cez prázdne recordy
     /// </summary>
     /// <param name="index">Index mazaného záznamu</param>

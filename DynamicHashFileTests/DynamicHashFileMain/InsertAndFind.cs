@@ -90,7 +90,7 @@ public class InsertAndFind
     {
         for (int i = 0; i < 12; i++)
         {
-            // fabrikujem kľúče tak aby mi prvý byt ostal rovnaký ale lýšil sa v iných
+            // fabrikujem kľúče tak aby mi prvý byt ostal rovnaký ale líšil sa v iných
             byte[] fabricedBytes = BitConverter.GetBytes(1);
             fabricedBytes[1] = BitConverter.GetBytes(i)[0];
             
@@ -119,7 +119,7 @@ public class InsertAndFind
     {
         for (int i = 0; i < 12; i++)
         {
-            // fabrikujem kľúče tak aby mi prvý byt ostal rovnaký ale lýšil sa v iných
+            // fabrikujem kľúče tak aby mi prvý byt ostal rovnaký ale líšil sa v iných
             byte[] fabricedBytes = BitConverter.GetBytes(1);
             fabricedBytes[1] = BitConverter.GetBytes(i)[0];
             
@@ -130,7 +130,7 @@ public class InsertAndFind
         Assert.That(_dynamicHashFile.Count, Is.EqualTo(12));
         for (int i = 0; i < 12; i++)
         {
-            // fabrikujem kľúče tak aby mi prvý byt ostal rovnaký ale lýšil sa v iných
+            // fabrikujem kľúče tak aby mi prvý byt ostal rovnaký ale líšil sa v iných
             byte[] fabricedBytes = BitConverter.GetBytes(1);
             fabricedBytes[1] = BitConverter.GetBytes(i)[0];
             

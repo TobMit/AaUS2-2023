@@ -11,7 +11,7 @@ public class Remove
         _dynamicHashFile = new DynamicHashFile<int, InsertAndFind.InsertClass>();
         for (int i = 0; i < 12; i++)
         {
-            // fabrikujem kľúče tak aby mi prvý byt ostal rovnaký ale lýšil sa v iných
+            // fabrikujem kľúče tak aby mi prvý byt ostal rovnaký ale líšil sa v iných
             byte[] fabricedBytes = BitConverter.GetBytes(1);
             fabricedBytes[1] = BitConverter.GetBytes(i)[0];
             
@@ -30,7 +30,7 @@ public class Remove
     [Test]
     public void RemoveZosypanie()
     {
-        // hodnoty kľúčou ťahám tak aby som mazal jeden záznam zakždého bloku
+        // hodnoty kľúčov ťahám tak aby som mazal jeden záznam z každého bloku
         Assert.That(_dynamicHashFile.Count, Is.EqualTo(12));
         var tmpRemoved = _dynamicHashFile.Remove(GetFabricedKey(0));
         Assert.That(tmpRemoved.AnotherInt, Is.EqualTo(0));

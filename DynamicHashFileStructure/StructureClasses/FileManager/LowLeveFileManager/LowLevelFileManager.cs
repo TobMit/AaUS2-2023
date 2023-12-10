@@ -16,14 +16,14 @@ public class LowLevelFileManager
     }
 
     /// <summary>
-    /// Inicializujem súbor ak ešte neexsituje
+    /// Inicializujem súbor ak ešte neexituje
     /// </summary>
     private void InitFile()
     {
         // skontrolujem či existuje
         if (!File.Exists(_fileName))
         {
-            // ak neexsituje tak vytvorím a nastavím zakládnú veľkosť
+            // ak neexituje tak vytvorím a nastavím základnú veľkosť
             using (var fileStream = File.Create(_fileName))
             {
                 fileStream.SetLength(0);
@@ -57,7 +57,6 @@ public class LowLevelFileManager
 
             // Získanie aktuálnej pozície (nový index bloku)
             int newIndex = (int)(_fileStream.Length / _blockSize);
-
             // Inicializácia nového bloku na veľkosť jedného bloku
             _fileStream.SetLength(_fileStream.Length + _blockSize);
 
@@ -95,12 +94,10 @@ public class LowLevelFileManager
         {
             // Presun na začiatok bloku
             _fileStream.Seek(GetAddress(blockIndex), SeekOrigin.Begin);
-
             // Zápis binárnych dát
             _fileStream.Write(data, 0, data.Length);
 
             return true;
-            
         }
         catch (Exception ex)
         {
@@ -113,7 +110,7 @@ public class LowLevelFileManager
     ///  Čítanie dát z konkrétneho bloku
     /// </summary>
     /// <param name="blockIndex">Index bloku ktorý chceme čítať</param>
-    /// <returns>Byte array prečítanách dát, môže byť aj null</returns>
+    /// <returns>Byte array prečítaných dát, môže byť aj null</returns>
     public byte[]? ReadBlock(int blockIndex)
     {
         if (_fileStream is null)
@@ -191,7 +188,7 @@ public class LowLevelFileManager
     }
 
     /// <summary>
-    /// Deštruktor automaticky zatovrí file stream;
+    /// Deštruktor automaticky zatvorí file stream;
     /// </summary>
     ~LowLevelFileManager()
     {

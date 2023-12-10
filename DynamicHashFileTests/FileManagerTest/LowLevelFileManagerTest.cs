@@ -23,7 +23,7 @@ public class LowLevelFileManagerTest
     [OneTimeTearDown]
     public void tearDown()
     {
-        // zamžeme vytvorený súbor
+        // zmažeme vytvorený súbor
         //Console.WriteLine("Tear down");
         _manager.CloseFile();
         File.Delete(FileName);
@@ -79,7 +79,7 @@ public class LowLevelFileManagerTest
         Assert.That(ex.Message, Is.EqualTo("File stream is not open."));
         _manager.OpenFile();
         
-        // Na záver skontrolujem či sa nám nahodov nezmenila veľkosť
+        // Na záver skontrolujem či sa nám náhodou nezmenila veľkosť
         Assert.That(_manager.BlockCount, Is.EqualTo(5));
         Assert.That(_manager.GetFileSizeTest(), Is.EqualTo(5*BlockSize));
     }
@@ -104,7 +104,7 @@ public class LowLevelFileManagerTest
         Assert.That(ex.Message, Is.EqualTo("File stream is not open."));
         _manager.OpenFile();
         
-        // Na záver skontrolujem či sa nám nahodov nezmenila veľkosť
+        // Na záver skontrolujem či sa nám náhodou nezmenila veľkosť
         Assert.That(_manager.BlockCount, Is.EqualTo(3));
         Assert.That(_manager.GetFileSizeTest(), Is.EqualTo(3*BlockSize)); 
     }
@@ -132,7 +132,7 @@ public class LowLevelFileManagerTest
         Assert.That(ex.Message, Is.EqualTo("File stream is not open."));
         _manager.OpenFile();
         
-        // Na záver skontrolujem či sa nám nahodov nezmenila veľkosť
+        // Na záver skontrolujem či sa nám náhodou nezmenila veľkosť
         Assert.That(_manager.BlockCount, Is.EqualTo(3));
         Assert.That(_manager.GetFileSizeTest(), Is.EqualTo(3*BlockSize)); 
     }
@@ -159,7 +159,7 @@ public class LowLevelFileManagerTest
         Assert.That(ex.Message, Is.EqualTo("File stream is not open."));
         _manager.OpenFile();
         
-        // Na záver skontrolujem či sa nám nahodov nezmenila veľkosť
+        // Na záver skontrolujem či sa nám náhodou nezmenila veľkosť
         Assert.That(_manager.BlockCount, Is.EqualTo(3));
         Assert.That(_manager.GetFileSizeTest(), Is.EqualTo(3*BlockSize));
     }

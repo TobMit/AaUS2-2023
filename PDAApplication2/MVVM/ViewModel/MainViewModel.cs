@@ -143,8 +143,6 @@ namespace PDAApplication2.MVVM.ViewModel
         public MainViewModel()
         {
             InitializeButtons();
-            //_allNehnutelnosti = new();
-            //_allParcelas = new();
             SplitViewShow = Visibility.Visible;
             SingleViewShow = Visibility.Hidden;
         }
@@ -222,7 +220,7 @@ namespace PDAApplication2.MVVM.ViewModel
             }
 
 
-            // musíme zmazať predchadzajúce súbori aby sa zabránilo vpisovaniu do existujúcich súborov
+            // musíme zmazať predchádzajúce súbory aby sa zabránilo vpisovaniu do existujúcich súborov
             File.Delete(_primaryFileNameParcela);
             File.Delete(_preplnovakFileNameParcela);
             _dynamicHashFileParcela =
@@ -236,8 +234,6 @@ namespace PDAApplication2.MVVM.ViewModel
 
             ListParcela = new ();
             ListNehnutelnost = new ();
-            //_allNehnutelnosti = new(pocetNehnutelnosti);
-            //_allParcelas = new(pocetParciel);
 
             Constants.IdObjektu = 0;
 
@@ -251,9 +247,7 @@ namespace PDAApplication2.MVVM.ViewModel
                 pocetParciel);
             
             MenuColor = new(Color.FromRgb(240, 240, 240));
-            
-            //_dynamicHashFileNehnutelnost.PrintFile();
-            //_dynamicHashFileParcela.PrintFile();
+
             
             HealthNehnutelnosti = Math.Round(_quadTreeNehnutelnost.Health*100).ToString();
             HealthParcela = Math.Round(_quadTreeParcela.Health * 100).ToString();
@@ -408,7 +402,7 @@ namespace PDAApplication2.MVVM.ViewModel
                 return;
             }
             // musím nájsť všetky parcely, ktoré obsahujú túto nehnuteľnosť
-            // skontrolovač či môžeme vkladať
+            // skontrolovať či môžeme vkladať
             // pridať tam tú nehnuteľnosť
             // pridať nehnuteľnosť do zoznamu všetkých nehnuteľností a všetky parcely do nehnuteľnosti
             // pridať nehnuteľnosť do quad tree a do dynamic hash file
@@ -449,7 +443,6 @@ namespace PDAApplication2.MVVM.ViewModel
                 MessageBox.Show("Presiahnutý počet zaznamov", "Chyba vstupu", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            //_allNehnutelnosti.Add(tmpNehnutelnost);
 
             HealthNehnutelnosti = Math.Round(_quadTreeNehnutelnost.Health * 100).ToString();
         }
@@ -502,7 +495,7 @@ namespace PDAApplication2.MVVM.ViewModel
             bool isOk = tmpListNehnutelnosti.Count <= Constants.MAX_COUNT_NEHNUTELNOST_IN_PARCEL;
             if (isOk)
             {
-                // musím si pred tým skontrolovať či mám dostatok miesta v nehnutelnostiach
+                // musím si pred tým skontrolovať či mám dostatok miesta v nehnuteľnostiach
                 foreach (ObjectModelQuad nehnutelnost in tmpListNehnutelnosti)
                 {
                     var tmpNehnutelnost = (ObjectModelNehnutelnost)_dynamicHashFileNehnutelnost.Find(nehnutelnost.IdObjektu);
@@ -528,7 +521,7 @@ namespace PDAApplication2.MVVM.ViewModel
             }
             else
             {
-                MessageBox.Show("Presiahnutý počet zaznamov", "Chyba vstupu", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Presiahnutí počet záznamov", "Chyba vstupu", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -585,7 +578,7 @@ namespace PDAApplication2.MVVM.ViewModel
                 return;
             }
             
-            // prepočítam si dáta pôvodné ktore sa používaju v kúči v stromu
+            // prepočítam si dáta pôvodné ktoré sa používajú v kľúči v stromu
             GPS origanalCheckedGps1 = new GPS();
             GPS origanalCheckedGps2 = new GPS();
             Core.Utils.CheckAndRecalculateGps(objectModel.GpsBod1, objectModel.GpsBod2, origanalCheckedGps1, origanalCheckedGps2);
@@ -629,7 +622,7 @@ namespace PDAApplication2.MVVM.ViewModel
                     _dynamicHashFileParcela.Insert(tmpParcela.IdObjektu, tmpParcela);
                 }
 
-                // potrebujem si to aj v stome upraviť
+                // potrebujem si to aj v strome upraviť
                 var quadTmpNehnutelnost = _quadTreeNehnutelnost.Find(origanalCheckedGps1.X, origanalCheckedGps1.Y, origanalCheckedGps2.X, origanalCheckedGps2.Y);
                 quadTmpNehnutelnost[0].GpsBod1 = dlgGps1;
                 quadTmpNehnutelnost[0].GpsBod2 = dlgGps2;
@@ -650,7 +643,7 @@ namespace PDAApplication2.MVVM.ViewModel
             }
             else
             {
-                MessageBox.Show("Presiahnutý počet zaznamov", "Chyba vstupu", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Presiahnutí počet záznamov", "Chyba vstupu", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -705,7 +698,7 @@ namespace PDAApplication2.MVVM.ViewModel
                 return;
             }
 
-            // prepočítam si dáta pôvodné ktore sa používaju v kúči v stromu
+            // prepočítam si dáta pôvodné ktoré sa používajú v kľúči v stromu
             GPS origanalCheckedGps1 = new GPS();
             GPS origanalCheckedGps2 = new GPS();
             Core.Utils.CheckAndRecalculateGps(objectModel.GpsBod1, objectModel.GpsBod2, origanalCheckedGps1, origanalCheckedGps2);
@@ -749,7 +742,7 @@ namespace PDAApplication2.MVVM.ViewModel
                     _dynamicHashFileNehnutelnost.Insert(tmpNehnutelnost.IdObjektu, tmpNehnutelnost);
                 }
 
-                // potrebujem si to aj v stome upraviť
+                // potrebujem si to aj v strome upraviť
                 var quadTmpParcla = _quadTreeParcela.Find(origanalCheckedGps1.X, origanalCheckedGps1.Y, origanalCheckedGps2.X, origanalCheckedGps2.Y);
                 quadTmpParcla[0].GpsBod1 = dlgGps1;
                 quadTmpParcla[0].GpsBod2 = dlgGps2;
@@ -770,7 +763,7 @@ namespace PDAApplication2.MVVM.ViewModel
             }
             else
             {
-                MessageBox.Show("Presiahnutý počet zaznamov", "Chyba vstupu", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Presiahnutí počet záznamov", "Chyba vstupu", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -897,7 +890,7 @@ namespace PDAApplication2.MVVM.ViewModel
         {
             if (_dynamicHashFileNehnutelnost is not null)
             {
-                var dlg = new SequeFilePrint("Nehnutelnosti", _dynamicHashFileNehnutelnost.GetPrimaryFileSequece(),
+                var dlg = new SequeFilePrint("Nehnuteľnosti", _dynamicHashFileNehnutelnost.GetPrimaryFileSequece(),
                     _dynamicHashFileNehnutelnost.GetPreplnovaciFileSequece());
                 dlg.Show();
             }
@@ -907,7 +900,7 @@ namespace PDAApplication2.MVVM.ViewModel
         {
             if (_dynamicHashFileParcela is not null)
             {
-                var dlg = new SequeFilePrint("Nehnutelnosti", _dynamicHashFileParcela.GetPrimaryFileSequece(),
+                var dlg = new SequeFilePrint("Parcely", _dynamicHashFileParcela.GetPrimaryFileSequece(),
                     _dynamicHashFileParcela.GetPreplnovaciFileSequece());
                 dlg.Show();
             }

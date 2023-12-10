@@ -76,14 +76,14 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
         while (stackData.Count > 0)
         {
             Stack<Node<TData>> stackNode = new();
-            // vložím do staku root a prechádzam vnútroný stak
+            // vložím do staku root a prechádzam vnútorný stak
             stackNode.Push(_root);
             // id vrcholu = 0
             int index = 0;
             
             // vytiahnem data zo staku
             var dataToInsert = stackData.Pop();
-            // zýskam hash
+            // získam hash
             var hash = TData.GetBytesForHash(dataToInsert.First);
             // premením hash byte na pole bitov
             BitArray bitArray = new(hash);
@@ -97,7 +97,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                     var internNode = (NodeIntern<TData>) node;
                     var tmp = bitArray[index];
                     // ak niektorý syn nie je vytvorený tak ho vytvorím ako externý a tam vložím dáta na nový blok
-                    if (!bitArray[index]) // 0 ak je lavý 1 ak je pravý (čiže false a true)
+                    if (!bitArray[index]) // 0 ak je ľavý 1 ak je pravý (čiže false a true)
                     {
                         if (internNode.LeftSon == null)
                         {
@@ -150,19 +150,19 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                     // ak je plný
                     else
                     {
-                        // skontrolujem či som už mynul všetky bity
+                        // skontrolujem či som už minul všetky bity
                         if (index >= bitArray.Length-1)
                         {
-                            // ak áno tak vkladám do preplňovacieho bloku
+                            // ak áno tak vkladám do preplňujúceho bloku
                             
                             if (externNode.CountPreplnovaciBlock > 0)
                             {
-                                // načítam si blok aby som získal adresu z preplňovacieho bloku
+                                // načítam si blok aby som získal adresu z preplňujúceho bloku
                                 var mainBlock = _fileManager.GetBlock(externNode.Address);
                                 Block<TData>? block = null;
                                 
                                 int current = mainBlock.NextDataBlock;
-                                int lastCurrent = mainBlock.NextDataBlock; // keď mám blok ktorý nemá daľší blok ktorý pokračuje tak potrebujem vedieť jeho adresu
+                                int lastCurrent = mainBlock.NextDataBlock; // keď mám blok ktorý nemá ďalší blok ktorý pokračuje tak potrebujem vedieť jeho adresu
                                 // budeme prechádzať kým nenarazíme na posledný blok alebo pokiaľ nenarazíme na blok v ktorom je voľné miesto
                                 while (current >= 0)
                                 {
@@ -182,30 +182,30 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                                 // ešte raz kontrolujeme či je blok plný (môže nastať situácia že je blok plný a nemá daľší blok)
                                 if (block is null)
                                 {
-                                    throw new Exception("Toto nemalo nastat, chyba v Inserte pri prehľadávanií preplňovacích blokov, block je null!");
+                                    throw new Exception("Toto nemalo nastať, chyba v Inserte pri prehľadávanií preplňujúcich blokov, block je null!");
                                 }
                                 if (block.IsFull())
                                 {
-                                    // tak najdeme nový block
+                                    // tak nájdem nový block
                                     var tmpPair = _filePreplnovaciManager.GetFreeBlock();
                                     externNode.CountPreplnovaciBlock++;
-                                    // do pôvodne načítaného bloku pridame linkovaciu adresu a zapíšeme ho
+                                    // do pôvodne načítaného bloku pridám linkovaciu adresu a zapíšeme ho
                                     block.NextDataBlock = tmpPair.First;
                                     _filePreplnovaciManager.WriteBlock(lastCurrent, block);
                                     current = tmpPair.First;
                                     block = tmpPair.Second;
                                 }
-                                // zapíšeme dáta do bloku a uložíme
+                                // zapíšeme dáta do bloku a uložím
                                 block.AddRecord(dataToInsert.Second);
                                 _filePreplnovaciManager.WriteBlock(current, block);
                                 Count++;
                                 externNode.CountPreplnovaciData++;
 
                             }
-                            // ak nemá tak pridám nový preplňovaci blok
+                            // ak nemá tak pridám nový preplňujúci blok
                             else
                             {
-                                // vytvorím nový blok z preplňovacieho súboru a uložíme tam dáta
+                                // vytvorím nový blok z preplňujúceho súboru a uložíme tam dáta
                                 var tmpPair = _filePreplnovaciManager.GetFreeBlock();
                                 externNode.CountPreplnovaciBlock++;
                                 tmpPair.Second.AddRecord(dataToInsert.Second);
@@ -222,7 +222,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                         }
                         else
                         {
-                            // načítam blok postuplne odstránim dáta ktoré sú v bloku a vložím ich do staku
+                            // načítam blok postupne odstránim dáta ktoré sú v bloku a vložím ich do staku
                             var block = _fileManager.GetBlock(externNode.Address);
                             var listRecordov = block.GetArrayRecords();
                             block.ClearRecords();
@@ -252,10 +252,9 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                             {
                                 parent.RightSon = tmpNode;
                             }
-                            // zamžem voľný blok
+                            // zamažem voľný blok
                             _fileManager.RemoveBlock(externNode.Address);
                             externNode.Address = -1;
-                            // týmto cyklus skončil ale pokračuje sa od znovu s novímy dátami (musím vložiť aj poledné dáta)   
                         }
                     }
                 }
@@ -267,7 +266,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
     /// Vyhľadá dáta pomocou kľúča
     /// </summary>
     /// <param name="key">Kľúč ktorý sa používa pri hľadaní</param>
-    /// <returns>Najedné dáta</returns>
+    /// <returns>Nájdene dáta</returns>
     /// <exception cref="ArgumentException">Ak sa nejaký záznam nenašiel</exception>
     public TData Find(TKey key)
     {
@@ -281,10 +280,8 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
         stackNode.Push(_root);
         while (stackNode.Count > 0)
         {
-            // zýskam vrchol
             var node = stackNode.Pop();
-            // budem skontrolujem si typ vrcholu
-            // je interny
+            // skontrolujem si typ vrcholu
             if (node.GetType() == typeof(NodeIntern<TData>))
             {
                 // zoberiem toho syna ktorý je podľa kľúča
@@ -296,7 +293,6 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                     {
                         throw new ArgumentException("Nenašiel sa záznam");
                     }
-                    // toho syna vložim do staku
                     stackNode.Push(internNode.LeftSon);
                     index++;
                 }
@@ -306,7 +302,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                     {
                         throw new ArgumentException("Nenašiel sa záznam");
                     }
-                    // toho syna vložim do staku
+                    // toho syna vložím do staku
                     stackNode.Push(internNode.RightSon);
                     index++;
                 }
@@ -338,19 +334,18 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                     int current = block.NextDataBlock;
                     while (current >= 0)
                     {
-                        // načítam blok a skontrolujem dáta vňom
+                        // načítam blok a skontrolujem dáta v ňom
                         block = _filePreplnovaciManager.GetBlock(current);
                         for (int i = 0; i < block.Count(); i++)
                         {
-                            // skontrolujem či je to to čo hľadám
                             if (block.GetRecord(i).CompareTo(key) == 0)
                             {
                                 returnData = block.GetRecord(i);
-                                current = -1; // aby sa ukončil cyklus
+                                current = -1;
                                 break;
                             }
                         }
-                        // ak je stále return data null, to znamená že som stále nenašiel záznam a musim pokračovať daľším preplňujúcim blokom
+                        // ak je stále return data null, to znamená že som stále nenašiel záznam a musím pokračovať ďalším preplňujúcim blokom
                         if (returnData is null)
                         {
                             current = block.NextDataBlock;
@@ -361,7 +356,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
         }
         
         
-        // ak som nenašiel tak hodím exception
+        // ak som nenašiel záznam tak hodím exception
         if (returnData is null)
         {
             throw new ArgumentException("Nenašiel sa záznam");
@@ -391,14 +386,9 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
         stackNode.Push(_root);
         while (stackNode.Count > 0)
         {
-            // zýskam vrchol
             var node = stackNode.Pop();
-            // budem skontrolujem si typ vrcholu
-            // je interny
             if (node.GetType() == typeof(NodeIntern<TData>))
             {
-                // zoberiem toho syna ktorý je podľa kľúča
-                // ak ten vrchol neexistuje tak hodím exception
                 var internNode = (NodeIntern<TData>) node;
                 if (!bitArray[index])
                 {
@@ -406,7 +396,6 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                     {
                         throw new ArgumentException("Nenašiel sa záznam");
                     }
-                    // toho syna vložim do staku
                     stackNode.Push(internNode.LeftSon);
                     index++;
                 }
@@ -416,7 +405,6 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                     {
                         throw new ArgumentException("Nenašiel sa záznam");
                     }
-                    // toho syna vložim do staku
                     stackNode.Push(internNode.RightSon);
                     index++;
                 }
@@ -424,7 +412,6 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
             // Ak je externý
             else
             {
-                // zoberiem blok
                 var externNode = (NodeExtern<TData>) node;
                 lastNode = externNode;
                 if (externNode.Address < 0)
@@ -458,7 +445,6 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                         block = _filePreplnovaciManager.GetBlock(current);
                         for (int i = 0; i < block.Count(); i++)
                         {
-                            // skontrolujem či je to to čo hľadám
                             if (block.GetRecord(i).CompareTo(key) == 0)
                             {
                                 // ak áno tak vrátim
@@ -471,7 +457,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                                 break;
                             }
                         }
-                        // ak je stále return data null, to znamená že som stále nenašiel záznam a musim pokračovať daľším preplňujúcim blokom
+                        // ak je stále return data null, to znamená že som stále nenašiel záznam a musím pokračovať ďalším preplňujúcim blokom
                         if (returnData is null)
                         {
                             current = block.NextDataBlock;
@@ -488,21 +474,16 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
             throw new ArgumentException("Nenašiel sa záznam");
         }
         
-        // robiť zosipanie dát
-        // todo pridať do dokumentácie, to že teraz ako to mám tak má výhodu pri inom zreťazený
         if (lastNode is null)
         {
             throw new Exception("Toto sa nemalo stať, chyba v Remove pri presípani a zmenšovaní bloku");
         }
         
-        // zosipanie robýme iba v tedy ak máme preplňovaci blok
+        // zosypanie robíme iba v tedy ak máme preplňovacie bloky
         if (lastNode.CountPreplnovaciBlock > 0)
         {
-            // spočítame či sa oplati robyť presipanie, presipanie sa oplatí robyť v tedy ak sa odstráni toľko dát že vieme vyprázdniť blok
-
+            // spočítame či sa oplatí robiť presýpanie, presýpanie sa oplatí robiť v tedy ak sa odstráni toľko dát že vieme vyprázdniť blok
             bool presipanie = false;
-            // môžu nastať 2 prípady
-            // máme práve 1 preplňujúci blok
             if (lastNode.CountPreplnovaciBlock == 1)
             {
                 presipanie = (lastNode.CountPrimaryData + lastNode.CountPreplnovaciData) <= PrimaryFileBlockSize;
@@ -518,7 +499,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
 
             if (presipanie)
             {
-                // do listu si načítam všetký data a popri tom mažem aj bloky v ktorych sa nachádzali
+                // do listu si načítam všetký data a popri tom mažem aj bloky v ktorých sa nachádzali
                 List<TData> tmpData = new();
                 var block = _fileManager.GetBlock(lastNode.Address);
                 tmpData.AddRange(block.GetArrayRecords());
@@ -578,7 +559,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                                 break;
                             }
                         }
-                        // ak potrebujem daľší blok tak ho zýskam
+                        // ak potrebujem ďalší blok tak ho získam
                         if (tmpData.Count > 0)
                         {
                             var tmpTmpPair = _filePreplnovaciManager.GetFreeBlock();
@@ -598,6 +579,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
             }
         }
 
+        // zmenšovanie stromu
         if (lastNode.CountPreplnovaciBlock <= 0 && lastNode.CountPrimaryData < PrimaryFileBlockSize)
         {
             // ak nemáme záznam tak môžeme vymazať blok
@@ -616,7 +598,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                 // ak je parent root tak bloky už nemôžem spájať
                 if (parent.Parent is null)
                 {
-                    // ak je niektorý z potomkov extern node a má adresu ktorá je väčšia ako 0 ale má 0 prvkov tak ho vymažem
+                    // ak je niektorý z potomkov extern node a má adresu ktorá je väčšia alebo rovná ako 0 ale má 0 prvkov tak ho vymažem
                     if (parent.LeftSon is not null)
                     {
                         if (parent.LeftSon.GetType() == typeof(NodeExtern<TData>))
@@ -646,7 +628,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                     break;
                 }
                 
-                // spocitam či viem spojiť
+                // spočítam či viem spojiť
                 var celovyPocet = 0;
                 
                 bool isLeftSonExtern = false;
@@ -713,7 +695,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                     }
                     _fileManager.WriteBlock(tmpPair.First, tmpPair.Second);
                     
-                    // namiesto parenta vytovrím nový externýNode a nastavím mu adresu na túto novú adresu
+                    // namiesto parenta vytvorím nový externýNode a nastavím mu adresu na túto novú adresu
                     var parentParenta = parent.Parent;
                     var tmpNode = new NodeExtern<TData>(tmpPair.First, parentParenta);
                     tmpNode.CountPrimaryData = listData.Count;
@@ -745,216 +727,6 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                 }
             }
         }
-        
-        // Zmenšovanie stromu ak nemá prepňovací blok
-        // if (lastNode.CountPreplnovaciBlock <= 0 && lastNode.CountPrimaryData < PrimaryFileBlockSize)
-        // {
-        //     // budem odstraňovať node dokiaľ nenarazím na nejaký z dátami
-        //     while (lastNode is not null)
-        //     {
-        //         // aby mi neostávali práznde bloky s adresou na pázdny blok
-        //         if (lastNode.CountPrimaryData + lastNode.CountPreplnovaciData == 0)
-        //         {
-        //             _fileManager.RemoveBlock(lastNode.Address);
-        //             lastNode.Address = -1;
-        //         }
-        //         
-        //         if (lastNode.Parent.Parent is null)
-        //         {
-        //             lastNode = null;
-        //             break;
-        //         }
-        //
-        //         bool leftSon;
-        //         if (lastNode.Parent.LeftSon is null)
-        //         {
-        //             leftSon = false;
-        //         }
-        //         else
-        //         {
-        //             leftSon = ReferenceEquals(lastNode, lastNode.Parent.LeftSon);   
-        //         }
-        //         if (leftSon)
-        //         {
-        //             // zistím či má pravého syna
-        //             if (lastNode.Parent.RightSon is null)
-        //             {
-        //                 // tak vyhodím parenta preč
-        //                 var parent = lastNode.Parent.Parent;
-        //                 // musím zisťiť do ktorej vetvy sa pridať
-        //                 bool leftSon1 = ReferenceEquals(lastNode.Parent, parent.LeftSon);
-        //                 if (leftSon1)
-        //                 {
-        //                     parent.LeftSon = lastNode;
-        //                     lastNode.Parent = parent;
-        //                 }
-        //                 else
-        //                 {
-        //                     parent.RightSon = lastNode;
-        //                     lastNode.Parent = parent;
-        //                 }
-        //                 
-        //             }
-        //             else
-        //             {
-        //                 var novyPocet = lastNode.CountPrimaryData;
-        //                 // skontrolujeme či je syn externalNode
-        //                 if (lastNode.Parent.RightSon.GetType() == typeof(NodeExtern<TData>))
-        //                 {
-        //                     // ak áno tak skontrolujeme či sa vieme spojiť
-        //                     var son = (NodeExtern<TData>)lastNode.Parent.RightSon;
-        //                     novyPocet += son.CountPrimaryData;
-        //                     novyPocet += son.CountPreplnovaciData;
-        //
-        //                     if (novyPocet < PrimaryFileBlockSize && son.Address >= 0) //todo check if is correct behavior
-        //                     {
-        //                         // spájame sa 
-        //                         Block<TData> lastNodeBlock = default;
-        //                         // // kontrolujeme či máme nastavenú adresu
-        //                         if (lastNode.Address >= 0)
-        //                         {
-        //                             lastNodeBlock = _fileManager.GetBlock(lastNode.Address);
-        //                         }
-        //                         else
-        //                         {
-        //                             var tmpPair = _fileManager.GetFreeBlock();
-        //                             lastNode.Address = tmpPair.First;
-        //                             lastNodeBlock = tmpPair.Second;
-        //
-        //                         }
-        //
-        //                         if (son.Address >= 0)
-        //                         {
-        //                             var sonBlock = _fileManager.GetBlock(son.Address);
-        //                             _fileManager.RemoveBlock(son.Address);
-        //                             for (int i = 0; i < sonBlock.Count(); i++)
-        //                             {
-        //                                 lastNodeBlock.AddRecord(sonBlock.GetRecord(i));
-        //                                 lastNode.CountPrimaryData++;
-        //                             }
-        //                         }
-        //                         _fileManager.WriteBlock(lastNode.Address, lastNodeBlock);
-        //                         // tak vyhodím parenta preč
-        //                         var parent = lastNode.Parent.Parent;
-        //                         // musím zisťiť do ktorej vetvy sa pridať
-        //                         bool leftSon1 = ReferenceEquals(lastNode.Parent, parent.LeftSon);
-        //                         if (leftSon1)
-        //                         {
-        //                             parent.LeftSon = lastNode;
-        //                             lastNode.Parent = parent;
-        //                         }
-        //                         else
-        //                         {
-        //                             parent.RightSon = lastNode;
-        //                             lastNode.Parent = parent;
-        //                         }
-        //                     }
-        //                     else
-        //                     {
-        //                         // koniec
-        //                         lastNode = null;
-        //                     }
-        //                 }
-        //                 else
-        //                 {
-        //                     // inak končíme
-        //                     lastNode = null;
-        //                 }
-        //                 
-        //             }
-        //         }
-        //         else
-        //         {
-        //             if (lastNode.Parent.LeftSon is null)
-        //             {
-        //                 // tak vyhodím parenta preč
-        //                 var parent = lastNode.Parent.Parent;
-        //                 // musím zisťiť do ktorej vetvy sa pridať
-        //                 bool leftSon1 = ReferenceEquals(lastNode.Parent, parent.LeftSon);
-        //                 if (leftSon1)
-        //                 {
-        //                     parent.LeftSon = lastNode;
-        //                     lastNode.Parent = parent;
-        //                 }
-        //                 else
-        //                 {
-        //                     parent.RightSon = lastNode;
-        //                     lastNode.Parent = parent;
-        //                 }
-        //                 
-        //             }
-        //             else
-        //             {
-        //                 // vypočítame si rozdiel
-        //                 var novyPocet = lastNode.CountPrimaryData;
-        //                 // skontrolujeme či je syn externalNode
-        //                 if (lastNode.Parent.LeftSon.GetType() == typeof(NodeExtern<TData>))
-        //                 {
-        //                     // ak áno tak skontrolujeme či sa vieme spojiť
-        //                     var son = (NodeExtern<TData>)lastNode.Parent.LeftSon;
-        //                     novyPocet += son.CountPrimaryData;
-        //                     novyPocet += son.CountPreplnovaciData;
-        //
-        //                     if (novyPocet < PrimaryFileBlockSize && son.Address >= 0) //todo check if is correct behavior
-        //                     {
-        //                         // spájame sa 
-        //                         Block<TData> lastNodeBlock = default;
-        //                         // kontrolujeme či máme nastavenú adresu
-        //                         if (lastNode.Address >= 0)
-        //                         {
-        //                             lastNodeBlock = _fileManager.GetBlock(lastNode.Address);
-        //                         }
-        //                         else
-        //                         {
-        //                             var tmpPair = _fileManager.GetFreeBlock();
-        //                             lastNode.Address = tmpPair.First;
-        //                             lastNodeBlock = tmpPair.Second;
-        //
-        //                         }
-        //
-        //                         if (son.Address >= 0)
-        //                         {
-        //                             var sonBlock = _fileManager.GetBlock(son.Address);
-        //                             _fileManager.RemoveBlock(son.Address);
-        //                             for (int i = 0; i < sonBlock.Count(); i++)
-        //                             {
-        //                                 lastNodeBlock.AddRecord(sonBlock.GetRecord(i));
-        //                                 lastNode.CountPrimaryData++;
-        //                             }
-        //                         }
-        //                         _fileManager.WriteBlock(lastNode.Address, lastNodeBlock);
-        //                         // tak vyhodím parenta preč
-        //                         var parent = lastNode.Parent.Parent;
-        //                         // musím zisťiť do ktorej vetvy sa pridať
-        //                         bool leftSon1 = ReferenceEquals(lastNode.Parent, parent.LeftSon);
-        //                         if (leftSon1)
-        //                         {
-        //                             parent.LeftSon = lastNode;
-        //                             lastNode.Parent = parent;
-        //                         }
-        //                         else
-        //                         {
-        //                             parent.RightSon = lastNode;
-        //                             lastNode.Parent = parent;
-        //                         }
-        //                     }
-        //                     else
-        //                     {
-        //                         // koniec
-        //                         lastNode = null;
-        //                     }
-        //                 }
-        //                 else
-        //                 {
-        //                     // inak končíme
-        //                     lastNode = null;
-        //                 }
-        //                 
-        //             }
-        //         }
-        //     }
-        // }
-        
         return returnData;
     }
     
@@ -1053,7 +825,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
         
             stack.Push(new(_root, new()));
             
-            // do staku budem postupne vkladať jednotlivé nodes a budem im postupne vyšovať bity
+            // do staku budem postupne vkladať jednotlivé nodes a budem im postupne zvyšovať bity
             while (stack.Count > 0)
             {
                 var current = stack.Pop();
@@ -1061,7 +833,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                 if (current.node.GetType() == typeof(NodeIntern<TData>))
                 {
                     var internNode = (NodeIntern<TData>) current.node;
-                    // musim kontrolovať aj null hodnoty
+                    // musím kontrolovať aj null hodnoty
                     if (internNode.LeftSon is not null)
                     {
                         var bitArrayLeft = new List<int>();
@@ -1100,7 +872,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
 
         using (StreamReader sr = new StreamReader(_primaryFileName.Substring(0, _primaryFileName.Length - 4) + "_dataStructure" + ".txt"))
         {
-            // načitanie celkového počtu
+            // načítanie celkového počtu
             Count = int.Parse(sr.ReadLine());
             
             // až teraz môžeme načítavať zbytok
@@ -1123,10 +895,10 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                 NodeIntern<TData> current = _root;
                 for (int i = 0; i < bitArray.Count; i++)
                 {
-                    // skontrolujeme či je posledný, ak áno vkladam externý node
+                    // skontrolujeme či je posledný, ak áno vkladám externý node
                     bool last = i == bitArray.Count - 1;
                     
-                    // ak je 0 tak vkladám do ľava inak do prava
+                    // ak je 0 tak vkladám doľava inak doprava
                     if (!bitArray[i])
                     {
                         if (!last)

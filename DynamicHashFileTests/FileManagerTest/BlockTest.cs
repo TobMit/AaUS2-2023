@@ -48,7 +48,7 @@ public class BlockTest
         /// Porovnáva či sú 2 pointy rovnaké.
         /// </summary>
         /// <param name="obj">Object na test rovnosti</param>
-        /// <returns>True ak sú rovnaké, false ak niesú rovnaké</returns>
+        /// <returns>True ak sú rovnaké, false ak nie sú rovnaké</returns>
         public override bool Equals([NotNullWhen(true)] object? obj) => obj is TestClass && Equals((TestClass)obj);
         public bool Equals(TestClass? other)
         {

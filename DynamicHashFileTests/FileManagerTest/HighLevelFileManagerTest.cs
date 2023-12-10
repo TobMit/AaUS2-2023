@@ -74,7 +74,7 @@ public class HighLevelFileManagerTest
         Assert.True(tmp.CompareTo(tmpPair.Second) == 0);
         Assert.That(tmp.GetRecord(0), Is.EqualTo(testRecord));
         
-        // nový daľší block
+        // nový ďalší block
         Assert.That(_manager.GetBlockCount(), Is.EqualTo(1));
         Assert.That(_manager.BlockUsedCount, Is.EqualTo(1));
         tmpPair = _manager.GetFreeBlock();

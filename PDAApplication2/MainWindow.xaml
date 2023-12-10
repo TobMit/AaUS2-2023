@@ -47,7 +47,7 @@
             </MenuItem>
             <MenuItem Header="Zobraziť vypis štruktúri">
                 <MenuItem 
-                    Header="Nehnutelnosti"
+                    Header="Nehnuteľnosti"
                     Command="{Binding ShowFileNehnutelnostiCommand}"/>
                 <MenuItem
                     Header="Parcely"

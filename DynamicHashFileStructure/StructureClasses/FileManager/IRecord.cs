@@ -7,7 +7,7 @@ public interface IRecord : IComparable
     /// <summary>
     /// Veľkosť záznamu v bajtoch
     /// </summary>
-    /// <returns> veľkosť zázanu v bajtoch</returns>
+    /// <returns> veľkosť záznamu v bajtoch</returns>
     public static abstract int GetSize();
     
     /// <summary>
@@ -17,10 +17,10 @@ public interface IRecord : IComparable
     public byte[] GetBytes();
     
     /// <summary>
-    /// Vytvorí napäť tiredu z poľa bitov ktorá je na disku
+    /// Vytvorí napäť triedu z poľa bitov ktorá je na disku
     /// </summary>
     /// <param name="bytes"> pole bitov ktoré sa načítali zo súboru</param>
-    /// <returns> vytovorený objekt</returns>
+    /// <returns> vytvorený objekt</returns>
     public static abstract object FromBytes(byte[] bytes);
     
     public string ToString();
