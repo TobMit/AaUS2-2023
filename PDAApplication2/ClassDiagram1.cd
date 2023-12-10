@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="PDAApplication2.Core.DataManager.FileManager.DataLoader">
+    <Position X="13" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\DataManager\FileManager\DataLoader.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PDAApplication2.Core.DataManager.FileManager.DataSaver&lt;T&gt;">
+    <Position X="15" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAAAAAAAAAAAAAAAAAQQAAAIAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\DataManager\FileManager\DataSaver.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PDAApplication2.Core.DataManager.DataGenerator">
+    <Position X="15" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACIA=</HashCode>
+      <FileName>Core\DataManager\DataGenerator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PDAApplication2.Core.Constants">
+    <Position X="15" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAIAAAAAAAABAQAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\Constants.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PDAApplication2.Core.ObservableObjects">
+    <Position X="3.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAIAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\ObservableObjects.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PDAApplication2.Core.RelayCommand" BaseTypeListCollapsed="true">
+    <Position X="3.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEACAAQAAECAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\RelayCommand.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="PDAApplication2.Core.Utils">
+    <Position X="15" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAABQAAAIAAAARAAAAAAAAAAAAAAAAAAEAI=</HashCode>
+      <FileName>Core\Utils.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PDAApplication2.MVVM.Model.GPS" BaseTypeListCollapsed="true">
+    <Position X="5.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACEAAAAAgAAAASUgAAAAAQAAEAAAEAAAAAAQAAAYiA=</HashCode>
+      <FileName>MVVM\Model\GPS.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="PDAApplication2.MVVM.Model.ObjectModel">
+    <Position X="7.25" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAiAAEAEATAAAAAAAAAAAQAAAIAEAAAAAAA=</HashCode>
+      <FileName>MVVM\Model\ObjectModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PDAApplication2.MVVM.Model.ObjectModelNehnutelnost">
+    <Position X="6" Y="5.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAABAAASAAAAAAAQAAAAAAEAAAAAAQAAAAAA=</HashCode>
+      <FileName>MVVM\Model\ObjectModelNehnutelnost.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PDAApplication2.MVVM.Model.ObjectModelParcela">
+    <Position X="8.5" Y="5.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAABAAASAAAAAAAQAAAAAAEAAAAAAQAAAAAA=</HashCode>
+      <FileName>MVVM\Model\ObjectModelParcela.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PDAApplication2.MVVM.Model.ObjectModelQuad" BaseTypeListCollapsed="true">
+    <Position X="9" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQQATAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MVVM\Model\ObjectModelQuad.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="PDAApplication2.MVVM.View.AddObject" BaseTypeListCollapsed="true">
+    <Position X="18" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIDQAAiAAAAAQCIAAAAAAwAAgAQQAABgAAAAAAA=</HashCode>
+      <FileName>MVVM\View\AddObject.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="PDAApplication2.MVVM.View.DataGeneratorDialog" BaseTypeListCollapsed="true">
+    <Position X="18" Y="6.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAQBAAAAAAAACIACAAAAAAAAABQAABgAAAAAAA=</HashCode>
+      <FileName>MVVM\View\DataGeneratorDialog.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="PDAApplication2.MVVM.View.EditObject" BaseTypeListCollapsed="true">
+    <Position X="19.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIDQAAiAAAAAQCIAAAAAAwAAgAQQAABgAAAAAAA=</HashCode>
+      <FileName>MVVM\View\EditObject.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="PDAApplication2.MVVM.View.FindObject" BaseTypeListCollapsed="true">
+    <Position X="21.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAAACIAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MVVM\View\FindObject.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="PDAApplication2.MVVM.View.SequeFilePrint" BaseTypeListCollapsed="true">
+    <Position X="21.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MVVM\View\SequeFilePrint.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="PDAApplication2.MVVM.ViewModel.MainViewModel">
+    <Position X="1.25" Y="0.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Properties" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>gCEGIBACBAAZgghAwDAIAgAYA4MgEISBATIfBYAMAKA=</HashCode>
+      <FileName>MVVM\ViewModel\MainViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PDAApplication2.App">
+    <Position X="24.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>App.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PDAApplication2.MainWindow" BaseTypeListCollapsed="true">
+    <Position X="21.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MainWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DynamicHashFileStructure.StructureClasses.LowLevelFileManager">
+    <Position X="31" Y="1.75" Width="2" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="DynamicHashFileStructure.StructureClasses.Block&lt;TData&gt;" BaseTypeListCollapsed="true">
+    <Position X="28.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="DynamicHashFileStructure.StructureClasses.FileManager&lt;TData&gt;">
+    <Position X="28.75" Y="1.75" Width="2" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="DynamicHashFileStructure.StructureClasses.DynamicHashFile&lt;TKey, TData&gt;">
+    <Position X="30.5" Y="5.75" Width="3" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="DynamicHashFileStructure.StructureClasses.HelperClasses.Pair&lt;TFirst, TSecond&gt;">
+    <Position X="13" Y="5.5" Width="1.75" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="DynamicHashFileStructure.StructureClasses.Nodes.Node&lt;TData&gt;">
+    <Position X="24.5" Y="1.5" Width="1.75" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="DynamicHashFileStructure.StructureClasses.Nodes.NodeExtern&lt;TData&gt;">
+    <Position X="23.5" Y="3.5" Width="1.75" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="DynamicHashFileStructure.StructureClasses.Nodes.NodeIntern&lt;TData&gt;">
+    <Position X="25.75" Y="3.5" Width="2" />
+    <TypeIdentifier />
+  </Class>
+  <Interface Name="PDAApplication2.Interface.ISavable">
+    <Position X="13" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Interface\ISavable.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="DynamicHashFileStructure.StructureClasses.IRecord">
+    <Position X="25.25" Y="6.25" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="DynamicHashFileStructure.StructureClasses.IRecordData&lt;T&gt;">
+    <Position X="27" Y="6.25" Width="1.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Enum Name="PDAApplication2.Core.ObjectType">
+    <Position X="13.25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\Constants.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
