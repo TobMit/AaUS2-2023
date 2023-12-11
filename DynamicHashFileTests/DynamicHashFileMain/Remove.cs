@@ -30,6 +30,7 @@ public class Remove
     [Test]
     public void RemoveZosypanie()
     {
+        _dynamicHashFile.PrintFile();
         // hodnoty kľúčov ťahám tak aby som mazal jeden záznam z každého bloku
         Assert.That(_dynamicHashFile.Count, Is.EqualTo(12));
         var tmpRemoved = _dynamicHashFile.Remove(GetFabricedKey(0));
@@ -77,26 +78,47 @@ public class Remove
     public void RemoveZmensovanie()
     {
         Assert.That(_dynamicHashFile.Count, Is.EqualTo(12));
-        //_dynamicHashFile.PrintFile();
+        
+        for (int i = 0; i < 12; i++)
+        {
+            _dynamicHashFile.Insert(GetFabricedKey2(i), new(GetFabricedKey2(i), i));
+        }
+        Console.WriteLine("Pred testom");
+        _dynamicHashFile.PrintFile();
         for (int i = 0; i < 9; i++)
         {
             _dynamicHashFile.Remove(GetFabricedKey(i));
         }
-        Assert.That(_dynamicHashFile.Count, Is.EqualTo(3));
-        _dynamicHashFile.Remove(GetFabricedKey(9));
-        _dynamicHashFile.PrintFile();
-        Assert.That(_dynamicHashFile.Count, Is.EqualTo(2));
-        _dynamicHashFile.Remove(GetFabricedKey(10));
-        Assert.That(_dynamicHashFile.Count, Is.EqualTo(1));
-        _dynamicHashFile.Remove(GetFabricedKey(11));
-        Assert.That(_dynamicHashFile.Count, Is.EqualTo(0));
         
+        for (int i = 0; i < 9; i++)
+        {
+            _dynamicHashFile.Remove(GetFabricedKey2(i));
+        }
+        Console.WriteLine("Po mazaní");
         _dynamicHashFile.PrintFile();
+        Assert.That(_dynamicHashFile.Count, Is.EqualTo(6));
+        _dynamicHashFile.Remove(GetFabricedKey(9));
+        Assert.That(_dynamicHashFile.Count, Is.EqualTo(5));
+        _dynamicHashFile.Remove(GetFabricedKey(10));
+        Assert.That(_dynamicHashFile.Count, Is.EqualTo(4));
+        Console.WriteLine("Tesne pred zmenšením");
+        _dynamicHashFile.PrintFile();
+        _dynamicHashFile.Remove(GetFabricedKey2(11));
+        //_dynamicHashFile.Remove(GetFabricedKey(11));
+        Assert.That(_dynamicHashFile.Count, Is.EqualTo(3));
+        _dynamicHashFile.PrintFile(); // vysledok je viditeľný v debug konozole
     }
 
     private int GetFabricedKey(int i)
     {
         byte[] fabricedBytes = BitConverter.GetBytes(1);
+        fabricedBytes[1] = BitConverter.GetBytes(i)[0];
+        return BitConverter.ToInt32(fabricedBytes);
+    }
+    
+    private int GetFabricedKey2(int i)
+    {
+        byte[] fabricedBytes = BitConverter.GetBytes(2);
         fabricedBytes[1] = BitConverter.GetBytes(i)[0];
         return BitConverter.ToInt32(fabricedBytes);
     }
