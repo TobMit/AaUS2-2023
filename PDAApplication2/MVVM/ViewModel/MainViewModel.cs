@@ -430,10 +430,10 @@ namespace PDAApplication2.MVVM.ViewModel
             {
                 foreach (ObjectModelQuad parcela in tmpListParciel)
                 {
-                    var tmpParcela = (ObjectModelParcela)_dynamicHashFileParcela.Remove(parcela.IdObjektu);
+                    var tmpParcela = (ObjectModelParcela)_dynamicHashFileParcela.Find(parcela.IdObjektu);
                     tmpNehnutelnost.ZoznamObjektov.Add(parcela.IdObjektu);
                     tmpParcela.ZoznamObjektov.Add(tmpNehnutelnost.IdObjektu);
-                    _dynamicHashFileParcela.Insert(tmpParcela.GetKey(), tmpParcela);
+                    _dynamicHashFileParcela.Update(tmpParcela.GetKey(), tmpParcela);
                 }
                 _quadTreeNehnutelnost.Insert(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, tmpQuad);
                 _dynamicHashFileNehnutelnost.Insert(tmpNehnutelnost.GetKey(), tmpNehnutelnost);
@@ -511,10 +511,10 @@ namespace PDAApplication2.MVVM.ViewModel
             {
                 foreach (ObjectModelQuad nehnutelnost in tmpListNehnutelnosti)
                 {
-                    var tmpNehnutelnost = (ObjectModelNehnutelnost)_dynamicHashFileNehnutelnost.Remove(nehnutelnost.IdObjektu);
+                    var tmpNehnutelnost = (ObjectModelNehnutelnost)_dynamicHashFileNehnutelnost.Find(nehnutelnost.IdObjektu);
                     tmpNehnutelnost.ZoznamObjektov.Add(tmpParcela.IdObjektu);
                     tmpParcela.ZoznamObjektov.Add(tmpNehnutelnost.IdObjektu);
-                    _dynamicHashFileNehnutelnost.Insert(tmpNehnutelnost.GetKey(), tmpNehnutelnost);
+                    _dynamicHashFileNehnutelnost.Update(tmpNehnutelnost.GetKey(), tmpNehnutelnost);
                 }
                 _quadTreeParcela.Insert(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y, tmpQuad);
                 _dynamicHashFileParcela.Insert(tmpParcela.GetKey(), tmpParcela);
@@ -561,10 +561,10 @@ namespace PDAApplication2.MVVM.ViewModel
             // skontrolujeme či sa zmenili gps súradnice
             if (dlgGpsOriginal1 == dlgGps1 && dlgGpsOriginal2 == dlgGps2)
             {
-                var toUpdateNehnutelnost = _dynamicHashFileNehnutelnost.Remove(objectModel.IdObjektu);
+                var toUpdateNehnutelnost = _dynamicHashFileNehnutelnost.Find(objectModel.IdObjektu);
                 toUpdateNehnutelnost.Popis = popis;
                 toUpdateNehnutelnost.SupisneCislo = supisneCislo;
-                _dynamicHashFileNehnutelnost.Insert(toUpdateNehnutelnost.GetKey(), toUpdateNehnutelnost);
+                _dynamicHashFileNehnutelnost.Update(toUpdateNehnutelnost.GetKey(), toUpdateNehnutelnost);
                 return;
             }
             // zmenili sa skontrolujeme či sú nové súradnice ok
@@ -617,9 +617,9 @@ namespace PDAApplication2.MVVM.ViewModel
 
                 foreach (int tmpID in objectModel.ZoznamObjektov)
                 {
-                    var tmpParcela = _dynamicHashFileParcela.Remove(tmpID);
+                    var tmpParcela = _dynamicHashFileParcela.Find(tmpID);
                     tmpParcela.ZoznamObjektov.Remove(objectModel.IdObjektu);
-                    _dynamicHashFileParcela.Insert(tmpParcela.IdObjektu, tmpParcela);
+                    _dynamicHashFileParcela.Update(tmpParcela.IdObjektu, tmpParcela);
                 }
 
                 // potrebujem si to aj v strome upraviť
@@ -634,10 +634,10 @@ namespace PDAApplication2.MVVM.ViewModel
                 tmpListParciel = _quadTreeParcela.FindIntervalOverlapping(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y);
                 foreach (ObjectModelQuad parcela in tmpListParciel)
                 {
-                    var tmpParcela = (ObjectModelParcela)_dynamicHashFileParcela.Remove(parcela.IdObjektu);
+                    var tmpParcela = (ObjectModelParcela)_dynamicHashFileParcela.Find(parcela.IdObjektu);
                     updatedNehnutelnost.ZoznamObjektov.Add(parcela.IdObjektu);
                     tmpParcela.ZoznamObjektov.Add(updatedNehnutelnost.IdObjektu);
-                    _dynamicHashFileParcela.Insert(tmpParcela.GetKey(), tmpParcela);
+                    _dynamicHashFileParcela.Update(tmpParcela.GetKey(), tmpParcela);
                 }
                 _dynamicHashFileNehnutelnost.Insert(updatedNehnutelnost.GetKey(), updatedNehnutelnost);
             }
@@ -682,9 +682,9 @@ namespace PDAApplication2.MVVM.ViewModel
             // skontrolujeme či sa zmenili gps súradnice
             if (dlgGpsOriginal1 == dlgGps1 && dlgGpsOriginal2 == dlgGps2)
             {
-                var toUpdateParcela = _dynamicHashFileParcela.Remove(objectModel.IdObjektu);
+                var toUpdateParcela = _dynamicHashFileParcela.Find(objectModel.IdObjektu);
                 toUpdateParcela.Popis = popis;
-                _dynamicHashFileParcela.Insert(toUpdateParcela.GetKey(), toUpdateParcela);
+                _dynamicHashFileParcela.Update(toUpdateParcela.GetKey(), toUpdateParcela);
                 return;
             }
             // zmenili sa skontrolujeme či sú nové súradnice ok
@@ -737,9 +737,9 @@ namespace PDAApplication2.MVVM.ViewModel
 
                 foreach (int tmpID in objectModel.ZoznamObjektov)
                 {
-                    var tmpNehnutelnost = _dynamicHashFileNehnutelnost.Remove(tmpID);
+                    var tmpNehnutelnost = _dynamicHashFileNehnutelnost.Find(tmpID);
                     tmpNehnutelnost.ZoznamObjektov.Remove(objectModel.IdObjektu);
-                    _dynamicHashFileNehnutelnost.Insert(tmpNehnutelnost.IdObjektu, tmpNehnutelnost);
+                    _dynamicHashFileNehnutelnost.Update(tmpNehnutelnost.IdObjektu, tmpNehnutelnost);
                 }
 
                 // potrebujem si to aj v strome upraviť
@@ -754,10 +754,10 @@ namespace PDAApplication2.MVVM.ViewModel
                 tmpListNehnutelnosti = _quadTreeNehnutelnost.FindIntervalOverlapping(checkedGps1.X, checkedGps1.Y, checkedGps2.X, checkedGps2.Y);
                 foreach (ObjectModelQuad nehnutelnost in tmpListNehnutelnosti)
                 {
-                    var tmpNehnutelnost = (ObjectModelNehnutelnost)_dynamicHashFileNehnutelnost.Remove(nehnutelnost.IdObjektu);
+                    var tmpNehnutelnost = (ObjectModelNehnutelnost)_dynamicHashFileNehnutelnost.Find(nehnutelnost.IdObjektu);
                     updatedParcela.ZoznamObjektov.Add(nehnutelnost.IdObjektu);
                     tmpNehnutelnost.ZoznamObjektov.Add(updatedParcela.IdObjektu);
-                    _dynamicHashFileNehnutelnost.Insert(tmpNehnutelnost.GetKey(), tmpNehnutelnost);
+                    _dynamicHashFileNehnutelnost.Update(tmpNehnutelnost.GetKey(), tmpNehnutelnost);
                 }
                 _dynamicHashFileParcela.Insert(updatedParcela.GetKey(), updatedParcela);
             }
@@ -781,9 +781,9 @@ namespace PDAApplication2.MVVM.ViewModel
 
             foreach (int tmpID in objectModel.ZoznamObjektov)
             {
-                var tmpParcela = _dynamicHashFileParcela.Remove(tmpID);
+                var tmpParcela = _dynamicHashFileParcela.Find(tmpID);
                 tmpParcela.ZoznamObjektov.Remove(objectModel.IdObjektu);
-                _dynamicHashFileParcela.Insert(tmpParcela.IdObjektu, tmpParcela);
+                _dynamicHashFileParcela.Update(tmpParcela.IdObjektu, tmpParcela);
             }
 
             GPS checkedGps1 = new GPS();
@@ -807,9 +807,9 @@ namespace PDAApplication2.MVVM.ViewModel
 
             foreach (int tmpID in objectModel.ZoznamObjektov)
             {
-                var tmpParcela = _dynamicHashFileNehnutelnost.Remove(tmpID);
+                var tmpParcela = _dynamicHashFileNehnutelnost.Find(tmpID);
                 tmpParcela.ZoznamObjektov.Remove(objectModel.IdObjektu);
-                _dynamicHashFileNehnutelnost.Insert(tmpParcela.IdObjektu, tmpParcela);
+                _dynamicHashFileNehnutelnost.Update(tmpParcela.IdObjektu, tmpParcela);
             }
 
             GPS checkedGps1 = new GPS();
