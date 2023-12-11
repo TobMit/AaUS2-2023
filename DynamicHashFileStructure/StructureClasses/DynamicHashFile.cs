@@ -227,8 +227,9 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                             var listRecordov = block.GetArrayRecords();
                             block.ClearRecords();
                             externNode.CountPrimaryData = 0;
-                            // zapíšem tento prázdny blok do súboru
-                            _fileManager.WriteBlock(externNode.Address, block);
+                            // zmažem tento blok
+                            _fileManager.RemoveBlock(externNode.Address);
+                            externNode.Address = -1;
                             foreach (var record in listRecordov)
                             {
                                 stackData.Push(new(record.GetKey(), record));
@@ -252,9 +253,6 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                             {
                                 parent.RightSon = tmpNode;
                             }
-                            // zamažem voľný blok
-                            _fileManager.RemoveBlock(externNode.Address);
-                            externNode.Address = -1;
                         }
                     }
                 }
@@ -506,6 +504,7 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                 block.ClearRecords();
                 int current = block.NextDataBlock;
                 _fileManager.RemoveBlock(lastNode.Address);
+                lastNode.Address = -1;
                 
                 while (current >= 0)
                 {
@@ -528,8 +527,8 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                     // iba ak máme čo zapisovať
                     if (tmpData.Count > 0)
                     {
-                        tmpPair.Second.AddRecord(tmpData[tmpData.Count - 1]);
-                        tmpData.RemoveAt(tmpData.Count - 1);
+                        tmpPair.Second.AddRecord(tmpData[0]);
+                        tmpData.RemoveAt(0);
                         lastNode.CountPrimaryData++;
                     }
                     else
@@ -550,8 +549,8 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
                             // iba ak máme čo zapisovať
                             if (tmpData.Count > 0)
                             {
-                                tmpPairPreplnovak.Second.AddRecord(tmpData[tmpData.Count - 1]);
-                                tmpData.RemoveAt(tmpData.Count - 1);
+                                tmpPairPreplnovak.Second.AddRecord(tmpData[0]);
+                                tmpData.RemoveAt(0);
                                 lastNode.CountPreplnovaciData++;
                             }
                             else

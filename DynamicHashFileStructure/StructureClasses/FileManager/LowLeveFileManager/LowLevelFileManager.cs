@@ -222,4 +222,21 @@ public class LowLevelFileManager
         return GetAddress(index);
     }
     
+    public void SetSize(int size)
+    {
+        if (_fileStream is not null)
+        {
+            _fileStream.SetLength(size);
+            if (size == 0)
+            {
+                BlockCount = 0;
+            }
+            else
+            {
+                BlockCount = (int) (_fileStream.Length / _blockSize);
+            }
+        }
+        
+    }
+    
 }

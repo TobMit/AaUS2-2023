@@ -41,10 +41,7 @@ public class Program
 
         public static byte[] GetBytesForHash(int key)
         {
-            // aby som nemal konflikty pri hashovani
-            // return BitConverter.GetBytes(key % 7919);
             return BitConverter.GetBytes(key % 503);
-            // return BitConverter.GetBytes(key % 19);
         }
 
         public int GetKey()
@@ -60,7 +57,6 @@ public class Program
         }
     }
     
-    private static bool PARALLEL = false;
     private static bool SAVETEST = true;
     private static int MAX_UNITS = 200000;
     private static int MAX_TEST = 100000;
@@ -70,41 +66,17 @@ public class Program
     
     private static int latestLowest = int.MaxValue;
     private static int seed = 0;
-    private static int maxSeed = 1;
-    //private static int maxSeed = int.MaxValue;
+    private static int maxSeed = 5;
     public static void Main(string[] args)
     {
-        if (PARALLEL)
+        for (int i = seed; i < maxSeed; i++)
         {
-            Parallel.For(seed, maxSeed, (iSeed) =>
-            {
-                try
-                {
-                    int result = TestInstance(iSeed);
-                    if (result < 30)
-                    {
-                        Console.WriteLine($"Nájdený SEED: {iSeed}");
-                        return;
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine($"---------------------------Error v seede: {iSeed} \n {e.Message}");
-                    return;
-                }
-            });
-        }
-        else
-        {
-            for (int i = seed; i < maxSeed; i++)
-            {
-                latestLowest = TestInstance(i);
+            latestLowest = TestInstance(i);
 
-                if (latestLowest <= 30)
-                {
-                    Console.WriteLine($"Nájdený SEED: {i}");
-                    return;
-                }
+            if (latestLowest <= 30)
+            {
+                Console.WriteLine($"Nájdený SEED: {i}");
+                return;
             }
         }
     }

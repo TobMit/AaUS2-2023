@@ -299,6 +299,11 @@ public class FileManager<TData> where TData : IRecord
             _firstFreeBlock = int.Parse(sr.ReadLine()!);
             _lastFreeBlock = int.Parse(sr.ReadLine()!);
         }
+
+        if (_blockTotalCount == 0)
+        {
+            _lowLevelFileManager.SetSize(0);
+        }
     }
     
 }

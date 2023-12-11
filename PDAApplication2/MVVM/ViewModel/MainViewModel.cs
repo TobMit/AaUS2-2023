@@ -836,12 +836,15 @@ namespace PDAApplication2.MVVM.ViewModel
 
 
             DataSaver<ObjectModelQuad> saverNehnutelnosti = new();
-            saverNehnutelnosti.AddLine(_quadTreeNehnutelnost.OriginalPointDownLeft.X + ";" + _quadTreeNehnutelnost.OriginalPointDownLeft.Y + ";" + _quadTreeNehnutelnost.OriginalPointUpRight.X + ";" + _quadTreeNehnutelnost.OriginalPointUpRight.Y + "\n");
+            saverNehnutelnosti.AddLine(_quadTreeNehnutelnost.OriginalPointDownLeft.X + ";" +
+                                       _quadTreeNehnutelnost.OriginalPointDownLeft.Y + ";" +
+                                       _quadTreeNehnutelnost.OriginalPointUpRight.X + ";" +
+                                       _quadTreeNehnutelnost.OriginalPointUpRight.Y + ";" + Constants.IdObjektu + "\n");
             saverNehnutelnosti.PrepareForSave(_quadTreeNehnutelnost.ToList());
             saverNehnutelnosti.SaveData("quadDataNehnutelnosti.csv");
 
             DataSaver<ObjectModelQuad> saverParcely = new();
-            saverParcely.AddLine(_quadTreeParcela.OriginalPointDownLeft.X + ";" + _quadTreeParcela.OriginalPointDownLeft.Y + ";" + _quadTreeParcela.OriginalPointUpRight.X + ";" + _quadTreeParcela.OriginalPointUpRight.Y + "\n");
+            saverParcely.AddLine(_quadTreeParcela.OriginalPointDownLeft.X + ";" + _quadTreeParcela.OriginalPointDownLeft.Y + ";" + _quadTreeParcela.OriginalPointUpRight.X + ";" + _quadTreeParcela.OriginalPointUpRight.Y + ";" + Constants.IdObjektu + "\n");
             saverParcely.PrepareForSave(_quadTreeParcela.ToList());
             saverParcely.SaveData("quadDataParcely.csv");
 

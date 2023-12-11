@@ -45,6 +45,7 @@ namespace PDAApplication2.Core.DataManager.FileManager
                     var gps2 = new GPS(double.Parse(values[2]), double.Parse(values[3]));
                     var sirka = Math.Abs(gps2.X - gps1.X);
                     var dlzka = Math.Abs(gps2.Y - gps1.Y);
+                    Constants.IdObjektu = int.Parse(values[4]);
 
                     quadTree = new QuadTree<int, ObjectModelQuad>(gps1.X, gps1.Y, sirka, dlzka);
                 }
