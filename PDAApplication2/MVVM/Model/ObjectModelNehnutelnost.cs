@@ -120,7 +120,7 @@ public class ObjectModelNehnutelnost : ObjectModel, IRecordData<int>
     public static byte[] GetBytesForHash(int key)
     {
         //return BitConverter.GetBytes(key % 503);
-        return BitConverter.GetBytes(key % 19);
+        return BitConverter.GetBytes(key % 4);
     }
 
     public int GetKey()
