@@ -94,10 +94,10 @@ namespace PDAApplication2.Core.DataManager
                 {
                     foreach (ObjectModelQuad parcela in tmpListParciel)
                     {
-                        var tmpParcela = (ObjectModelParcela) dhfParcely.Remove(parcela.IdObjektu);
+                        var tmpParcela = (ObjectModelParcela) dhfParcely.Find(parcela.IdObjektu);
                         tmpDHFNehnutelnost.ZoznamObjektov.Add(parcela.IdObjektu);
                         tmpParcela.ZoznamObjektov.Add(tmpNehnutelnost.IdObjektu);
-                        dhfParcely.Insert(tmpParcela.GetKey(), tmpParcela);
+                        dhfParcely.Update(tmpParcela.GetKey(), tmpParcela);
                     }
 
                     nehnutelnostiQuadTree.Insert(tmpGps1.X, tmpGps1.Y, tmpGps2.X, tmpGps2.Y, tmpNehnutelnost);

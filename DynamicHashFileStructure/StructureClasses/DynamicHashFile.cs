@@ -729,6 +729,140 @@ public class DynamicHashFile<TKey, TData> where TData : IRecordData<TKey>
         return returnData;
     }
     
+    /// <summary>
+    /// Upraví dáta v štruktúre
+    /// </summary>
+    /// <param name="key">Kľúč ktorý sa používa pri hľadaní a následnom mazaní</param>
+    /// <returns>Vymazané dáta</returns>
+    /// <exception cref="ArgumentException">Ak sa mazaný záznam nenašiel</exception>
+    public void Update(TKey key, TData data)
+    {
+        
+        TData returnData = default;
+        Pair<int, Block<TData>> returnDPair = default;
+        
+        BitArray bitArray = new(TData.GetBytesForHash(key));
+        int index = 0;
+
+        bool primary = true;
+
+        NodeExtern<TData>? lastNode = null;
+        
+        Stack<Node<TData>> stackNode = new();
+        stackNode.Push(_root);
+        while (stackNode.Count > 0)
+        {
+            var node = stackNode.Pop();
+            if (node.GetType() == typeof(NodeIntern<TData>))
+            {
+                var internNode = (NodeIntern<TData>) node;
+                if (!bitArray[index])
+                {
+                    if (internNode.LeftSon is null)
+                    {
+                        throw new ArgumentException("Nenašiel sa záznam");
+                    }
+                    stackNode.Push(internNode.LeftSon);
+                    index++;
+                }
+                else
+                {
+                    if (internNode.RightSon is null)
+                    {
+                        throw new ArgumentException("Nenašiel sa záznam");
+                    }
+                    stackNode.Push(internNode.RightSon);
+                    index++;
+                }
+            }
+            // Ak je externý
+            else
+            {
+                var externNode = (NodeExtern<TData>) node;
+                lastNode = externNode;
+                if (externNode.Address < 0)
+                {
+                    throw new ArgumentException("Nenašiel sa záznam");
+                }
+                var block = _fileManager.GetBlock(externNode.Address);
+                // prejdem všetky dáta v bloku
+                for (int i = 0; i < block.Count(); i++)
+                {
+                    // skontrolujem či je to to čo hľadám
+                    if (block.GetRecord(i).CompareTo(key) == 0)
+                    {
+                        // ak áno tak vrátim
+                        returnData = block.GetRecord(i);
+                        returnDPair = new Pair<int, Block<TData>>(externNode.Address, block);
+                        primary = true;
+                        break;
+                    }
+                }
+                
+                // ak sa nenašiel v hlavnom bloku tak idem do preplňujúceho ak existuje
+                if (externNode.CountPreplnovaciBlock > 0 && returnData is null)
+                {
+                    int current = block.NextDataBlock;
+                    while (current >= 0)
+                    {
+                        // načítam blok a skontrolujem dáta vňom
+                        block = _filePreplnovaciManager.GetBlock(current);
+                        for (int i = 0; i < block.Count(); i++)
+                        {
+                            if (block.GetRecord(i).CompareTo(key) == 0)
+                            {
+                                // ak áno tak vrátim
+                                returnData = block.GetRecord(i);
+                                returnDPair = new Pair<int, Block<TData>>(current, block);
+                                primary = false;
+                                current = -1; // aby sa ukončil cyklus
+                                break;
+                            }
+                        }
+                        // ak je stále return data null, to znamená že som stále nenašiel záznam a musím pokračovať ďalším preplňujúcim blokom
+                        if (returnData is null)
+                        {
+                            current = block.NextDataBlock;
+                        }
+                    }
+                }
+            }
+        }
+        
+        
+        // ak som nenašiel tak hodím exception
+        if (returnData is null || returnDPair is null)
+        {
+            throw new ArgumentException("Nenašiel sa záznam");
+        }
+
+        if (returnData.CompareTo(data.GetKey()) != 0)
+        {
+            throw new ArgumentException("Nenašiel sa záznam");
+        }
+        
+        for (int i = 0; i < returnDPair.Second.Count(); i++)
+        {
+            if (returnDPair.Second.GetRecord(i).CompareTo(key) == 0)
+            {
+                // ak áno tak vrátim
+                returnDPair.Second.RemoverRecord(i);
+                returnDPair.Second.AddRecord(data);
+                if (primary)
+                {
+                    _fileManager.WriteBlock(returnDPair.First, returnDPair.Second);
+                }
+                else
+                {
+                    _filePreplnovaciManager.WriteBlock(returnDPair.First, returnDPair.Second);
+                }
+                break;
+            }
+        }
+        
+        
+    }
+    
     public void CloseFile()
     {
         _fileManager.CloseFile();
