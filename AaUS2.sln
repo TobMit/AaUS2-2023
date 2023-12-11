@@ -3,19 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AaUS2", "AaUS2\AaUS2.csproj", "{C95D7422-4EB2-4DD7-8351-F1602B3EC56C}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Quadtree", "Quadtree\Quadtree.csproj", "{EDB67729-A5BB-4AFC-ACC4-D564DDAD5B22}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuadTreeTests", "QuadTreeTests\QuadTreeTests.csproj", "{E41D6857-84AD-45E6-82D5-B73B6E4F6DFC}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PDAAplication", "PDAAplication\PDAAplication.csproj", "{C6B1F375-1C36-49C5-9FDD-14DC8DA0DC72}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DynamicHashFileStructure", "DynamicHashFileStructure\DynamicHashFileStructure.csproj", "{7947CC33-5C5B-4F78-BC7E-F083ACDBD3F2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DynamicHashFileTests", "DynamicHashFileTests\DynamicHashFileTests.csproj", "{667B7D39-C269-4DBD-A8BA-D5F0C5A1596A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PDAApplication2", "PDAApplication2\PDAApplication2.csproj", "{0DA7AF39-CA61-4ADA-BE53-2712C1268E68}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PDAApplication2", "PDAApplication2\PDAApplication2.csproj", "{0DA7AF39-CA61-4ADA-BE53-2712C1268E68}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +19,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C95D7422-4EB2-4DD7-8351-F1602B3EC56C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C95D7422-4EB2-4DD7-8351-F1602B3EC56C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C95D7422-4EB2-4DD7-8351-F1602B3EC56C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C95D7422-4EB2-4DD7-8351-F1602B3EC56C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EDB67729-A5BB-4AFC-ACC4-D564DDAD5B22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EDB67729-A5BB-4AFC-ACC4-D564DDAD5B22}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EDB67729-A5BB-4AFC-ACC4-D564DDAD5B22}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -35,10 +27,6 @@ Global
 		{E41D6857-84AD-45E6-82D5-B73B6E4F6DFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E41D6857-84AD-45E6-82D5-B73B6E4F6DFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E41D6857-84AD-45E6-82D5-B73B6E4F6DFC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C6B1F375-1C36-49C5-9FDD-14DC8DA0DC72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C6B1F375-1C36-49C5-9FDD-14DC8DA0DC72}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C6B1F375-1C36-49C5-9FDD-14DC8DA0DC72}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C6B1F375-1C36-49C5-9FDD-14DC8DA0DC72}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7947CC33-5C5B-4F78-BC7E-F083ACDBD3F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7947CC33-5C5B-4F78-BC7E-F083ACDBD3F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7947CC33-5C5B-4F78-BC7E-F083ACDBD3F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
